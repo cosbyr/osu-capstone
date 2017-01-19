@@ -22,15 +22,14 @@ def fill_document(doc):
 def renderIndex():
 	doc = Document('basic')
 	fill_document(doc)
-
-	doc.generate_pdf(filepath='basic',clean_tex=False)
+	doc.generate_pdf(clean_tex=False)
 	return render_template('index.html')
 
 @app.errorhandler(500)
 def server_error(e):
     # Log the error and stacktrace.
     logging.exception('An error occurred during a request.')
-    return 'An internal error occurred.', 500
+    return 'An internal error occurred: ' + str(e), 500
 
 if __name__ == "__main__":
     app.run()
