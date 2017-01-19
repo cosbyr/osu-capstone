@@ -8,3 +8,5 @@ future==0.16.0
 ordered-set==2.0.1
 PyLaTeX==1.1.1
 gunicorn==19.6.0
+latexmk.py==0.4
+latexpages==0.6
