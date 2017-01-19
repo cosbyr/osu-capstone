@@ -3,7 +3,7 @@ from flask import Flask, render_template
 app = Flask(__name__)
 
 
-@app.route('/')
+@app.route('osu-capstone.herokuapp.com')
 def renderIndex():
 	return render_template('index.html')
 
