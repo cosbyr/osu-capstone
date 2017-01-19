@@ -1,6 +1,9 @@
+click==6.7
 Flask==0.12
 itsdangerous==0.24
-Jinja2==2.8
-Werkzeug==0.11.11
-gunicorn==19.6.0
+Jinja2==2.9.4
+MarkupSafe==0.23
+Werkzeug==0.11.15
+future==0.16.0
+ordered-set==2.0.1
 PyLaTeX==1.1.1

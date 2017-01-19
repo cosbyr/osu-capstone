@@ -1,7 +1,9 @@
+from __future__ import print_function #debug
+import sys,os #debug
 import logging
 from flask import Flask, render_template
 from pylatex import Document, Section, Subsection, Command
-from pylatex.utils import italic, NoEscape
+from pylatex.utils import italic, NoEscape, make_temp_dir
 
 app = Flask(__name__)
 
@@ -20,9 +22,13 @@ def fill_document(doc):
 			
 @app.route('/')
 def renderIndex():
-	doc = Document('basic')
+	fp = make_temp_dir()
+	print(str(fp), file=sys.stderr)
+	doc = Document('test')
 	fill_document(doc)
-	doc.generate_pdf(clean_tex=False)
+	doc.generate_tex()
+	
+	#doc.generate_pdf(filepath='test',clean=False,clean_tex=False)
 	return render_template('index.html')
 
 @app.errorhandler(500)
