@@ -23,7 +23,7 @@ def fill_document(doc):
 @app.route('/')
 def renderIndex():
 	#print('FILEPATH----->' + str(fp), file=sys.stderr)
-	fp = './tmp/test'
+	fp = './static/test'
 	doc = Document(fp)
 	fill_document(doc)
 	doc.generate_tex()
