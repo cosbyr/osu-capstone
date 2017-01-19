@@ -22,11 +22,11 @@ def fill_document(doc):
 			
 @app.route('/')
 def renderIndex():
-	fp = make_temp_dir()
-	print(fp, file=sys.stderr)
-	#doc = Document('test')
-	#fill_document(doc)
-	#doc.generate_tex()
+	#fp = make_temp_dir()
+	#print(fp, file=sys.stderr)
+	doc = Document('test')
+	fill_document(doc)
+	doc.generate_tex()
 	
 	#doc.generate_pdf(filepath='test',clean=False,clean_tex=False)
 	return render_template('index.html')
