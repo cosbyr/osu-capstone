@@ -21,9 +21,9 @@ def fill_document(doc):
 @app.route('/')
 def renderIndex():
 	doc = Document('basic')
-	fill_document(filepath='/tmp/pylatex/basic')
+	fill_document(doc)
 
-	doc.generate_pdf(clean_tex=False)
+	doc.generate_pdf(filepath='/tmp/pylatex/basic',clean_tex=False)
 	return render_template('index.html')
 
 @app.errorhandler(500)
