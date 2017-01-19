@@ -22,13 +22,12 @@ def fill_document(doc):
 			
 @app.route('/')
 def renderIndex():
-	fp = make_temp_dir()
-	print('FILEPATH----->' + str(fp), file=sys.stderr)
+	#print('FILEPATH----->' + str(fp), file=sys.stderr)
 	doc = Document('test')
 	fill_document(doc)
 	doc.generate_tex()
 	
-	#doc.generate_pdf(filepath='test',clean=False,clean_tex=False)
+	#doc.generate_pdf(filepath='/tmp/pylatex/test')
 	return render_template('index.html')
 
 @app.errorhandler(500)
