@@ -22,7 +22,7 @@ def fill_document(doc):
 			
 @app.route('/')
 def renderIndex():
-	'''
+	
 	fp = './basic'
 	doc = Document(fp)
 	fill_document(doc)
@@ -36,7 +36,7 @@ def renderIndex():
 		print('!!!FOUND PDF!!!',file=sys.stderr)
 	else:
 		print('NO PDF!!!',file=sys.stderr)
-	'''
+	
 	return render_template('index.html')
 
 @app.errorhandler(500)
