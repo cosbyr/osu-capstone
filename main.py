@@ -23,9 +23,14 @@ def fill_document(doc):
 @app.route('/')
 def renderIndex():
 	#print('FILEPATH----->' + str(fp), file=sys.stderr)
-	doc = Document('/app/test')
+	fp = '~/test'
+	doc = Document(fp)
 	fill_document(doc)
 	doc.generate_tex()
+	if os.path.exists(fp) == True:
+		print('FOUND FILE!!!',file=sys.stderr)
+	else:
+		print('NO FILE!!!',file=sys.stderr)
 	
 	#doc.generate_pdf(filepath='/tmp/pylatex/test')
 	return render_template('index.html')
