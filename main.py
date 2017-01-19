@@ -2,8 +2,9 @@ from __future__ import print_function #debug
 import sys,os #debug
 import logging
 from flask import Flask, render_template
-from pylatex import Document, Section, Subsection, Command
-from pylatex.utils import italic, NoEscape, make_temp_dir
+from latex import build_pdf
+#from pylatex import Document, Section, Subsection, Command
+#from pylatex.utils import italic, NoEscape
 
 app = Flask(__name__)
 
@@ -22,8 +23,16 @@ def fill_document(doc):
 			
 @app.route('/')
 def renderIndex():
-	
-	fp = './basic'
+	min_latex = (r"\documentclass{article}"
+             r"\begin{document}"
+             r"Hello, world!"
+             r"\end{document}")
+	# this builds a pdf-file inside a temporary directory
+	pdf = build_pdf(min_latex)
+
+	# look at the first few bytes of the header
+	print(bytes(pdf)[:10],file=sys.stderr)
+	'''fp = './basic'
 	doc = Document(fp)
 	fill_document(doc)
 	if os.path.exists('./basic.tex') == True:
@@ -36,7 +45,7 @@ def renderIndex():
 		print('FOUND PDF!!!',file=sys.stderr)
 	else:
 		print('NO PDF!!!',file=sys.stderr)
-	
+	'''
 	return render_template('index.html')
 
 @app.errorhandler(500)
