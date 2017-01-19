@@ -28,7 +28,7 @@ def renderIndex():
 	fill_document(doc)
 	doc.generate_tex()
 	if os.path.exists(fp) == True:
-		print('FOUND FILE!!!',file=sys.stderr)
+		print('!!!FOUND FILE!!!',file=sys.stderr)
 	else:
 		print('NO FILE!!!',file=sys.stderr)
 	
