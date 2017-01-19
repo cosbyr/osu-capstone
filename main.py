@@ -27,13 +27,13 @@ def renderIndex():
 	doc = Document(fp)
 	fill_document(doc)
 	if os.path.exists('./basic.tex') == True:
-		print('!!!FOUND FILE!!!',file=sys.stderr)
+		print('FOUND FILE!!!',file=sys.stderr)
 	else:
 		print('NO FILE!!!',file=sys.stderr)
 		
 	doc.generate_pdf(filepath='./basic',clean_tex=False)
 	if os.path.exists('./basic.pdf') == True:
-		print('!!!FOUND PDF!!!',file=sys.stderr)
+		print('FOUND PDF!!!',file=sys.stderr)
 	else:
 		print('NO PDF!!!',file=sys.stderr)
 	
