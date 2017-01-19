@@ -31,7 +31,7 @@ def renderIndex():
 	pdf = build_pdf(min_latex)
 
 	# look at the first few bytes of the header
-	print(bytes(pdf)[:10],file=sys.stderr)
+	print('HERE!!! ' + bytes(pdf)[:10],file=sys.stderr)
 	'''fp = './basic'
 	doc = Document(fp)
 	fill_document(doc)
