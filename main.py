@@ -20,7 +20,7 @@ def fill_document(doc):
 			
 @app.route('/')
 def renderIndex():
-	doc = Document('tmp/basic')
+	doc = Document()
 	fill_document(doc)
 
 	doc.generate_pdf(clean_tex=False)
