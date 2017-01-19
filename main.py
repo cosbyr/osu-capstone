@@ -26,13 +26,16 @@ def renderIndex():
 	fp = './test'
 	doc = Document(fp)
 	fill_document(doc)
-	#doc.generate_tex()
+	doc.generate_tex()
 	if os.path.exists('./test.tex') == True:
 		print('!!!FOUND FILE!!!',file=sys.stderr)
 	else:
 		print('NO FILE!!!',file=sys.stderr)
-	
-	doc.generate_pdf(filepath='./test.pdf')
+	doc.generate_pdf()
+	if os.path.exists('./test.pdf') == True:
+		print('!!!FOUND PDF!!!',file=sys.stderr)
+	else:
+		print('NO PDF!!!',file=sys.stderr)
 	return render_template('index.html')
 
 @app.errorhandler(500)
