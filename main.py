@@ -26,13 +26,13 @@ def renderIndex():
 	fp = './test'
 	doc = Document(fp)
 	fill_document(doc)
-	doc.generate_tex()
+	#doc.generate_tex()
 	if os.path.exists('./test.tex') == True:
 		print('!!!FOUND FILE!!!',file=sys.stderr)
 	else:
 		print('NO FILE!!!',file=sys.stderr)
 	
-	#doc.generate_pdf(filepath='/tmp/pylatex/test')
+	doc.generate_pdf(filepath='./test.pdf')
 	return render_template('index.html')
 
 @app.errorhandler(500)
