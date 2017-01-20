@@ -1,7 +1,7 @@
 from __future__ import print_function #debug
 import sys,os #debug
 import logging
-from flask import Flask, render_template
+from flask import Flask, render_template, send_file
 from latex import build_pdf
 import smtplib
 from email.mime.text import MIMEText
