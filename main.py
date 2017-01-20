@@ -3,13 +3,14 @@ import sys,os #debug
 import logging
 from flask import Flask, render_template, send_file
 from latex import build_pdf
-import smtplib
-from email.mime.text import MIMEText
+#import smtplib
+#from email.mime.text import MIMEText
 #from pylatex import Document, Section, Subsection, Command
 #from pylatex.utils import italic, NoEscape
 
 app = Flask(__name__)
 
+'''
 def fill_document(doc):
     """Add a section, a subsection and some text to the document.
 
@@ -22,6 +23,7 @@ def fill_document(doc):
 
         with doc.create(Subsection('A subsection')):
             doc.append('Also some crazy characters: $&#{}')
+'''
 			
 @app.route('/')
 def renderIndex():
@@ -37,8 +39,7 @@ def renderIndex():
 	else:
 		print('NO FILE!!!',file=sys.stderr)
 		
-	with open('./test.pdf', 'rb') as static_file:
-		return send_file(static_file, attachment_filename='test.pdf')
+	return send_file('./test.pdf')
 	'''fp = './basic'
 	doc = Document(fp)
 	fill_document(doc)
