@@ -21,11 +21,11 @@ def renderIndex():
 	if os.path.exists('./test.pdf') == True:
 		print('FOUND FILE!!!',file=sys.stderr)
 	else:
-		print('NO FILE!!!',file=sys.stderr)
+		print('NO FILE!!!',file=sys.stderr)'''
 		
 	return send_file('./test.pdf')
 	
-	#return render_template('index.html')'''
+	#return render_template('index.html')
 
 @app.errorhandler(500)
 def server_error(e):
