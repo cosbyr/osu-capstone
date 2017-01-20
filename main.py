@@ -15,10 +15,10 @@ def renderIndex():
 
 @app.route('/latex')
 def renderPDF():
-		#just a test. changes will be made to this when we have a better idea how this function should... uh, function
-		filename = 'test'
-		pdf = texHandler.genAward(filename)
-		return send_file(pdf)
+	#just a test. changes will be made to this when we have a better idea how this function should... uh, function
+	filename = 'test'
+	pdf = texHandler.genAward(filename)
+	return send_file(pdf)
 
 @app.errorhandler(500)
 def server_error(e):
