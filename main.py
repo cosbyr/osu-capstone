@@ -29,9 +29,11 @@ def renderIndex():
              r"\end{document}")
 	# this builds a pdf-file inside a temporary directory
 	pdf = build_pdf(min_latex)
-
-	# look at the first few bytes of the header
-	print('HERE!!! ' + bytes(pdf)[:10],file=sys.stderr)
+	pdf.save_to('./test.pdf')
+	if os.path.exists('./test.pdf') == True:
+		print('FOUND FILE!!!',file=sys.stderr)
+	else:
+		print('NO FILE!!!',file=sys.stderr)
 	'''fp = './basic'
 	doc = Document(fp)
 	fill_document(doc)
