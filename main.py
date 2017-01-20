@@ -14,7 +14,7 @@ def renderIndex():
              r"Hello, world!"
              r"\end{document}")
 			 
-	pdf = build_pdf(min_latex)
+	pdf = build_pdf(min_latex,'./')
 	pdf.save_to('./test.pdf')
 	
 	'''debug - makes sure the PDF file exists
