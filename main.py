@@ -3,6 +3,8 @@ import sys,os #debug
 import logging
 from flask import Flask, render_template
 from latex import build_pdf
+import smtplib
+from email.mime.text import MIMEText
 #from pylatex import Document, Section, Subsection, Command
 #from pylatex.utils import italic, NoEscape
 
@@ -34,6 +36,9 @@ def renderIndex():
 		print('FOUND FILE!!!',file=sys.stderr)
 	else:
 		print('NO FILE!!!',file=sys.stderr)
+		
+	with open('./test.pdf', 'rb') as static_file:
+		return send_file(static_file, attachment_filename='test.pdf')
 	'''fp = './basic'
 	doc = Document(fp)
 	fill_document(doc)
@@ -48,7 +53,7 @@ def renderIndex():
 	else:
 		print('NO PDF!!!',file=sys.stderr)
 	'''
-	return render_template('index.html')
+	#return render_template('index.html')
 
 @app.errorhandler(500)
 def server_error(e):
