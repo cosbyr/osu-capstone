@@ -13,7 +13,6 @@ app = Flask(__name__)
 def renderIndex():		
 	return render_template('index.html')
 
-	
 @app.route('/latex')
 def renderPDF():
 		#just a test. changes will be made to this when we have a better idea how this function should... uh, function
