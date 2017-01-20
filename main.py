@@ -1,8 +1,21 @@
 from __future__ import print_function #debug
 import sys,os #debug
 import logging
+import psycopg2
+import urlparse
 from flask import Flask, render_template, send_file
 from latex import build_pdf
+
+urlparse.uses_netloc.append("postgres")
+url = urlparse.urlparse(os.environ["DATABASE_URL"])
+
+conn = psycopg2.connect(
+	database=url.path[1:],
+	user=url.username,
+	password=url.password,
+	host=url.hostname,
+	port=url.port
+)
 
 app = Flask(__name__)
 
@@ -23,9 +36,9 @@ def renderIndex():
 	else:
 		print('NO FILE!!!',file=sys.stderr)'''
 		
-	return send_file('./test.pdf')
+	#return send_file('./test.pdf')
 	
-	#return render_template('index.html')
+	return render_template('index.html')
 
 @app.errorhandler(500)
 def server_error(e):
