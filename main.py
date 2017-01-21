@@ -1,8 +1,9 @@
 from __future__ import print_function #debug
 import sys,os #debug
 import logging
-import texHandler
-import dbHandler
+from handlers import texHandler, dbHandler
+#import texHandler
+#import dbHandler
 from flask import Flask, render_template, send_file
 
 dbHandler.connectDB()
