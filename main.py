@@ -24,6 +24,7 @@ def renderPDF():
 	pdf = texHandler.genAward(tex,filename)
 	return send_file(pdf)
 
+
 @app.errorhandler(500)
 def server_error(e):
     # Log the error and stacktrace.

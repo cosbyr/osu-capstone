@@ -5,3 +5,4 @@ def genAward(tex,filename):
 	pdf = build_pdf(tex)
 	pdf.save_to(filename)
 	return filename
+	
