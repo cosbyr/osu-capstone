@@ -16,8 +16,12 @@ def renderIndex():
 @app.route('/latex')
 def renderPDF():
 	#just a test. changes will be made to this when we have a better idea how this function should... uh, function
+	tex = (r"\documentclass{article}"
+			 r"\begin{document}"
+			 r"Hello, world!"
+			 r"\end{document}")
 	filename = 'test'
-	pdf = texHandler.genAward(filename)
+	pdf = texHandler.genAward(tex,filename)
 	return send_file(pdf)
 
 @app.errorhandler(500)
