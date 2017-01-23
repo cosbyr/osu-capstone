@@ -2,12 +2,9 @@ from __future__ import print_function #debug
 import sys,os #debug
 import logging
 from handlers import texHandler, dbHandler
-#import texHandler
-#import dbHandler
 from flask import Flask, render_template, send_file
 
-dbHandler.connectDB()
-
+db = dbHandler.connectDB()
 app = Flask(__name__)
 		
 @app.route('/')
