@@ -1,11 +1,19 @@
 from __future__ import print_function #debug
-import sys #debug
-from latex import build_pdf, LatexBuildError
+import os,sys #debug
+#from latex import build_pdf, LatexBuildError
+import latex
 
-def genAward(tex,filename):
-	filename = './' + filename + '.pdf'
-	pdf = build_pdf(tex)
-	pdf.save_to(filename)
+def genAward(texFile,filename):
+	filename = './' + texFile[:-3] + 'pdf'
+	'''pdf = build_pdf(tex)
+	pdf.save_to(filename)'''
+	
+	'''builder = latex.build.PdfLatexBuilder()
+	builder.build_pdf(tex)
+	pdf.save_to(filename)'''
+	
+	os.system("pdflatex " + texFile)
+	#os.system("mv " + filename + './')
 	return filename
 	'''try:
 		pdf = build_pdf(tex)
