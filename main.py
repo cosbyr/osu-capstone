@@ -24,7 +24,7 @@ def renderPDF():
 	
 	'''with open('./testaward2.tex','r') as file:
 		pdf = texHandler.genAward(file,'test2')'''
-	texFile = './testaward2.tex'
+	texFile = 'testaward2.tex'
 	savedAs = 'test3'
 	pdf = texHandler.genAward(texFile,savedAs)
 	
