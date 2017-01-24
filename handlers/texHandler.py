@@ -6,5 +6,9 @@ import latex
 def genAward(texFile):
 	os.system('pdflatex ' + texFile)
 	pdf = texFile[:-3] + 'pdf'
+	if os.path.exists(pdf):
+		print('FILE EXISTS!!!',file=sys.stderr)
+	else:
+		print('NOTHING!!!',file=sys.stderr)
 	#os.system('mv ' + pdf + '~/')
 	return pdf

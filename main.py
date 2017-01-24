@@ -16,7 +16,7 @@ def renderPDF():
 	texFile = 'testaward2.tex'
 	pdf = texHandler.genAward(texFile)
 	
-	return send_file('test3.pdf')
+	return send_file(pdf)
 
 
 @app.errorhandler(500)
