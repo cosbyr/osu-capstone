@@ -13,7 +13,7 @@ def genAward(texFile,filename):
 	pdf.save_to(filename)'''
 	
 	os.system("pdflatex " + texFile)
-	#os.system("mv " + filename + './')
+
 	return filename
 	'''try:
 		pdf = build_pdf(tex)
