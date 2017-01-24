@@ -4,7 +4,7 @@ import os,sys #debug
 import latex
 
 def genAward(texFile,filename):
-	filename = '/app/' + texFile[:-3] + 'pdf'
+	filename = './' + texFile[:-3] + 'pdf'
 	'''pdf = build_pdf(tex)
 	pdf.save_to(filename)'''
 	
@@ -12,8 +12,8 @@ def genAward(texFile,filename):
 	builder.build_pdf(tex)
 	pdf.save_to(filename)'''
 	
-	os.system("pdflatex " + texFile)
-
+	os.system("pdflatex " + './' + texFile)
+	#os.system("mv " + filename + './')
 	return filename
 	'''try:
 		pdf = build_pdf(tex)
