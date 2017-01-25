@@ -1,7 +1,16 @@
 from __future__ import print_function #debug
-import os
+import os,sys
+from subprocess import check_call,CalledProcessError,Popen
+from datetime import datetime as dt
 
 class Award:
+	'''
+	Serves as the template for award PDFs.
+	param awardDetails -> details to be retrieved from a form when creating the award.
+		requires a dict object with the following keys: 'background','logo','company','message','title','employee','admin1','admin2','adminTitle1','adminTitle2'
+	param saveAs -> the name you want to ascribe to the PDF file. do not include an extension
+	'''
+	
 	def __init__(self,awardDetails,saveAs):
 		self.details = awardDetails
 		self.filename = saveAs
@@ -78,28 +87,70 @@ class Award:
 		'''
 		
 	def _genTexFile(self,filename):
+		'''
+		generates a .tex file based on the awardTemplate property. errors will be logged in a log.txt.
+		if successful the .tex file name is returned, otherwise None is returned
+		'''
+		
 		texFile = filename + '.tex'
-		with open(texFile,'w') as file:
-			file.write(self.awardTemplate)
-		
-		if os.path.getsize(texFile) == 0:
-			raise Exception('Unable to create tex file.')
-		
+		try:
+			with open(texFile,'w') as file:
+				file.write(self.awardTemplate)
+		except IOError as e:
+			with open('log.txt','a') as log:
+				log.write(dt.now() + ' Unable to open {0}\n'.format(texFile))
+				
+			return None
+			
 		return texFile
 		
 	def _genPDF(self,texFile):
-		os.system('pdflatex ' + texFile)
-		pdf = texFile[:-3] + 'pdf'
+		'''
+		generates a .pdf file based on a .tex file by calling the pdflatex compiler. errors will be logged in a log.txt.
+		if successful the .pdf file name is returned, otherwise None is returned
+		'''
+		
+		if os.path.isfile(texFile) == False:
+			return None
+		else:
+			pdf = texFile[:-3] + 'pdf'
 			
+			try:
+				check_call(['pdflatex',texFile,'>',pdf])
+			except CalledProcessError as e:
+				details = {'code':e.returncode,'output':e.output,'cmd':e.cmd}
+				
+				with open('log.txt','a') as log:
+					log.write(dt.now() + ' {0} caused a CalledProcessError (Error Code: {1}): {2}'.format(details['cmd'],details['code'],details['output']))
+					
+				return None
+		
 		return pdf
 		
 	def _clean(self):
-		os.remove(self.filename + '.log')
-		os.remove(self.filename + '.aux')
-		os.remove(self.filename + '.tex')
+		'''
+		removes all the files the pdflatex compiler creates while generating a PDF from the given tex code.
+		errors are written to log.txt
+		'''
 		
+		try:
+			os.remove(self.filename + '.log')
+			os.remove(self.filename + '.aux')
+			os.remove(self.filename + '.tex')
+		except OSError as e:
+			with open('log.txt','a') as log:
+				log.write(str(dt.now()) + ' Unable to clean up LaTex files. {0} (Error Code: {1})\n'.format(e.strerror,e.errno))
+			
 	def genAward(self):
+		'''calls the preceeding "private" functions to generate and return a PDF award file'''
+		
 		texFile = self._genTexFile(self.filename)
-		pdf = self._genPDF(texFile)
-		self._clean()
-		return pdf
+		
+		if texFile is not None:
+			pdf = self._genPDF(texFile)
+				
+			if pdf is not None:
+				self._clean()
+				return pdf
+				
+		return None

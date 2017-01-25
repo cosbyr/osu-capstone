@@ -7,3 +7,4 @@ build
 *.aux
 *.log
 *.tex
+log.txt

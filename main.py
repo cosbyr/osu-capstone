@@ -13,6 +13,7 @@ def renderIndex():
 
 @app.route('/latex')
 def renderPDF():
+	#still just a testing LaTex functionality
 	filename = 'test'
 	details = {
 	'background':'static/images/tiling.png',
@@ -29,14 +30,17 @@ def renderPDF():
 	award = ah.Award(details,filename)
 	pdf = award.genAward()
 	
-	return send_file(pdf)
+	if pdf is not None:
+		return send_file(pdf)
+	else:
+		abort(500) #change to proper error code
 
 
 @app.errorhandler(500)
-def server_error(e):
+def serverError(e):
     # Log the error and stacktrace.
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred: ' + str(e), 500
-
+	
 if __name__ == "__main__":
     app.run()
