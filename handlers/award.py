@@ -1,6 +1,6 @@
 from __future__ import print_function #debug
 import os,sys
-from subprocess import check_call,CalledProcessError,Popen
+from subprocess import check_call,CalledProcessError
 from datetime import datetime as dt
 
 class Award:
