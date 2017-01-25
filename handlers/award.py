@@ -1,7 +1,6 @@
 from __future__ import print_function #debug
 import os,sys
 from subprocess import check_call,CalledProcessError
-from datetime import datetime as dt
 
 class Award:
 	'''
@@ -97,9 +96,8 @@ class Award:
 			with open(texFile,'w') as file:
 				file.write(self.awardTemplate)
 		except IOError as e:
-			with open('log.txt','a') as log:
-				log.write(dt.now() + ' Unable to open {0}\n'.format(texFile))
-				
+			print('Unable to open {0}\n'.format(texFile),file=sys.stderr)
+			sys.stdout.flush()
 			return None
 			
 		return texFile
@@ -119,10 +117,8 @@ class Award:
 				check_call(['pdflatex',texFile,'>',pdf])
 			except CalledProcessError as e:
 				details = {'code':e.returncode,'output':e.output,'cmd':e.cmd}
-				
-				with open('log.txt','a') as log:
-					log.write(dt.now() + ' {0} caused a CalledProcessError (Error Code: {1}): {2}'.format(details['cmd'],details['code'],details['output']))
-					
+				print('{0} caused a CalledProcessError (Error Code: {1}): {2}'.format(details['cmd'],details['code'],details['output']),file=sys.stderr)
+					sys.stdout.flush()	
 				return None
 		
 		return pdf
@@ -138,8 +134,8 @@ class Award:
 			os.remove(self.filename + '.aux')
 			os.remove(self.filename + '.tex')
 		except OSError as e:
-			with open('log.txt','a') as log:
-				log.write(str(dt.now()) + ' Unable to clean up LaTex files. {0} (Error Code: {1})\n'.format(e.strerror,e.errno))
+			print('Unable to clean up LaTex files. {0} (Error Code: {1})\n'.format(e.strerror,e.errno),file=sys.stderr)
+			sys.stdout.flush()
 			
 	def genAward(self):
 		'''calls the preceeding "private" functions to generate and return a PDF award file'''
