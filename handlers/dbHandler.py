@@ -14,3 +14,5 @@ def connectDB():
 		port=url.port
 	)
 	
+	return conn
+	

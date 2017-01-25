@@ -1,8 +1,7 @@
-from latex import build_pdf
+from __future__ import print_function #debug
+import os,sys #debug
 
-def genAward(tex,filename):
-	filename = './' + filename + '.pdf'
-	pdf = build_pdf(tex)
-	pdf.save_to(filename)
-	return filename
-	
+def genAward(texFile):
+	os.system('pdflatex ' + texFile)
+	pdf = texFile[:-3] + 'pdf'
+	return pdf
