@@ -15,4 +15,3 @@ def connectDB():
 	)
 	
 	return conn
-	
