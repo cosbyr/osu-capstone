@@ -11,6 +11,34 @@ app = Flask(__name__)
 def renderIndex():		
 	return render_template('index.html')
 
+@app.route('/login.html')
+def renderLogin():
+	return render_template('login.html')
+
+@app.route('/admin.html')
+def renderAdmin():
+	return render_template('admin.html')
+
+@app.route('/user.html')
+def renderUser():
+	return render_template('user.html')
+
+@app.route('/create.html')
+def renderCreate():
+	return render_template('create.html')
+
+@app.route('/history.html')
+def renderHistory():
+	return render_template('history.html')
+
+@app.route('/new-account.html')
+def renderNewAccount():
+	return render_template('new-account.html')
+
+@app.route('/password.html')
+def renderPassword():
+	return render_template('password.html')
+
 @app.route('/latex')
 def renderPDF():
 	#still just a testing LaTex functionality

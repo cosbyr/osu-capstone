@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block title %}<title>Capstone Project</title>{% endblock title %}
+{% block meta %}{% endblock meta %}
+
+{% block navbar %}
+{% endblock navbar %}
+
+{% block content %}
+	<div class="outter-container">
+		<header class="header-row"><a href="login.html">Login</a></header>
+		<div class="page-title">Create New Account</div>
+		<form action="" method="post">
+			
+				<input class="input-box-50" type="text" name="firstName" placeholder="First Name">
+				<input class="input-box-50" type="text" name="lastName" placeholder="Last Name">
+				<input class="input-box-50" type="email" name="email" placeholder="Email">
+				<input class="input-box-50" type="text" name="signature" placeholder="Signature Image">
+				<input class="input-box-50" type="password" name="password" placeholder="Password">
+				<input class="input-box-50" type="password" name="password" placeholder="Reenter Password">
+				<select class="input-box-50" name="security-question-1">
+					<option value="paternal-grandfather">What is your paternal grandfather's name</option>
+					<option value="first-pet">What is the name of your first pet</option>
+					<option value="best-friend">what is the name of your childhood best friend</option>
+				</select>
+				<input class="input-box-50" type="text" name="security-answer-1" placeholder="Answer">
+
+				<select class="input-box-50" name="security-question-2">
+					<option value="paternal-grandfather">What is your paternal grandfather's name</option>
+					<option value="first-pet">What is the name of your first pet</option>
+					<option value="best-friend">what is the name of your childhood best friend</option>
+				</select>
+				<input class="input-box-50" type="text" name="security-answer-2" placeholder="Answer">
+				
+				<input class="button-box" type="submit" value="Create Account">
+		</form>
+	</div>
+{% endblock content %}
