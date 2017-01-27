@@ -139,6 +139,9 @@ input{
 	margin-top: 0px;
 }
 
+.small-margin-top{
+	margin-top: 2px;
+}
 .margin-top{
 	margin-top: 2em;
 }
