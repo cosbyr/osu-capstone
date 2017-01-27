@@ -1,19 +1,20 @@
 from __future__ import print_function #debug
 import sys,os #debug
 import logging
-from handlers import award as ah, database as dbh, IDatabase
+from handlers import award as ah, database as dbh, exceptions as eh, IDatabase
 from flask import Flask, render_template, send_file, abort
 
 db = dbh.PostgresDatabase()
+conn = None
 
 try:
 	if isinstance(db,IDatabase.IDatabase):
 		conn = db.connection
 	else:
-		raise Exception('Unable to connect to database. Database instance is not derived from the IDatabase abstract base class.')
-except Exception as e:
-	print(e,file=sys.stderr)
-	abort(500)
+		raise eh.DatabaseInterfaceError()
+except eh.DatabaseInterfaceError as e:
+	print(e.msg,file=sys.stderr)
+	sys.exit(1)
 
 app = Flask(__name__)
 		
