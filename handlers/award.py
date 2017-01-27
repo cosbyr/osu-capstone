@@ -2,7 +2,7 @@ from __future__ import print_function #debug
 import os,sys
 from subprocess import check_call,CalledProcessError
 
-class Award:
+class Award(object):
 	'''
 	Serves as the template for award PDFs.
 	param awardDetails -> details to be retrieved from a form when creating the award.
@@ -85,7 +85,7 @@ class Award:
 		\end{document}
 		'''
 		
-	def _genTexFile(self,filename):
+	def __genTexFile(self,filename):
 		'''
 		generates a .tex file based on the awardTemplate property. errors will be logged in a log.txt.
 		if successful the .tex file name is returned, otherwise None is returned
@@ -102,7 +102,7 @@ class Award:
 			
 		return texFile
 		
-	def _genPDF(self,texFile):
+	def __genPDF(self,texFile):
 		'''
 		generates a .pdf file based on a .tex file by calling the pdflatex compiler. errors will be logged in a log.txt.
 		if successful the .pdf file name is returned, otherwise None is returned
@@ -123,7 +123,7 @@ class Award:
 		
 		return pdf
 		
-	def _clean(self):
+	def __clean(self):
 		'''
 		removes all the files the pdflatex compiler creates while generating a PDF from the given tex code.
 		errors are written to log.txt
@@ -140,13 +140,13 @@ class Award:
 	def genAward(self):
 		'''calls the preceeding "private" functions to generate and return a PDF award file'''
 		
-		texFile = self._genTexFile(self.filename)
+		texFile = self.__genTexFile(self.filename)
 		
 		if texFile is not None:
-			pdf = self._genPDF(texFile)
+			pdf = self.__genPDF(texFile)
 				
 			if pdf is not None:
-				self._clean()
+				self.__clean()
 				return pdf
 				
 		return None
