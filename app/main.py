@@ -1,23 +1,35 @@
 from __future__ import print_function #debug
 import sys,os #debug
 import logging
-from handlers import award as ah, database as dbh, exceptions as eh, IDatabase
-from flask import Flask, render_template, send_file, abort
+from handlers.LaTex import award
+from handlers.Database import database
+from handlers.Database import models
+from flask import Flask, render_template, send_file, abort, request, redirect
 
-db = dbh.PostgresDatabase()
-conn = None
 
-try:
-	if isinstance(db,IDatabase.IDatabase):
-		conn = db.connection
-	else:
-		raise eh.DatabaseInterfaceError()
-except eh.DatabaseInterfaceError as e:
-	print(e.msg,file=sys.stderr)
-	sys.exit(1)
+app = Flask('app',template_folder='./app/templates',static_folder='./app/static')
+app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+database.db.init_app(app)
 
-app = Flask(__name__)
-		
+postgres = database.PostgresDatabase(
+models.Account,
+models.Admin,
+models.Employee,
+models.Branch,
+models.State,
+models.Department,
+models.AwardType,
+models.Award,
+models.AwardArchive)
+
+'''
+#this was used to create the database 
+from handlers.Database import models
+with app.app_context():
+	database.db.create_all()
+	database.db.session.commit()
+'''
+
 @app.route('/')
 def renderIndex():
 	return render_template('index.html')
@@ -42,9 +54,15 @@ def renderCreate():
 def renderHistory():
 	return render_template('history.html')
 
-@app.route('/new-account.html')
+@app.route('/new-account.html',methods=['GET','POST'])
 def renderNewAccount():
-	return render_template('new-account.html')
+	if request.method == 'GET':
+		return render_template('new-account.html')
+	
+	if request.method == 'POST':
+		payload = request.form
+		postgres.createAccount(payload)
+		return redirect('/login.html',code=201)
 
 @app.route('/password.html')
 def renderPassword():
@@ -66,7 +84,7 @@ def renderPDF():
 	'adminTitle1':'Supervisor',
 	'adminTitle2':'Head of Department'}
 	
-	award = ah.Award(details,filename)
+	award = award.Award(details,filename)
 	pdf = award.genAward()
 	
 	if pdf is not None:
