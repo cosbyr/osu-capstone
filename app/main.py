@@ -7,7 +7,7 @@ from handlers.Database import models
 from flask import Flask, render_template, send_file, abort, request, redirect
 
 
-app = Flask('app',template_folder='./app/templates',static_folder='./app/static')
+app = Flask('app',template_folder='./templates',static_folder='./app/static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 database.db.init_app(app)
 
