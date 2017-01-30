@@ -1,131 +1,74 @@
 from handlers.Database import database
-
-employeeDepartment = database.db.Table(
-'employee_department',
-database.db.Column('employee_id',database.db.Integer, database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False),
-database.db.Column('department_id',database.db.Integer, database.db.ForeignKey('department.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False),
-database.db.PrimaryKeyConstraint('employee_id', 'department_id'))
-
-employeeAward = database.db.Table(
-"employee_award",
-database.db.Column('recepient', database.db.Integer, database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False),
-database.db.Column('award_id', database.db.Integer, database.db.ForeignKey('award.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False),
-database.db.Column('recvd', database.db.DateTime,nullable=False),
-database.db.Column('issued_by', database.db.Integer, database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False),
-database.db.PrimaryKeyConstraint('recepient', 'award_id','recvd'))
-	
+			
 class Account (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	pword = database.db.Column(database.db.String(100), nullable=False)
-	question1 = database.db.Column(database.db.Text, nullable=False)
-	question2 = database.db.Column(database.db.Text, nullable=False)
+	q1_id = database.db.Column(database.db.Integer, database.db.ForeignKey('question.id',ondelete='RESTRICT',onupdate='RESTRICT'), nullable=False)
+	q2_id = database.db.Column(database.db.Integer, database.db.ForeignKey('question.id',ondelete='RESTRICT',onupdate='RESTRICT'), nullable=False)
 	answer1 = database.db.Column(database.db.Text, nullable=False)
 	answer2 = database.db.Column(database.db.Text, nullable=False)
 	created = database.db.Column(database.db.DateTime, nullable=False)
 
 	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined')
-	employee = database.db.relationship('Employee', backref='account', uselist=False, lazy='joined')
+	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined')
 	
 	def __init__(self,pword,q1,q2,a1,a2,created):
 		self.pword = pword
-		self.question1 = q1
-		self.question2 = q2
+		self.q1_id = q1
+		self.q2_id = q2
 		self.answer1 = a1
 		self.answer2 = a2
 		self.created = created
 
 	def __repr__(self):
-		return '<Account %r>' % (self.id)
-	
+		return '<Account {0}>'.format(self.id)
+
+class Question(database.db.Model):
+		id = database.db.Column(database.db.Integer, primary_key=True)
+		prompt = database.db.Column(database.db.String(255), nullable=False)
+		
+		account = database.db.relationship('Account',backref='question',lazy='joined',foreign_keys=[id],primaryjoin=(Account.id == id))
+		
+		def __init__(self,prompt):
+			self.prompt = prompt
+			
+		def __repr__(self):
+			return '<Question {0}>'.format(self.prompt)		
 	
 class Admin (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	account_id = database.db.Column(database.db.Integer, database.db.ForeignKey('account.id',ondelete='CASCADE',onupdate='RESTRICT'), nullable=False)
-	fname = database.db.Column(database.db.String(32), nullable=False)
-	lname = database.db.Column(database.db.String(32), nullable=False)
-	email = database.db.Column(database.db.String(32), nullable=False)
 
 	def __init__(self,account,fname,lname,email):
 		self.account_id = account
-		self.fname = fname
-		self.lname = lname
-		self.email = email
 
 	def __repr__(self):
-		return '<Admin %r>' % (self.fname + ' ' + self.lname)
+		return '<Admin {0}>'.format(self.account_id)
 
     
 
-class Employee (database.db.Model):
+class Manager (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	account_id = database.db.Column(database.db.Integer, database.db.ForeignKey('account.id',ondelete='CASCADE',onupdate='RESTRICT'), nullable=False)
+	title = database.db.Column(database.db.String(32), nullable=False)
 	fname = database.db.Column(database.db.String(32), nullable=False)
 	lname = database.db.Column(database.db.String(32), nullable=False)
 	signature = database.db.Column(database.db.Text, nullable=False)
 	email = database.db.Column(database.db.String(32), nullable=False, unique=True)
 
-	creation = database.db.relationship('Award', backref='employee',lazy='dynamic')
-	departments = database.db.relationship('Department',secondary=employeeDepartment,backref='employee')
-	awards = database.db.relationship('Award',
-		secondary=employeeAward,
-		primaryjoin=(employeeAward.c.recepient == id),
-		secondaryjoin=(employeeAward.c.issued_by == id),
-		backref='recepient',
-		foreign_keys=[id])
+	created = database.db.relationship('Award', backref='manager',lazy='dynamic')
 
-	def __init__(self,account,fname,lname,signature,email):
+	def __init__(self,account,title,fname,lname,signature,email):
 		self.account = account
+		self.title = title
 		self.fname = fname
 		self.lname = lname
 		self.signature = signature
 		self.email = email
 
 	def __repr__(self):
-		return '<Employee %r>' % (self.fname + ' ' + self.lname)
+		return '<Manager {0}>'.format(self.fname + ' ' + self.lname)
 
-class Branch (database.db.Model):
-	id = database.db.Column(database.db.Integer, primary_key=True)
-	name = database.db.Column(database.db.String(32), nullable=False)
-	address = database.db.Column(database.db.String(100), nullable=False)
-	city = database.db.Column(database.db.String(32), nullable=False)
-	zip = database.db.Column(database.db.String(5), nullable=False)
-	state_id = database.db.Column(database.db.Integer, database.db.ForeignKey('state.id',ondelete='CASCADE',onupdate='RESTRICT'), nullable=False)
-
-	department = database.db.relationship('Department', backref='branch',lazy='dynamic')
-
-	def __init__(self,name,address,city,zip,state):
-		self.name = name
-		self.address = address
-		self.city = city
-		self.zip = zip
-		self.state_id = state
-
-	def __repr__(self):
-		return '<Branch %r>' % (self.name)
-
-class State (database.db.Model):
-	id = database.db.Column('id', database.db.Integer, primary_key=True)
-	name = database.db.Column('name', database.db.String(2),nullable=False)
-
-	branch = database.db.relationship('Branch', backref='state', lazy='joined')
-
-	def __init__(self,name):
-		self.name = name
-
-	def __repr__(self):
-		return '<State %r>' % (self.name)
-
-class Department (database.db.Model):
-	id = database.db.Column(database.db.Integer, primary_key=True)
-	branch_id = database.db.Column(database.db.Integer, database.db.ForeignKey('branch.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
-	name = database.db.Column(database.db.String(32),nullable=False)
-
-	def __init__(self,branchId,name):
-		self.branch_id = branchId
-		self.name = name
-
-	def __repr__(self):
-		return '<Department %r>' % (self.name)
 
 class AwardType (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
@@ -138,27 +81,29 @@ class AwardType (database.db.Model):
 		self.name = name
 
 	def __repr__(self):
-		return '<AwardType %r>' % (self.name)
+		return '<AwardType {0}>'.format(self.name)
 
 class Award (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
+	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('manager.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
 	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
-	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
-	title = database.db.Column(database.db.String(32),nullable=False)
 	message = database.db.Column(database.db.String(255),nullable=False)
+	recepient_fname = database.db.Column(database.db.String(32),nullable=False)
+	recepient_lname = database.db.Column(database.db.String(32),nullable=False)
 	background = database.db.Column(database.db.Text,nullable=False)
-
-	#recepients = database.db.relationship('Employee',secondary=employeeAward,backref=database.db.backref('employees', lazy='dynamic'))
+	issuedOn = database.db.Column(database.db.DateTime,nullable=False)
 	
-	def __init__(self,typeId,creator,title,message,background):
-		self.type_id = typeId
+	def __init__(self,creator,typeId,message,fname,lname,background,issuedOn):
 		self.creator = creator
-		self.title = title
+		self.type_id = typeId
 		self.message = message
+		self.recepient_fname = fname
+		self.recepient_lname = fname
 		self.background = background
+		self.issuedOn = issuedOn
 
 	def __repr__(self):
-		return '<Award %r>' % (self.title)
+		return '<Award {0} {1} {2}>'.format(self.creator,self.type_id,self.message)
 
 class AwardArchive (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
@@ -174,4 +119,4 @@ class AwardArchive (database.db.Model):
 		self.recvd = recvd
 
 	def __repr__(self):
-		return '<AwardArchive %r>' % (self.fname + ' ' + self.lname + ' ' + self.type_id)
+		return '<AwardArchive {0} {1} {2}>'.format(self.fname,self.lname,self.type_id)

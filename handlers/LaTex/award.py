@@ -61,7 +61,7 @@ class Award(object):
 
 		\smallskip
 
-		\textcolor{black}{\large \textsc{''' + awardDetails['title'] + r'''}}
+		\textcolor{black}{\large \textsc{''' + awardDetails['type'] + r'''}}
 
 		\vspace{2mm}
 

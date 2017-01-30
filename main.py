@@ -1,26 +1,15 @@
 from __future__ import print_function #debug
-import sys,os #debug
+import sys,os #sys debug
 import logging
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
-from flask import Flask, render_template, send_file, abort, request, redirect
+from flask import Flask, render_template, send_file, abort, request, redirect, url_for
 
 
 app = Flask('app',template_folder='./templates',static_folder='./static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 database.db.init_app(app)
-
-postgres = database.PostgresDatabase(
-models.Account,
-models.Admin,
-models.Employee,
-models.Branch,
-models.State,
-models.Department,
-models.AwardType,
-models.Award,
-models.AwardArchive)
 
 '''
 #this was used to create the database 
@@ -30,13 +19,32 @@ with app.app_context():
 	database.db.session.commit()
 '''
 
+postgres = database.PostgresDatabase(
+models.Question,
+models.Account,
+models.Admin,
+models.Manager,
+models.AwardType,
+models.Award,
+models.AwardArchive)
+
 @app.route('/')
 def renderIndex():
 	return render_template('index.html')
 
-@app.route('/login.html')
+@app.route('/login.html',methods=['GET','POST'])
 def renderLogin():
-	return render_template('login.html')
+	if request.method == 'GET':
+		return render_template('login.html')
+	
+	if request.method == 'POST':
+		payload = request.form
+		status = postgres.login(payload)
+		
+		if status == False:
+			return render_template('login.html',status=status)
+		
+		return redirect(url_for('renderUser'))
 
 @app.route('/admin.html')
 def renderAdmin():
@@ -61,8 +69,12 @@ def renderNewAccount():
 	
 	if request.method == 'POST':
 		payload = request.form
-		postgres.createAccount(payload)
-		return redirect('/login.html',code=201)
+		status = postgres.createAccount(payload)
+		
+		if status == False:
+			return render_template('new-account.html',status=status)
+		
+		return redirect(url_for('renderLogin',status=status))
 
 @app.route('/password.html')
 def renderPassword():
@@ -77,7 +89,7 @@ def renderPDF():
 	'logo':'static/images/gateway.png',
 	'company':'Gateway Mapping, Inc.',
 	'message':'In recognition of hard work and passion we hereby award',
-	'title':'Employee of the Month',
+	'type':'Employee of the Month',
 	'employee':'Aristotle Jones',
 	'admin1':'John Doe',
 	'admin2':'Jane Smith',
