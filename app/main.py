@@ -1,13 +1,13 @@
 from __future__ import print_function #debug
 import sys,os #debug
 import logging
-from handlers.LaTex import award
+from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
 from flask import Flask, render_template, send_file, abort, request, redirect
 
 
-app = Flask('app',template_folder='./templates',static_folder='./app/static')
+app = Flask('app',template_folder='./templates',static_folder='./static')
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 database.db.init_app(app)
 
@@ -84,7 +84,7 @@ def renderPDF():
 	'adminTitle1':'Supervisor',
 	'adminTitle2':'Head of Department'}
 	
-	award = award.Award(details,filename)
+	award = ah.Award(details,filename)
 	pdf = award.genAward()
 	
 	if pdf is not None:
