@@ -5,7 +5,7 @@ import json, boto3
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
-from flask import Flask, render_template, send_file, abort, request, redirect, url_for
+from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify
 from flask_cors import CORS, cross_origin
 
 
@@ -134,6 +134,11 @@ def renderPDF():
 		abort(500) #change to proper error code
 
 
+
+@app.route('/jquery')
+def jquerytest():
+    return render_template('jquery.html')
+
 @app.errorhandler(500)
 def serverError(e):
     # Log the error and stacktrace.
@@ -142,3 +147,7 @@ def serverError(e):
 	
 if __name__ == "__main__":
     app.run()
+
+
+
+

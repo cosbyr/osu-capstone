@@ -63,3 +63,9 @@
     (() => {
       document.getElementById('file_input').onchange = initUpload;
     })();
+
+
+/*onlick for signature upload button*/
+$("#file-load-button").click(function () {
+          $("#file_input").click();
+      });

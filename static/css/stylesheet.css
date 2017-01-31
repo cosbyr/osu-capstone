@@ -118,6 +118,16 @@ input{
 	text-align: center;
 }
 
+.upload-button{
+	background: red;
+	font-size: 1.05em;
+	color: white;
+	text-align: center;
+
+
+
+}
+
 .right-align{
 	text-align: right;
 }
@@ -144,4 +154,12 @@ input{
 }
 .margin-top{
 	margin-top: 2em;
+}
+
+.no-display {
+    display:none;
+}
+
+#preview {
+	border: 2px solid blue;
 }
