@@ -10,12 +10,16 @@
 	<div class="outter-container">
 		<header class="header-row"><a href="login.html">Login</a></header>
 		<div class="page-title">Create New Account</div>
-		<form action="/new-account.html" method="post">
+		<form action="/new-account" method="post">
 			
 				<input class="input-box-50" type="text" name="firstName" placeholder="First Name">
 				<input class="input-box-50" type="text" name="lastName" placeholder="Last Name">
 				<input class="input-box-50" type="email" name="email" placeholder="Email">
-				<input class="input-box-50" type="text" name="signature" placeholder="Signature Image">
+				<input class="input-box-50" type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" placeholder="Signature Image">
+				<p id="status">Select an image of your signature"</p>
+				<img id="preview" src="/static/images/ex-sig.png" />
+				<br>
+				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png">
 				<input class="input-box-50" type="password" name="password" placeholder="Password">
 				<input class="input-box-50" type="password" name="password" placeholder="Reenter Password">
 				<select class="input-box-50" name="security-question-1">
@@ -35,4 +39,7 @@
 				<input class="button-box" type="submit" value="Create Account">
 		</form>
 	</div>
+{% block javascript %}
+    <SCRIPT SRC="/static/js/uploadSig.js"></SCRIPT>
+{% endblock %}
 {% endblock content %}

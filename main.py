@@ -1,13 +1,16 @@
 from __future__ import print_function #debug
 import sys,os #sys debug
 import logging
+import json, boto3
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
 from flask import Flask, render_template, send_file, abort, request, redirect, url_for
+from flask_cors import CORS, cross_origin
 
 
 app = Flask('app',template_folder='./templates',static_folder='./static')
+CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 database.db.init_app(app)
 
@@ -32,7 +35,7 @@ models.AwardArchive)
 def renderIndex():
 	return render_template('index.html')
 
-@app.route('/login.html',methods=['GET','POST'])
+@app.route('/login',methods=['GET','POST'])
 def renderLogin():
 	if request.method == 'GET':
 		return render_template('login.html')
@@ -46,29 +49,30 @@ def renderLogin():
 		
 		return redirect(url_for('renderUser'))
 
-@app.route('/admin.html')
+@app.route('/admin')
 def renderAdmin():
 	return render_template('admin.html')
 
-@app.route('/user.html')
+@app.route('/user')
 def renderUser():
 	return render_template('user.html')
 
-@app.route('/create.html')
+@app.route('/create')
 def renderCreate():
 	return render_template('create.html')
 
-@app.route('/history.html')
+@app.route('/history')
 def renderHistory():
 	return render_template('history.html')
 
-@app.route('/new-account.html',methods=['GET','POST'])
+@app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
 	if request.method == 'GET':
 		return render_template('new-account.html')
 	
 	if request.method == 'POST':
 		payload = request.form
+		logging.warning(payload)
 		status = postgres.createAccount(payload)
 		
 		if status == False:
@@ -76,7 +80,32 @@ def renderNewAccount():
 		
 		return redirect(url_for('renderLogin',status=status))
 
-@app.route('/password.html')
+		
+@app.route('/sign_s3/')
+def sign_s3():
+	S3_BUCKET = os.environ.get('S3_BUCKET_NAME')
+
+	file_name = request.args.get('file_name')
+	file_type = request.args.get('file_type')
+
+	s3 = boto3.client('s3')
+
+	presigned_post = s3.generate_presigned_post(
+		Bucket = S3_BUCKET,
+		Key = file_name,
+		Fields = {"acl": "public-read", "Content-Type": file_type},
+		Conditions = [
+			{"acl": "public-read"},
+			{"Content-Type": file_type}
+		],
+		ExpiresIn = 3600
+	)
+	return json.dumps({
+		'data': presigned_post,
+		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
+	})
+	
+@app.route('/password')
 def renderPassword():
 	return render_template('password.html')
 

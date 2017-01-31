@@ -38,7 +38,7 @@ class PostgresDatabase(object):
 		quest1 = int(payload['security-question-1'])
 		quest2 = int(payload['security-question-2'])
 		answ1 = payload['security-answer-1']
-		answ2 = payload['security-answer-1']
+		answ2 = payload['security-answer-2']
 		created = datetime.now() #add this to the model by putting this arg in the Column(...,default=db.func.current_timestamp())
 		title = 'boss' #this field needs to be added to the new account form
 		
