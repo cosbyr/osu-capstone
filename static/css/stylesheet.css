@@ -108,6 +108,7 @@ input{
 
 .input-box-50{
 	width: 40%;
+	display: inline-flex;
 }
 
 .button-box{
@@ -160,6 +161,16 @@ input{
     display:none;
 }
 
+.change-question{
+	background: grey;
+	text-align: right;
+	display: inline-block;
+
+	/*margin-left: 10%;*/
+	margin-top: .25em;
+
+}
+
 #preview {
 	border: 2px solid blue;
 }
@@ -167,4 +178,8 @@ input{
 #file-load-button {
 	cursor: pointer;
 	margin-bottom: .25em;
+}
+
+#file-load-button:active {
+	border: 1px solid black;
 }

@@ -103,4 +103,14 @@ function checkPass()
         message.style.color = badColor;
         message.innerHTML = "Passwords Do Not Match!"
     }
-} 
+}
+
+/*changes question on update account page*/
+$("#change-question1").click(function () {
+  $("#question1").addClass("no-display");
+  $(this).css("backgroundColor: yellow");
+});
+
+$("#change-question1").click(function () {
+          $("#question1").addClass("no-display");
+      });
