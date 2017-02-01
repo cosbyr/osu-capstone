@@ -13,27 +13,30 @@
 		<form action="/new-account" method="post">
 			
 
-				<input class="input-box-50" type="text" name="firstName" placeholder="First Name">
-				<input class="input-box-50" type="text" name="lastName" placeholder="Last Name">
+				<input class="input-box-50" type="text" name="firstName" placeholder="First Name" required />
+				<input class="input-box-50" type="text" name="lastName" placeholder="Last Name" required />
 
-				<input class="input-box-50" type="email" id='email' name="email" placeholder="Email">
-				<input class="input-box-50" type="text" name="jobTitle" placeholder="Job Title">
+				<input class="input-box-50" type="email" id='email' name="email" placeholder="Email" required />
+				<input class="input-box-50" type="text" name="jobTitle" placeholder="Job Title" required />
 
-				<input class="input-box-50" type="password" name="password" placeholder="Password">
-				<input class="input-box-50" type="password" name="password" placeholder="Reenter Password">
+				<input class="input-box-50" type="password" id="pass1" name="password" placeholder="Password" required />
+				<input class="input-box-50" type="password" id="pass2" name="password" placeholder="Reenter Password" onkeyup="checkPass(); return false;" required />
+
+
 				<select class="input-box-50" name="security-question-1">
-					<option value="1">What is your paternal grandfather's name</option>
-					<option value="2">What is the name of your first pet</option>
-					<option value="3">what is the name of your childhood best friend</option>
+					{% for q in questions %}
+						<option value="{{ q.key }}">{{ q.question}}</option>
+					{% endfor %}
 				</select>
-				<input class="input-box-50" type="text" name="security-answer-1" placeholder="Answer">
+				<input class="input-box-50" type="text" name="security-answer-1" placeholder="Answer" required />
+				
 
 				<select class="input-box-50" name="security-question-2">
-					<option value="1">What is your paternal grandfather's name</option>
-					<option value="2">What is the name of your first pet</option>
-					<option value="3">what is the name of your childhood best friend</option>
+					{% for q in questions %}
+						<option value="{{ q.key }}">{{ q.question}}</option>
+					{% endfor %}
 				</select>
-				<input class="input-box-50" type="text" name="security-answer-2" placeholder="Answer">
+				<input class="input-box-50" type="text" name="security-answer-2" placeholder="Answer" required />
 				
 				<!-- the file upload. the input is hidden behind my button -->
 				
@@ -41,14 +44,14 @@
 				    Upload signature image
 				</div>
 				<div class="no-display">
-					<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png">
+					<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required/>
 				</div>
 
 				<div class="center-algin" id="status">Preview of signature
 					<p><img id="preview" src="/static/images/ex-sig.png" /></p>
 				</div>
 
-				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png">
+				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png" />
 				
 
 
