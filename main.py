@@ -129,9 +129,8 @@ def renderPDF():
 	'type':'Employee of the Month',
 	'employee':'Aristotle Jones',
 	'admin1':'John Doe',
-	'admin2':'Jane Smith',
 	'adminTitle1':'Supervisor',
-	'adminTitle2':'Head of Department'}
+	'signature':'static/images/ex-sig.png'}
 	
 	award = ah.Award(details,filename)
 	pdf = award.genAward()

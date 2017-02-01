@@ -69,15 +69,16 @@ class Award(object):
 		{\textcolor{black}{
 		\uppercase{''' + awardDetails['employee'] + r'''}}}
 
-		\vspace{8mm}
+		\vspace{5mm}
 
 		{\color{blue!40!black}
 		\scalebox{.8}{
 		\begin{tabular}{ccc}
-		\cline{1-1} 
-		\cline{3-3}
-		\ ''' + awardDetails['admin1'] + r''' & & ''' + awardDetails['admin2'] + r'''\\
-		\ ''' + awardDetails['adminTitle1'] + r''' & & ''' + awardDetails['adminTitle2'] + r'''\\
+		\ & 
+		\includegraphics[height=1.1cm]{''' + awardDetails['signature'] + r'''}\\[-12pt]
+		\cline{1-3}\\[-4pt] 
+		\ ''' + r''' & ''' + awardDetails['admin1'] + r''' & ''' + r'''\\
+		\ ''' + r''' & ''' + awardDetails['adminTitle1'] + r''' & ''' + r'''\\
 		\end{tabular}
 		}}}}
 		\end{minipage}
