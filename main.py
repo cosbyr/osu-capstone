@@ -49,6 +49,10 @@ def renderLogin():
 		
 		return redirect(url_for('renderUser'))
 
+@app.route('/logout')
+def renderLogout():
+	return render_template('logout.html')
+
 @app.route('/admin')
 def renderAdmin():
 	return render_template('admin.html')
@@ -56,6 +60,10 @@ def renderAdmin():
 @app.route('/user')
 def renderUser():
 	return render_template('user.html')
+
+@app.route('/update-account')
+def renderUpdateAccount():
+	return render_template('update-account.html')
 
 @app.route('/create')
 def renderCreate():
