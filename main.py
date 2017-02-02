@@ -10,7 +10,7 @@ from flask_cors import CORS, cross_origin
 
 
 app = Flask('app',template_folder='./templates',static_folder='./static')
-app.secret_key = os.urandom(24)
+app.secret_key = os.environ['SECRET_KEY']
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 database.db.init_app(app)
