@@ -32,6 +32,8 @@ models.AwardType,
 models.Award,
 models.AwardArchive)
 
+#the login link should only be present on the index and perhaps the login page. when logged in, this link should change to logout
+
 @app.route('/')
 def renderIndex():
 	return render_template('index.html')
@@ -49,7 +51,11 @@ def renderLogin():
 			return render_template('login.html',status=status)
 		
 		session['email'] = payload['userName']
-		return redirect(url_for('renderUser'))
+		if payload['account-type'] == 'user':
+			return redirect(url_for('renderUser'))
+		
+		if payload['account-type'] == 'admin':
+			return redirect(url_for('renderAdmin'))
 
 @app.route('/logout')
 def renderLogout():

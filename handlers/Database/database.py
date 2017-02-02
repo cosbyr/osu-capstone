@@ -32,26 +32,24 @@ class PostgresDatabase(object):
 		return questions
 		
 	def getUserDetails(self,email):
-		'''
 		bucket = os.environ.get('S3_BUCKET_NAME')
-		accessKey = os.environ.get('AWS_ACCESS_KEY_ID')
-		secretKey = os.environ.get('AWS_SECRET_ACCESS_KEY')
-		
-		transfer = S3Transfer(boto3.client('s3', 'us-west-1', aws_access_key_id=accessKey, aws_secret_access_key=secretKey))
 		
 		filename = replace(email,'@','_')
 		filename = replace(filename,'.','_')
 		filename += '_sig.png'
+		destFile = './static/images/sign.png'
+		
+		client = boto3.client('s3')
 		
 		try:
-			transfer.download_file(bucket, filename, '/static/images/sig.png')
+			client.download_file(bucket, filename, destFile)
 		except ClientError as e:
 			print(e.response['Error']['Message'],file=sys.stderr)
 			return None
 		except IOError as e:
-			print('Here: {0}'.format(e))
+			print(e,file=sys.stderr)
 			return None
-		'''
+		
 		user = self.Manager.query.filter_by(email=email).first()
 		
 		details = {
@@ -64,7 +62,7 @@ class PostgresDatabase(object):
 		'question2':user.account.q2,
 		'answer1':user.account.answer1,
 		'answer2':user.account.answer2,
-		'signature':'/static/images/ex-sig.png'}#placeholder
+		'signature':destFile}
 		
 		return details
 		
@@ -74,15 +72,22 @@ class PostgresDatabase(object):
 		pword = payload['password']
 		type = payload['account-type']
 		
-		#if the user is a manager, then get their first and last name an return that along with the boolean
-		#indicating whether their password was verified or not. store this string in the session['name']
-		user = self.Manager.query.filter_by(email=email).first()
-		
 		#we should indicate why the login failed on the login page
-		if user is None:
-			return False
-		
-		return argon2.verify(pword,user.account.pword)
+		if type == 'admin':
+			admin = self.Admin.query.filter_by(email=email).first()
+			if admin is None:
+				return False
+			else:
+				return argon2.verify(pword,admin.account.pword)
+				
+		if type == 'user':
+			user = self.Manager.query.filter_by(email=email).first()
+			if user is None:
+				return False
+			else:
+				return argon2.verify(pword,user.account.pword)
+				
+		return False
 		
 		
 	def createAccount(self,payload):
@@ -96,7 +101,7 @@ class PostgresDatabase(object):
 		quest2 = int(payload['security-question-2'])
 		answ1 = payload['security-answer-1']
 		answ2 = payload['security-answer-2']
-		created = datetime.now() #add this to the model by putting this arg in the Column(...,default=db.func.current_timestamp())
+		created = datetime.now()
 		
 		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
 		manager = self.Manager(account,title,fname,lname,sign,email)
@@ -116,12 +121,29 @@ class PostgresDatabase(object):
 		user.lname = payload['lastName']
 		user.email = payload['email']
 		user.title = payload['jobTitle']
-		#user.signature = payload['signature'] 
-		
+		user.signature = payload['signature'] 
+		print(user.signature,file=sys.stderr)
 		try:
 			db.session.commit()
 		except IntegrityError:
 			return False
 			
 		return True
+	
+	'''
+	def createRootAdmin(self):
+		pword = argon2.using(rounds=4).hash('root')
+		quest1 = 1
+		quest2 = 2
+		answ1 = 'root'
+		answ2 = 'root'
+		email = 'root@admin.com'
+		created = datetime.now()
 		
+		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
+		admin = self.Admin(account,email)
+		
+		db.session.add(account)
+		db.session.add(admin)
+		db.session.commit()
+	'''
