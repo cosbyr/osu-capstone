@@ -77,7 +77,7 @@ def renderUser():
 	if 'email' not in session:
 		return redirect(url_for('renderLogin'))
 		
-	return render_template('user.html')
+	return render_template('user.html',user=session['email'])
 
 @app.route('/update-account',methods=['GET','POST'])
 def renderUpdateAccount():	
