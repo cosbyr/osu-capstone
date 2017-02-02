@@ -24,16 +24,16 @@
 				<div class="right-align outter-container" id="confirmMessage" class="confirmMessage"></div>
 
 				<select class="input-box-50" name="security-question-1">
-					{% for q in questions %}
-						<option value="{{ q.key }}">{{ q.question}}</option>
+					{% for key,value in questions.iteritems() %}
+						<option value="{{ key }}">{{ value }}</option>
 					{% endfor %}
 				</select>
 				<input class="input-box-50" type="text" name="security-answer-1" placeholder="Answer" required />
 				
 
 				<select class="input-box-50" name="security-question-2">
-					{% for q in questions %}
-						<option value="{{ q.key }}">{{ q.question}}</option>
+					{% for key,value in questions.iteritems() %}
+						<option value="{{ key }}">{{ value }}</option>
 					{% endfor %}
 				</select>
 				<input class="input-box-50" type="text" name="security-answer-2" placeholder="Answer" required />

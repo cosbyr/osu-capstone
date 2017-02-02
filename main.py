@@ -5,11 +5,12 @@ import json, boto3
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
-from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify
+from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session
 from flask_cors import CORS, cross_origin
 
 
 app = Flask('app',template_folder='./templates',static_folder='./static')
+app.secret_key = os.urandom(24)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 database.db.init_app(app)
@@ -22,7 +23,7 @@ with app.app_context():
 	database.db.session.commit()
 '''
 
-postgres = database.PostgresDatabase(
+alchemist = database.PostgresDatabase(
 models.Question,
 models.Account,
 models.Admin,
@@ -42,15 +43,17 @@ def renderLogin():
 	
 	if request.method == 'POST':
 		payload = request.form
-		status = postgres.login(payload)
+		status = alchemist.login(payload)
 		
 		if status == False:
 			return render_template('login.html',status=status)
 		
+		session['email'] = payload['userName']
 		return redirect(url_for('renderUser'))
 
 @app.route('/logout')
 def renderLogout():
+	session.pop('email', None)
 	return render_template('logout.html')
 
 @app.route('/admin')
@@ -59,14 +62,39 @@ def renderAdmin():
 
 @app.route('/user')
 def renderUser():
+	if 'email' not in session:
+		return redirect(url_for('renderLogin'))
+		
 	return render_template('user.html')
 
-@app.route('/update-account')
-def renderUpdateAccount():
-	return render_template('update-account.html')
+@app.route('/update-account',methods=['GET','POST'])
+def renderUpdateAccount():	
+	if request.method == 'GET':
+		if 'email' not in session:
+			return redirect(url_for('renderLogin'))
+			
+		details = alchemist.getUserDetails(session['email'])
+		
+		if details is None:
+			abort(500) #this should flash a message rather than abort. will fix later
+			
+		return render_template('update-account.html',details=details)
+		
+	if request.method == 'POST':
+		payload = request.form
+		status = alchemist.updateAccount(payload,session['email'])
+		
+		if status == False:
+			return redirect(url_for('renderUpdateAccount'))
+			
+		return redirect(url_for('renderUser'))
+	
 
 @app.route('/create')
 def renderCreate():
+	if 'email' not in session:
+		return redirect(url_for('renderLogin'))
+		
 	return render_template('create.html')
 
 @app.route('/history')
@@ -76,12 +104,13 @@ def renderHistory():
 @app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
 	if request.method == 'GET':
-		return render_template('new-account.html')
+		questions = alchemist.getQuestions()
+		return render_template('new-account.html',questions=questions)
 	
 	if request.method == 'POST':
 		payload = request.form
 		logging.warning(payload)
-		status = postgres.createAccount(payload)
+		status = alchemist.createAccount(payload)
 		
 		if status == False:
 			return render_template('new-account.html',status=status)
