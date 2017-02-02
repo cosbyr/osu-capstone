@@ -13,12 +13,15 @@
 			<div class="inner-container">
 				<form method="post" action="/login">
 					<input class="input-box" type="text" name="userName" placeholder="User name or Email">
+					<div>Please choose the account type you are logging in with
+					<div>
+						<input class="radio" type="radio" name="account-type" value="admin">Admin
+						<input class="radio" type="radio" name="account-type" value="user">User
+					</div>
 					<input class="input-box" type="password" name="password" placeholder="Password">
 					<a class="forgotPassword right-align" href="/password">* Forgot Password?</a><br>
 
-					<div>Please choose the account type you are logging in with</div>
-					<input type="radio" name="account-type" value="admin">Admin<br>
-					<input type="radio" name="account-type" value="user">User<br>
+
 					<div class="left-align"><input  class="button-box" type="submit" value="Login"></div>
 				</form>
 
