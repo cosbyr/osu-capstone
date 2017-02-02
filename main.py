@@ -36,11 +36,16 @@ models.AwardArchive)
 
 @app.route('/')
 def renderIndex():
+	if 'email' in session:
+		session.pop('email', None)
+		
 	return render_template('index.html')
 
 @app.route('/login',methods=['GET','POST'])
 def renderLogin():
 	if request.method == 'GET':
+		if 'email' in session:
+		session.pop('email', None)
 		return render_template('login.html')
 	
 	if request.method == 'POST':
