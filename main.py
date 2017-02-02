@@ -45,7 +45,8 @@ def renderIndex():
 def renderLogin():
 	if request.method == 'GET':
 		if 'email' in session:
-		session.pop('email', None)
+			session.pop('email', None)
+			
 		return render_template('login.html')
 	
 	if request.method == 'POST':
