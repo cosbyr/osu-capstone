@@ -10,41 +10,28 @@
 	<div class="outter-container">
 		<header class="header-row"><a href="/login">Login</a></header>
 		<div class="page-title">Update Account</div>
-		<form action="/new-account" method="post">
+		<form action="/update-account" method="post">
 			
 
-				<input class="input-box-50" type="text" name="firstName" placeholder="First Name" required />
-				<input class="input-box-50" type="text" name="lastName" placeholder="Last Name" required />
+				<input class="input-box-50" type="text" name="firstName" value="{{details.fname}}" required />
+				<input class="input-box-50" type="text" name="lastName" value="{{details.lname}}" required />
 
-				<input class="input-box-50" type="email" id='email' name="email" placeholder="Email" required />
-				<input class="input-box-50" type="text" name="jobTitle" placeholder="Job Title" required />
+				<input class="input-box-50" type="email" id='email' name="email" value="{{details.email}}" required />
+				<input class="input-box-50" type="text" name="jobTitle" value="{{details.title}}" required />
 
+				<!---
 				<input class="input-box-50" type="password" id="pass1" name="password" placeholder="Password" required />
 				<input class="input-box-50" type="password" id="pass2" name="password" placeholder="Reenter Password" onkeyup="checkPass(); return false;" required />
 				<div class="right-align outter-container" id="confirmMessage" class="confirmMessage"></div>
-
-				<p>How do I pull the questions they have previously selected out?</p>
-				<div class="input-box-50 input">question 1</div>
-				<div class="input-box-50 input">answer</div>
-				<div class="change-question" id="change-question1">Change question</div><br>
-
-				<select id="question1" class="input-box-50 no-display" name="security-question-1">
-					{% for q in questions %}
-						<option value="{{ q.key }}">{{ q.question}}</option>
-					{% endfor %}
-				</select>
-				<input id="answer1" class="input-box-50 no-display" type="text" name="security-answer-1" placeholder="Answer" required />
-
-				<div class="input-box-50 input">question 1</div>
-				<div class="input-box-50 input">answer</div>
-				<div class="change-question" id="change-question1">Change question</div><br>
+				-->
 				
-				<select id="question2" class="input-box-50 no-display" name="security-question-2">
-					{% for q in questions %}
-						<option value="{{ q.key }}">{{ q.question}}</option>
-					{% endfor %}
-				</select>
-				<input id="answer2" class="input-box-50 no-display" type="text" name="security-answer-2" placeholder="Answer" required />
+				<div class="input-box-50 input">{{details.question1}}</div>
+				<div class="input-box-50 input">{{details.answer1}}</div>
+				<div class="change-question" id="change-question1">Change question</div><br>
+
+				<div class="input-box-50 input">{{details.question2}}</div>
+				<div class="input-box-50 input">{{details.answer2}}</div>
+				<div class="change-question" id="change-question1">Change question</div><br>
 				
 				<!-- the file upload. the input is hidden behind my button -->
 				
@@ -56,14 +43,14 @@
 				</div>
 
 				<div class="center-algin" id="status">Preview of signature
-					<p><img id="preview" src="/static/images/ex-sig.png" /></p>
+					<p><img id="preview" src="{{details.signature}}" /></p>
 				</div>
 
-				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png" />
+				<input type="hidden" id="sig-url" name="signature" value="{{details.signature}}" />
 				
 
 
-				<input class="button-box" type="submit" value="Create Account">
+				<input class="button-box" type="submit" value="Update Account">
 		</form>
 	</div>
 {% block javascript %}

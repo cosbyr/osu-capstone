@@ -11,6 +11,8 @@ class Account (database.db.Model):
 
 	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined')
 	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined')
+	q1 = database.db.relationship('Question',foreign_keys=[q1_id])
+	q2 = database.db.relationship('Question',foreign_keys=[q2_id])
 	
 	def __init__(self,pword,q1,q2,a1,a2,created):
 		self.pword = pword
@@ -27,13 +29,14 @@ class Question(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)
 		prompt = database.db.Column(database.db.String(255), nullable=False)
 		
-		account = database.db.relationship('Account',backref='question',lazy='joined',foreign_keys=[id],primaryjoin=(Account.id == id))
+		#account = database.db.relationship('Account',backref='questions',lazy='joined',foreign_keys=[id],primaryjoin=(Account.id == id))
+		#account = database.db.relationship('Account',backref='questions',lazy='joined',foreign_keys=[Account.q1_id,Account.q2_id])
 		
 		def __init__(self,prompt):
 			self.prompt = prompt
 			
 		def __repr__(self):
-			return '<Question {0}>'.format(self.prompt)		
+			return '{0}'.format(self.prompt)		
 	
 class Admin (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
