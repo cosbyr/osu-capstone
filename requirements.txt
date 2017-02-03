@@ -19,8 +19,9 @@ passlib==1.7.0
 psycopg2==2.6.2
 pycparser==2.17
 python-dateutil==2.6.0
-requests==2.13.0
+python-http-client==2.2.1
 s3transfer==0.1.10
+sendgrid==3.6.3
 six==1.10.0
 SQLAlchemy==1.1.5
 Werkzeug==0.11.11

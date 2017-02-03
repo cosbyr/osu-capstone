@@ -164,7 +164,8 @@ def renderPassword():
 @app.route('/latex')
 def renderPDF():
 	#still just a testing LaTex functionality
-	filename = 'test'
+	#may want to add a timestamp to the pdf filename to avoid caching
+	filename = 'award'
 	details = {
 	'background':'static/images/tiling.png',
 	'logo':'static/images/gateway.png',
@@ -185,9 +186,16 @@ def renderPDF():
 		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
 		recepient = 'conrad.lewin@gmail.com'
 		response = emailer.sendAward(session['email'],recepient,pdf)
+		
+		#debug
 		print('Code: {0}'.format(response.status_code,file=sys.stderr))
+		sys.stdout.flush()
 		print('Body: {0}'.format(response.body,file=sys.stderr))
+		sys.stdout.flush()
 		print('Headers: {0}'.format(response.headers,file=sys.stderr))
+		sys.stdout.flush()
+		#end debug
+		
 		return send_file(pdf)
 	else:
 		abort(500) #change to proper error code

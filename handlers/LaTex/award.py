@@ -1,5 +1,6 @@
 from __future__ import print_function #debug
 import os,sys
+from datetime import datetime
 from subprocess import check_call,CalledProcessError
 
 class Award(object):
@@ -12,7 +13,7 @@ class Award(object):
 	
 	def __init__(self,awardDetails,saveAs):
 		self.details = awardDetails
-		self.filename = saveAs
+		self.filename = saveAs + datetime.now().strftime("%m%d%Y%f")
 		self.awardTemplate = r'''
 		\documentclass[landscape]{article}
 		\usepackage{wallpaper}
@@ -93,6 +94,7 @@ class Award(object):
 		'''
 		
 		texFile = filename + '.tex'
+
 		try:
 			with open(texFile,'w') as file:
 				file.write(self.awardTemplate)
@@ -105,7 +107,7 @@ class Award(object):
 		
 	def __genPDF(self,texFile):
 		'''
-		generates a .pdf file based on a .tex file by calling the pdflatex compiler. errors will be logged in a log.txt.
+		generates a .pdf file based on a .tex file by calling the pdflatex compiler.
 		if successful the .pdf file name is returned, otherwise None is returned
 		'''
 		
@@ -116,6 +118,8 @@ class Award(object):
 			
 			try:
 				check_call(['pdflatex',texFile,'>',pdf])
+				print('HERE-------------> {0}'.format(pdf,file=sys.stderr))
+				sys.stdout.flush()
 			except CalledProcessError as e:
 				details = {'code':e.returncode,'output':e.output,'cmd':e.cmd}
 				print('{0} caused a CalledProcessError (Error Code: {1}): {2}'.format(details['cmd'],details['code'],details['output']),file=sys.stderr)
@@ -145,7 +149,7 @@ class Award(object):
 		
 		if texFile is not None:
 			pdf = self.__genPDF(texFile)
-				
+			
 			if pdf is not None:
 				self.__clean()
 				return pdf
