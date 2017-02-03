@@ -5,6 +5,7 @@ import json, boto3
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
+from handlers.Email import email
 from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session
 from flask_cors import CORS, cross_origin
 
@@ -31,6 +32,8 @@ models.Manager,
 models.AwardType,
 models.Award,
 models.AwardArchive)
+
+emailer = email.Emailer()
 
 #the login link should only be present on the index and perhaps the login page. when logged in, this link should change to logout
 
@@ -177,11 +180,17 @@ def renderPDF():
 	pdf = award.genAward()
 	
 	if pdf is not None:
+		#testing email functionality
+		#if response code is not 202 then something bad happened... added error checking
+		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
+		recepient = 'conrad.lewin@gmail.com'
+		response = emailer.sendAward(session['email'],recepient,pdf)
+		print('Code: {0}'.format(response.status_code,file=sys.stderr))
+		print('Body: {0}'.format(response.body,file=sys.stderr))
+		print('Headers: {0}'.format(response.headers,file=sys.stderr))
 		return send_file(pdf)
 	else:
 		abort(500) #change to proper error code
-
-
 
 @app.route('/jquery')
 def jquerytest():
