@@ -72,20 +72,19 @@ class PostgresDatabase(object):
 		pword = payload['password']
 		type = payload['account-type']
 		
-		#we should indicate why the login failed on the login page
 		if type == 'admin':
 			admin = self.Admin.query.filter_by(email=email).first()
 			if admin is None:
-				return False
+				return False, None #we should indicate why the login failed on the login page
 			else:
-				return argon2.verify(pword,admin.account.pword)
+				return argon2.verify(pword,admin.account.pword), admin.account
 				
 		if type == 'user':
 			user = self.Manager.query.filter_by(email=email).first()
 			if user is None:
-				return False
+				return False, None #we should indicate why the login failed on the login page
 			else:
-				return argon2.verify(pword,user.account.pword)
+				return argon2.verify(pword,user.account.pword), user.account
 				
 		return False
 		
@@ -130,6 +129,21 @@ class PostgresDatabase(object):
 			
 		return True
 	
+	def getAccount(self,id):
+		return self.Account.query.get(id)
+		
+	def setAuthenticated(self,account,val):
+		#account = self.getAccount(accountId)
+		
+		try:
+			account.authenticated = val
+			db.session.add(account)
+			db.session.commit()
+		except IntegrityError:
+			return False,None
+			
+		return True,account
+	
 	'''
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')
@@ -146,4 +160,4 @@ class PostgresDatabase(object):
 		db.session.add(account)
 		db.session.add(admin)
 		db.session.commit()
-	'''
+	'''	

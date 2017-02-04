@@ -8,7 +8,8 @@ class Account (database.db.Model):
 	answer1 = database.db.Column(database.db.Text, nullable=False)
 	answer2 = database.db.Column(database.db.Text, nullable=False)
 	created = database.db.Column(database.db.DateTime, nullable=False)
-
+	authenticated = database.db.Column(database.db.Boolean, default=False)
+	
 	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined')
 	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined')
 	q1 = database.db.relationship('Question',foreign_keys=[q1_id])
@@ -24,13 +25,22 @@ class Account (database.db.Model):
 
 	def __repr__(self):
 		return '<Account {0}>'.format(self.id)
+		
+	def is_active(self):
+		return True
+
+	def get_id(self):
+		return self.id
+
+	def is_authenticated(self):
+		return self.authenticated
+
+	def is_anonymous(self):
+		return False
 
 class Question(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)
 		prompt = database.db.Column(database.db.String(255), nullable=False)
-		
-		#account = database.db.relationship('Account',backref='questions',lazy='joined',foreign_keys=[id],primaryjoin=(Account.id == id))
-		#account = database.db.relationship('Account',backref='questions',lazy='joined',foreign_keys=[Account.q1_id,Account.q2_id])
 		
 		def __init__(self,prompt):
 			self.prompt = prompt
@@ -50,7 +60,6 @@ class Admin (database.db.Model):
 	def __repr__(self):
 		return '<Admin {0}>'.format(self.account_id)
 
-    
 
 class Manager (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
@@ -60,9 +69,9 @@ class Manager (database.db.Model):
 	lname = database.db.Column(database.db.String(32), nullable=False)
 	signature = database.db.Column(database.db.Text, nullable=False)
 	email = database.db.Column(database.db.String(32), nullable=False, unique=True)
-
+	
 	created = database.db.relationship('Award', backref='manager',lazy='dynamic')
-
+	
 	def __init__(self,account,title,fname,lname,signature,email):
 		self.account = account
 		self.title = title

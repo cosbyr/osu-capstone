@@ -118,8 +118,6 @@ class Award(object):
 			
 			try:
 				check_call(['pdflatex',texFile,'>',pdf])
-				print('HERE-------------> {0}'.format(pdf,file=sys.stderr))
-				sys.stdout.flush()
 			except CalledProcessError as e:
 				details = {'code':e.returncode,'output':e.output,'cmd':e.cmd}
 				print('{0} caused a CalledProcessError (Error Code: {1}): {2}'.format(details['cmd'],details['code'],details['output']),file=sys.stderr)
