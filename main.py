@@ -90,8 +90,9 @@ def renderAdmin():
 
 @app.route('/user')
 @login_required
-def renderUser():		
-	return render_template('user.html',user=session['email'])
+def renderUser():
+	details = alchemist.getUserDetails(session['email'])
+	return render_template('user.html',details=details)
 
 @app.route('/update-account',methods=['GET','POST'])
 @login_required
@@ -122,12 +123,14 @@ def renderUpdateAccount():
 def renderCreate():
 	if 'email' not in session:
 		return redirect(url_for('renderLogin'))
-		
-	return render_template('create.html')
+	
+	details = alchemist.getUserDetails(session['email'])	
+	return render_template('create.html', details=details)
 
 @app.route('/history')
 @login_required
 def renderHistory():
+	details = alchemist.getUserDetails(session['email'])	
 	return render_template('history.html')
 
 @app.route('/new-account',methods=['GET','POST'])

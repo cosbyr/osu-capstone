@@ -8,7 +8,11 @@
 
 {% block content %}
 	<div class="outter-container">
+		{% if details.email %}
+		<header class="header-row">{{details.fname}} {{details.lname}}, <a href="/logout">Logout</a></header>
+		{% else %}
 		<header class="header-row"><a href="/login">Login</a></header>
+		{% endif %}
 		<div class="page-title">Update Account</div>
 		<form action="/update-account" method="post">
 			
