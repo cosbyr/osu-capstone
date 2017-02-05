@@ -14,5 +14,33 @@
 		<header class="header-row"><a href="/login">Login</a></header>
 		{% endif %}
 		<div class="page-title">Create New Award</div>
+		<form action="/latex" method="post">
+			
+
+				
+				<input class="input-box-50" type="text" name="recpFirst" placeholder="Recipient First Name" required />
+				<input class="input-box-50" type="text" name="recpLast" placeholder="Recipient Last Name" required />
+				<input class="input-box-50" type="text" name="message" placeholder="Award Message" required />
+				<input class="input-box-50" type="email" id='email' name="recpEmail" placeholder="Recipient Email" required />
+
+				<select class="input-box-50" name="type">
+					{% for key,value in awardTypes.iteritems() %}
+						<option value="{{ value }}">{{ value }}</option>
+					{% endfor %}
+				</select>
+				
+				<select class="input-box-50" name="theme">
+					{% for key,value in awardThemes.iteritems() %}
+						<option value="{{ value }}">{{ value }}</option>
+					{% endfor %}
+				</select>
+				<select class="input-box-50" name="background">
+					{% for key,value in awardBackgrounds.iteritems() %}
+						<option value="{{ value }}">{{ value }}</option>
+					{% endfor %}
+				</select>
+				
+				<input class="button-box" type="submit" value="Create Award">
+		</form>
 	</div>
 {% endblock content %}

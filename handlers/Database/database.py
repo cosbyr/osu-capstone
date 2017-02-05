@@ -13,7 +13,7 @@ db = SQLAlchemy()
 
 #consider making this a singleton class
 class PostgresDatabase(object):
-	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive):
+	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme):
 		self.Question = clsQuestion
 		self.Account = clsAccount
 		self.Admin = clsAdmin
@@ -21,7 +21,36 @@ class PostgresDatabase(object):
 		self.AwardType = clsAwardType
 		self.Award = clsAward
 		self.AwardArchive = clsAwardArchive
+		self.AwardBackground = clsAwardBackground
+		self.AwardTheme = clsAwardTheme
+
+	def getAwardTheme(self):
+		themes = {}
+		results = db.session.query(self.AwardTheme).all()
+		
+		for r in results:
+			themes[r.id] = r.theme
+			
+		return themes
+		
+	def getAwardBackground(self):
+		backgrounds = {}
+		results = db.session.query(self.AwardBackground).all()
+		
+		for r in results:
+			backgrounds[r.id] = r.filename
+			
+		return backgrounds
 	
+	def getAwardTypes(self):
+		types = {}
+		results = db.session.query(self.AwardType).all()
+		
+		for r in results:
+			types[r.id] = r.name
+			
+		return types
+
 	def getQuestions(self):
 		questions = {}
 		results = db.session.query(self.Question).all()
@@ -30,27 +59,31 @@ class PostgresDatabase(object):
 			questions[r.id] = r.prompt
 			
 		return questions
-		
-	def getUserDetails(self,email):
+	
+	def downloadUserSig(self,email):
 		bucket = os.environ.get('S3_BUCKET_NAME')
 		
 		filename = replace(email,'@','_')
 		filename = replace(filename,'.','_')
 		filename += '_sig.png'
-		destFile = './static/images/sign.png'
+		#destFile = './static/images/sign.png'
 		
 		client = boto3.client('s3')
 		
 		try:
-			client.download_file(bucket, filename, destFile)
+			client.download_file(bucket, filename, filename)
 		except ClientError as e:
 			print(e.response['Error']['Message'],file=sys.stderr)
 			return None
 		except IOError as e:
 			print(e,file=sys.stderr)
 			return None
+		return True
 		
+	def getUserDetails(self,email):
 		user = self.Manager.query.filter_by(email=email).first()
+		
+		self.downloadUserSig(email)
 		
 		details = {
 		'id':user.id,
@@ -62,7 +95,7 @@ class PostgresDatabase(object):
 		'question2':user.account.q2,
 		'answer1':user.account.answer1,
 		'answer2':user.account.answer2,
-		'signature':destFile}
+		'signature':user.signature}
 		
 		return details
 		
@@ -127,6 +160,30 @@ class PostgresDatabase(object):
 		except IntegrityError:
 			return False
 			
+		return True
+		
+	def createAward(self,payload,email):
+		
+		creator = self.Manager.query.filter_by(email=email).first()
+	
+		creatorId = creator.id
+		typeID = int(payload['type'])
+		message = payload['message']
+		recpFirst = payload['recpFirst']
+		recpLast = payload['recpLast']
+		background = payload['background']
+		granted = datetime.now()
+		theme = payload['theme']
+		recpEmail = payload['recpEmail']
+		
+		
+		award = self.Award(creatorId,typeID,message,recpFirst,recpLast,recpEmail,background,granted,theme)
+		
+		try:
+			db.session.add_all([award])
+			db.session.commit()
+		except IntegrityError:
+			return False
 		return True
 	
 	def getAccount(self,id):

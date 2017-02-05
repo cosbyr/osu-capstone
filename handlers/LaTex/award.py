@@ -30,10 +30,10 @@ class Award(object):
 
 		\begin{document}
 
-		\TileWallPaper{4cm}{2cm}{''' + awardDetails['background'] + r'''}
+		\TileWallPaper{8cm}{8cm}{''' + awardDetails['background'] + r'''}
 
 		\centering
-		\scalebox{3.0}{\color{green!30!black!60}
+		\scalebox{3.0}{\color{''' + awardDetails['color'] + r'''!30!black!60}
 		\begin{minipage}{.33\textwidth}
 		\font\border=umrandb
 		\generalframe
@@ -55,9 +55,9 @@ class Award(object):
 
 		\curlyframe[.9\columnwidth]{
 
-		\textcolor{red!10!black!90}
+		\textcolor{black!10!black!90}
 		{\small ''' + awardDetails['company'] + r'''}\\ 
-		\textcolor{green!10!black!90}{
+		\textcolor{black!10!black!90}{
 		\tiny ''' + awardDetails['message'] + r'''}
 
 		\smallskip
@@ -72,7 +72,7 @@ class Award(object):
 
 		\vspace{5mm}
 
-		{\color{blue!40!black}
+		{\color{''' + awardDetails['color'] + r'''!40!black}
 		\scalebox{.8}{
 		\begin{tabular}{ccc}
 		\ & 

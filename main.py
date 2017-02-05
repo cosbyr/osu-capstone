@@ -36,7 +36,9 @@ models.Admin,
 models.Manager,
 models.AwardType,
 models.Award,
-models.AwardArchive)
+models.AwardArchive,
+models.AwardBackground,
+models.AwardTheme)
 
 emailer = email.Emailer()
 
@@ -124,8 +126,11 @@ def renderCreate():
 	if 'email' not in session:
 		return redirect(url_for('renderLogin'))
 	
-	details = alchemist.getUserDetails(session['email'])	
-	return render_template('create.html', details=details)
+	details = alchemist.getUserDetails(session['email'])
+	awardBackgrounds = alchemist.getAwardBackground	()
+	awardThemes = alchemist.getAwardTheme()
+	awardTypes = alchemist.getAwardTypes()
+	return render_template('create.html', details=details, awardBackgrounds=awardBackgrounds, awardThemes=awardThemes, awardTypes=awardTypes)
 
 @app.route('/history')
 @login_required
@@ -141,7 +146,6 @@ def renderNewAccount():
 	
 	if request.method == 'POST':
 		payload = request.form
-		logging.warning(payload)
 		status = alchemist.createAccount(payload)
 		
 		if status == False:
@@ -179,23 +183,30 @@ def sign_s3():
 def renderPassword():
 	return render_template('password.html')
 
-@app.route('/latex')
+@app.route('/latex', methods=['POST'])
+@login_required
 def renderPDF():
 	#still just a testing LaTex functionality
 	#may want to add a timestamp to the pdf filename to avoid caching
+	payload = request.form
+	#status = alchemist.createAward(payload, session['email'])
+	
 	filename = 'award'
-	details = {
-	'background':'static/images/tiling.png',
+	awdDetails = {
+	'background':'static/images/' + payload['background'],
+	'color':payload['theme'],
 	'logo':'static/images/gateway.png',
 	'company':'Gateway Mapping, Inc.',
-	'message':'In recognition of hard work and passion we hereby award',
-	'type':'Employee of the Month',
-	'employee':'Aristotle Jones',
+	'message': payload['message'],
+	'type': payload['type'],
+	'employee':payload['recpFirst'] + ' ' + payload['recpLast'] ,
 	'admin1':'John Doe',
 	'adminTitle1':'Supervisor',
-	'signature':'static/images/ex-sig.png'}
+	'signature':'./rbcosby_gmail_com_sig.png'}
 	
-	award = ah.Award(details,filename)
+	alchemist.downloadUserSig(session['email'])
+	
+	award = ah.Award(awdDetails,filename)
 	pdf = award.genAward()
 	
 	if pdf is not None:
@@ -203,7 +214,7 @@ def renderPDF():
 		#if response code is not 202 then something bad happened... added error checking
 		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
 		sender = session['email']
-		recepient = 'conrad.lewin@gmail.com'
+		recepient = payload['recpEmail']
 		response = emailer.sendAward(sender,recepient,pdf)
 		
 		#debug

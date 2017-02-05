@@ -106,8 +106,10 @@ class Award (database.db.Model):
 	recepient_lname = database.db.Column(database.db.String(32),nullable=False)
 	background = database.db.Column(database.db.Text,nullable=False)
 	issuedOn = database.db.Column(database.db.DateTime,nullable=False)
+	theme = database.db.Column(database.db.Text,nullable=False)
+	recepient_email = database.db.Column(database.db.String(32),nullable=False)
 	
-	def __init__(self,creator,typeId,message,fname,lname,background,issuedOn):
+	def __init__(self,creator,typeId,message,fname,lname,email,background,issuedOn,theme):
 		self.creator = creator
 		self.type_id = typeId
 		self.message = message
@@ -115,6 +117,8 @@ class Award (database.db.Model):
 		self.recepient_lname = fname
 		self.background = background
 		self.issuedOn = issuedOn
+		self.theme = theme
+		self.recepient_email = email
 
 	def __repr__(self):
 		return '<Award {0} {1} {2}>'.format(self.creator,self.type_id,self.message)
@@ -134,3 +138,24 @@ class AwardArchive (database.db.Model):
 
 	def __repr__(self):
 		return '<AwardArchive {0} {1} {2}>'.format(self.fname,self.lname,self.type_id)
+		
+class AwardBackground(database.db.Model):
+		id = database.db.Column(database.db.Integer, primary_key=True)
+		filename = database.db.Column(database.db.String(12), nullable=False)
+		
+		def __init__(self,filename):
+			self.filename = filename
+			
+		def __repr__(self):
+			return '{0}'.format(self.filename)
+
+class AwardTheme(database.db.Model):
+		id = database.db.Column(database.db.Integer, primary_key=True)
+		theme = database.db.Column(database.db.String(12), nullable=False)
+		
+		def __init__(self,theme):
+			self.theme = theme
+			
+		def __repr__(self):
+			return '{0}'.format(self.theme)	
+		
