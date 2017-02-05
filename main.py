@@ -190,7 +190,7 @@ def renderPDF():
 	#still just a testing LaTex functionality
 	#may want to add a timestamp to the pdf filename to avoid caching
 	payload = request.form
-	#status = alchemist.createAward(payload, session['email'])
+	status = alchemist.createAward(payload, session['email'])
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
 	sigFile = replace(sigFile,'.','_')

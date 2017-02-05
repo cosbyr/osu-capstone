@@ -66,7 +66,6 @@ class PostgresDatabase(object):
 		filename = replace(email,'@','_')
 		filename = replace(filename,'.','_')
 		filename += '_sig.png'
-		#destFile = './static/images/sign.png'
 		
 		client = boto3.client('s3')
 		
@@ -165,9 +164,10 @@ class PostgresDatabase(object):
 	def createAward(self,payload,email):
 		
 		creator = self.Manager.query.filter_by(email=email).first()
+		awardType = self.AwardType.query.filter_by(name=payload['type']).first()
 	
 		creatorId = creator.id
-		typeID = int(payload['type'])
+		typeID = awardType.id
 		message = payload['message']
 		recpFirst = payload['recpFirst']
 		recpLast = payload['recpLast']
