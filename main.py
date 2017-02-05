@@ -6,6 +6,7 @@ from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
 from handlers.Email import email
+from string import replace
 from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session, Response
 from flask_cors import CORS, cross_origin
 from flask.ext.login import LoginManager, login_required, current_user, login_user, logout_user
@@ -43,7 +44,7 @@ models.AwardTheme)
 emailer = email.Emailer()
 
 #the login link should only be present on the index and perhaps the login page. when logged in, this link should change to logout
-
+	
 @app.route('/')
 def renderIndex():
 	return render_template('index.html')
@@ -190,6 +191,12 @@ def renderPDF():
 	#may want to add a timestamp to the pdf filename to avoid caching
 	payload = request.form
 	#status = alchemist.createAward(payload, session['email'])
+	sigFile = session['email']
+	sigFile = replace(sigFile,'@','_')
+	sigFile = replace(sigFile,'.','_')
+	sigFile += '_sig.png'
+	
+	details = alchemist.getUserDetails(session['email'])
 	
 	filename = 'award'
 	awdDetails = {
@@ -200,11 +207,9 @@ def renderPDF():
 	'message': payload['message'],
 	'type': payload['type'],
 	'employee':payload['recpFirst'] + ' ' + payload['recpLast'] ,
-	'admin1':'John Doe',
-	'adminTitle1':'Supervisor',
-	'signature':'./rbcosby_gmail_com_sig.png'}
-	
-	alchemist.downloadUserSig(session['email'])
+	'admin1':details['fname'] + ' ' + details['lname'],
+	'adminTitle1':details['title'],
+	'signature':sigFile}
 	
 	award = ah.Award(awdDetails,filename)
 	pdf = award.genAward()
