@@ -13,14 +13,14 @@
 
 		<div class="inner-container center-align">Find Employee</div>
 		<input class="input-box-50 small-margin-top" type="text" name="recpLast" placeholder="Recipient Last Name" required />
-		<div id="get-employee" class="grey-button">Find Employees </div>
+		<div id="get-employee" class="grey-button">Find Employees </div><br>
 
 
 		<!-- Python needs to return possible employees, -->
 		<select class="input-box-50" name="employee">
-			{% for key, fname, lname in alchemist.findUser(lname) %}
+			{% for key, fname, lname in names %}
 				<option value="key" >{{ fname }} {{ lname }}</option>
-			{% enfor %}
+			{% endfor %}
 		</select>
 
 
