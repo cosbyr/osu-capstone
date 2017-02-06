@@ -193,3 +193,9 @@ input{
 #file-load-button:active {
 	border: 1px solid black;
 }
+
+.award-image {
+	width: 20%;
+	height: 20%;
+	border: 2px solid blue;
+}

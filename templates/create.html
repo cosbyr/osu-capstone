@@ -19,12 +19,15 @@
 				<input class="input-box-50" type="text" name="message" placeholder="Award Message" required />
 				<input class="input-box-50" type="email" id='email' name="recpEmail" placeholder="Recipient Email" required />
 
-				<select class="input-box-50" name="type">
-					{% for key,value in awardTypes.iteritems() %}
-						<option value="{{ key }}">{{ value }}</option>
-					{% endfor %}
-				</select>
+				<!-- Display background options -->
+				{% for path,value in awardTypes.iteritems() %}
+					<div class="award-image">
+						<img src=" {{ path }}" alt="Award {{ value }}">
+					</div>
+				{% endfor %}
 				
+				
+				<!-- Display color options -->
 				<select class="input-box-50" name="theme">
 					{% for key,value in awardThemes.iteritems() %}
 						<option value="{{ key }}">{{ value }}</option>
