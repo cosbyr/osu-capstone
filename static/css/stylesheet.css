@@ -27,6 +27,38 @@ body{
 
 }
 
+
+
+header > ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background-color: blue
+}
+
+header > ul > li {
+    display: inline;
+    float: left;   
+}
+
+header ul li {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 5px 8px;
+    text-decoration: none;
+}
+
+/* Change the link color to #111 (black) on hover */
+header ul li:hover {
+    color: #111;
+}
+
+.active {
+	background: grey;
+}
+
 input{
 	width: 100%;
 	background: blue;
@@ -35,8 +67,6 @@ input{
 	margin-top: 40px;
 	line-height: 20px;
 	font-weight: bold;
-
-
 }
 
 .input{

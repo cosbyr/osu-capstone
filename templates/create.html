@@ -17,6 +17,11 @@
 
 
 		<!-- Python needs to return possible employees, -->
+		<select class="input-box-50" name="employee">
+			{% for key, fname, lname in alchemist.findUser(lname) %}
+				<option value="key" >{{ fname }} {{ lname }}</option>
+			{% enfor %}
+		</select>
 
 
 		<form action="/latex" method="post">
