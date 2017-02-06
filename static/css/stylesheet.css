@@ -126,6 +126,14 @@ input{
 	text-align: center;
 }
 
+.grey-button{
+	background: grey;
+	text-align: right;
+	display: inline-block;
+	margin-top: .25em;
+	cursor: pointer;
+}
+
 .radio {
 	margin: 0;
 	padding: 0;
@@ -171,15 +179,7 @@ input{
     display:none;
 }
 
-.change-question{
-	background: grey;
-	text-align: right;
-	display: inline-block;
 
-	/*margin-left: 10%;*/
-	margin-top: .25em;
-
-}
 
 #preview {
 	border: 2px solid blue;
