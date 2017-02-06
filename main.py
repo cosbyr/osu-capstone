@@ -122,6 +122,7 @@ def renderUpdateAccount():
 				return redirect(url_for('renderUpdateAccount'))
 				
 			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
+			session['email'] = payload['email']
 			return redirect(url_for('renderUser'))
 	else:
 		abort(401)
