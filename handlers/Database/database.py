@@ -13,7 +13,7 @@ db = SQLAlchemy()
 
 #consider making this a singleton class
 class PostgresDatabase(object):
-	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme):
+	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme,clsEmployee):
 		self.Question = clsQuestion
 		self.Account = clsAccount
 		self.Admin = clsAdmin
@@ -23,8 +23,9 @@ class PostgresDatabase(object):
 		self.AwardArchive = clsAwardArchive
 		self.AwardBackground = clsAwardBackground
 		self.AwardTheme = clsAwardTheme
+		self.Employee = clsEmployee
 
-	def getAwardTheme(self):
+	def getAwardThemes(self):
 		themes = {}
 		results = db.session.query(self.AwardTheme).all()
 		
@@ -33,7 +34,7 @@ class PostgresDatabase(object):
 			
 		return themes
 		
-	def getAwardBackground(self):
+	def getAwardBackgrounds(self):
 		backgrounds = {}
 		results = db.session.query(self.AwardBackground).all()
 		
@@ -162,41 +163,45 @@ class PostgresDatabase(object):
 		return True
 		
 	def createAward(self,payload,email):
-		
 		creator = self.Manager.query.filter_by(email=email).first()
-		awardType = self.AwardType.query.filter_by(name=payload['type']).first()
-	
+		awardType = self.AwardType.query.get(payload['type'])
+		recvdBy = self.Employee.query.filter_by(email=payload['recpEmail']).first()
+		
+		if recvdBy is None:
+			return False, None
+			
 		creatorId = creator.id
-		typeID = awardType.id
+		typeId = awardType.id
 		message = payload['message']
-		recpFirst = payload['recpFirst']
-		recpLast = payload['recpLast']
-		background = payload['background']
-		granted = datetime.now()
-		theme = payload['theme']
-		recpEmail = payload['recpEmail']
+		issuedOn = datetime.now()
+		recepient = recvdBy.id
+		background = int(payload['background'])
+		theme = int(payload['theme'])
 		
 		
-		award = self.Award(creatorId,typeID,message,recpFirst,recpLast,recpEmail,background,granted,theme)
-		
+		award = self.Award(creatorId,typeId,message,issuedOn,recepient,background,theme)
+
 		try:
-			db.session.add_all([award])
+			db.session.add(award)
 			db.session.commit()
-		except IntegrityError:
-			return False
-		return True
+		except IntegrityError as e:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			return False, None
+			
+		return True, award
 	
 	def getAccount(self,id):
 		return self.Account.query.get(id)
 		
-	def setAuthenticated(self,account,val):
-		#account = self.getAccount(accountId)
-		
+	def setAuthenticated(self,account,val):		
 		try:
 			account.authenticated = val
 			db.session.add(account)
 			db.session.commit()
-		except IntegrityError:
+		except IntegrityError as e:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
 			return False,None
 			
 		return True,account
@@ -217,4 +222,4 @@ class PostgresDatabase(object):
 		db.session.add(account)
 		db.session.add(admin)
 		db.session.commit()
-	'''	
+	'''

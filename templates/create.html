@@ -8,11 +8,7 @@
 
 {% block content %}
 	<div class="outter-container">
-		{% if details.email %}
-		<header class="header-row">{{details.fname}} {{details.lname}}, <a href="/logout">Logout</a></header>
-		{% else %}
-		<header class="header-row"><a href="/login">Login</a></header>
-		{% endif %}
+		<header class="header-row">{{username}}, <a href="/logout">Logout</a></header>
 		<div class="page-title">Create New Award</div>
 		<form action="/latex" method="post">
 			
@@ -25,22 +21,23 @@
 
 				<select class="input-box-50" name="type">
 					{% for key,value in awardTypes.iteritems() %}
-						<option value="{{ value }}">{{ value }}</option>
+						<option value="{{ key }}">{{ value }}</option>
 					{% endfor %}
 				</select>
 				
 				<select class="input-box-50" name="theme">
 					{% for key,value in awardThemes.iteritems() %}
-						<option value="{{ value }}">{{ value }}</option>
+						<option value="{{ key }}">{{ value }}</option>
 					{% endfor %}
 				</select>
 				<select class="input-box-50" name="background">
 					{% for key,value in awardBackgrounds.iteritems() %}
-						<option value="{{ value }}">{{ value }}</option>
+						<option value="{{ key }}">{{ value }}</option>
 					{% endfor %}
 				</select>
 				
 				<input class="button-box" type="submit" value="Create Award">
+
 		</form>
 	</div>
 {% endblock content %}

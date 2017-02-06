@@ -7,14 +7,10 @@
 {% endblock navbar %}
 
 {% block content %}
-{% if details.email %}
-<header class="header-row">{{details.fname}} {{details.lname}}, <a href="/logout">Logout</a></header>
-{% else %}
-<header class="header-row"><a href="/login">Login</a></header>
-{% endif %}
+<header class="header-row">{{username}}, <a href="/logout">Logout</a></header>
 <p>user portal goes here</p>
 <a href="/create">Click to Create Award</a>
 <br>
 <a href="/update-account">Click to Update Account</a>
-<p>Logged in as: {{details.email}}</p>
+<p>Logged in as: {{email}}</p>
 {% endblock content %}

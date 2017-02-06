@@ -88,7 +88,7 @@ class AwardType (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	name = database.db.Column(database.db.String(32),nullable=False)
 
-	award = database.db.relationship('Award', backref='award_type', lazy='dynamic')
+	type = database.db.relationship('Award', backref='award_type', lazy='dynamic')
 	archive = database.db.relationship('AwardArchive', backref='award_type',lazy='dynamic')
 
 	def __init__(self,name):
@@ -102,23 +102,19 @@ class Award (database.db.Model):
 	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('manager.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
 	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	message = database.db.Column(database.db.String(255),nullable=False)
-	recepient_fname = database.db.Column(database.db.String(32),nullable=False)
-	recepient_lname = database.db.Column(database.db.String(32),nullable=False)
-	background = database.db.Column(database.db.Text,nullable=False)
 	issuedOn = database.db.Column(database.db.DateTime,nullable=False)
-	theme = database.db.Column(database.db.Text,nullable=False)
-	recepient_email = database.db.Column(database.db.String(32),nullable=False)
+	recepient = database.db.Column(database.db.Integer,database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
+	background_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_background.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
+	theme_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_theme.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	
-	def __init__(self,creator,typeId,message,fname,lname,email,background,issuedOn,theme):
+	def __init__(self,creator,typeId,message,issuedOn,recepient,background,theme):
 		self.creator = creator
 		self.type_id = typeId
 		self.message = message
-		self.recepient_fname = fname
-		self.recepient_lname = fname
-		self.background = background
 		self.issuedOn = issuedOn
-		self.theme = theme
-		self.recepient_email = email
+		self.recepient = recepient
+		self.background_id = background
+		self.theme_id = theme
 
 	def __repr__(self):
 		return '<Award {0} {1} {2}>'.format(self.creator,self.type_id,self.message)
@@ -141,21 +137,43 @@ class AwardArchive (database.db.Model):
 		
 class AwardBackground(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)
-		filename = database.db.Column(database.db.String(12), nullable=False)
+		filename = database.db.Column(database.db.String(32), nullable=False)
+		
+		background = database.db.relationship('Award', backref='award_background', lazy='dynamic')
 		
 		def __init__(self,filename):
 			self.filename = filename
 			
 		def __repr__(self):
-			return '{0}'.format(self.filename)
+			return '<AwardBackground {0}>'.format(self.filename)
 
 class AwardTheme(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)
-		theme = database.db.Column(database.db.String(12), nullable=False)
+		theme = database.db.Column(database.db.String(32), nullable=False)
+		
+		color = database.db.relationship('Award', backref='award_theme', lazy='dynamic')
 		
 		def __init__(self,theme):
 			self.theme = theme
 			
 		def __repr__(self):
-			return '{0}'.format(self.theme)	
+			return '<AwardTheme {0}>'.format(self.theme)
+			
+class Employee(database.db.Model):
+	id = database.db.Column(database.db.Integer,primary_key=True)
+	fname = database.db.Column(database.db.String(32),nullable=False)
+	lname = database.db.Column(database.db.String(32),nullable=False)
+	email = database.db.Column(database.db.String(32),nullable=False,unique=True)
+	
+	award = database.db.relationship('Award', backref='employee', lazy='dynamic')
+	
+	def __init__(self,fname,lname,email):
+		self.fname = fname
+		self.lname = lname
+		self.email = email
+			
+	def __repr__(self):
+		return '<Employee {0} {1} {2}>'.format(self.fname,self.lname,self.email)
+	
+	
 		

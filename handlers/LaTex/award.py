@@ -78,8 +78,8 @@ class Award(object):
 		\ & 
 		\includegraphics[height=1.1cm]{''' + awardDetails['signature'] + r'''}\\[-12pt]
 		\cline{1-3}\\[-4pt] 
-		\ ''' + r''' & ''' + awardDetails['admin1'] + r''' & ''' + r'''\\
-		\ ''' + r''' & ''' + awardDetails['adminTitle1'] + r''' & ''' + r'''\\
+		\ ''' + r''' & ''' + awardDetails['admin'] + r''' & ''' + r'''\\
+		\ ''' + r''' & ''' + awardDetails['adminTitle'] + r''' & ''' + r'''\\
 		\end{tabular}
 		}}}}
 		\end{minipage}

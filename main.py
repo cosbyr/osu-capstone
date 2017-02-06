@@ -39,11 +39,10 @@ models.AwardType,
 models.Award,
 models.AwardArchive,
 models.AwardBackground,
-models.AwardTheme)
+models.AwardTheme,
+models.Employee)
 
 emailer = email.Emailer()
-
-#the login link should only be present on the index and perhaps the login page. when logged in, this link should change to logout
 	
 @app.route('/')
 def renderIndex():
@@ -71,6 +70,7 @@ def renderLogin():
 			if payload['account-type'] == 'admin':
 				return redirect(url_for('renderAdmin'))
 			else:
+				session['name'] = '{0} {1}'.format(account.manager.fname,account.manager.lname)
 				return redirect(url_for('renderUser'))			
 		else:
 			abort(401)
@@ -94,50 +94,59 @@ def renderAdmin():
 @app.route('/user')
 @login_required
 def renderUser():
-	details = alchemist.getUserDetails(session['email'])
-	return render_template('user.html',details=details)
+	#details = alchemist.getUserDetails(session['email'])
+	#return render_template('user.html',details=details)
+	if session['role'] == 'user':
+		return render_template('user.html',username=session['name'],email=session['email'])
+	else:
+		abort(401)
 
 @app.route('/update-account',methods=['GET','POST'])
 @login_required
 def renderUpdateAccount():	
-	if request.method == 'GET':
-		if 'email' not in session:
-			return redirect(url_for('renderLogin'))
+	if session['role'] == 'user':
+		if request.method == 'GET':
+			details = alchemist.getUserDetails(session['email'])
 			
-		details = alchemist.getUserDetails(session['email'])
-		
-		if details is None:
-			abort(500) #this should flash a message rather than abort. will fix later
+			if details is None:
+				abort(500) #this should flash a message rather than abort. will fix later
+				
+			return render_template('update-account.html',username=session['name'],details=details)
 			
-		return render_template('update-account.html',details=details)
-		
-	if request.method == 'POST':
-		payload = request.form
-		status = alchemist.updateAccount(payload,session['email'])
-		
-		if status == False:
-			return redirect(url_for('renderUpdateAccount'))
+		if request.method == 'POST':
+			payload = request.form
+			status = alchemist.updateAccount(payload,session['email'])
 			
-		return redirect(url_for('renderUser'))
+			if status == False:
+				#print some error message on the update page after the redirect as to why the account could not be updated
+				return redirect(url_for('renderUpdateAccount'))
+				
+			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
+			return redirect(url_for('renderUser'))
+	else:
+		abort(401)
 	
 
 @app.route('/create')
 @login_required
 def renderCreate():
-	if 'email' not in session:
-		return redirect(url_for('renderLogin'))
-	
-	details = alchemist.getUserDetails(session['email'])
-	awardBackgrounds = alchemist.getAwardBackground	()
-	awardThemes = alchemist.getAwardTheme()
-	awardTypes = alchemist.getAwardTypes()
-	return render_template('create.html', details=details, awardBackgrounds=awardBackgrounds, awardThemes=awardThemes, awardTypes=awardTypes)
+	if session['role'] == 'user':
+		#details = alchemist.getUserDetails(session['email'])
+		awardBackgrounds = alchemist.getAwardBackgrounds()
+		awardThemes = alchemist.getAwardThemes()
+		awardTypes = alchemist.getAwardTypes()
+		return render_template('create.html', username=session['name'], awardBackgrounds=awardBackgrounds, awardThemes=awardThemes, awardTypes=awardTypes)
+	else:
+		abort(401)
 
 @app.route('/history')
 @login_required
 def renderHistory():
-	details = alchemist.getUserDetails(session['email'])	
-	return render_template('history.html')
+	if session['role'] == 'user':
+		#details = alchemist.getUserDetails(session['email'])	
+		return render_template('history.html',username=session['name'])
+	else:
+		abort(401)
 
 @app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
@@ -188,36 +197,41 @@ def renderPassword():
 @login_required
 def renderPDF():
 	#still just a testing LaTex functionality
-	#may want to add a timestamp to the pdf filename to avoid caching
 	payload = request.form
-	status = alchemist.createAward(payload, session['email'])
+	status,award = alchemist.createAward(payload, session['email'])
+	
+	if status == False:
+		abort(500) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
+	
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
 	sigFile = replace(sigFile,'.','_')
 	sigFile += '_sig.png'
 	
-	details = alchemist.getUserDetails(session['email'])
+	details = alchemist.getUserDetails(session['email']) #get details in login route and add title to session var
 	
 	filename = 'award'
 	awdDetails = {
-	'background':'static/images/' + payload['background'],
-	'color':payload['theme'],
+	'background':'static/images/' + award.award_background.filename,
+	'color':award.award_theme.theme,
 	'logo':'static/images/gateway.png',
 	'company':'Gateway Mapping, Inc.',
-	'message': payload['message'],
-	'type': payload['type'],
-	'employee':payload['recpFirst'] + ' ' + payload['recpLast'] ,
-	'admin1':details['fname'] + ' ' + details['lname'],
-	'adminTitle1':details['title'],
+	'message': award.message,
+	'type': award.award_type.name,
+	'employee':award.employee.fname + ' ' + award.employee.lname,
+	'admin':session['name'],
+	'adminTitle':details['title'],
 	'signature':sigFile}
 	
 	award = ah.Award(awdDetails,filename)
 	pdf = award.genAward()
 	
+
 	if pdf is not None:
 		#testing email functionality
 		#if response code is not 202 then something bad happened... added error checking
 		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
+		'''
 		sender = session['email']
 		recepient = payload['recpEmail']
 		response = emailer.sendAward(sender,recepient,pdf)
@@ -230,7 +244,7 @@ def renderPDF():
 		print('Headers: {0}'.format(response.headers,file=sys.stderr))
 		sys.stdout.flush()
 		#end debug
-		
+		'''
 		return send_file(pdf)
 	else:
 		abort(500) #change to proper error code
