@@ -215,7 +215,7 @@ class PostgresDatabase(object):
 			return False, None
 			
 		for r in results:
-			employees[r.id] = [r.fname,r.lname,r.email]
+			employees[r.id] = {'fname':r.fname,'lname':r.lname,'email':r.email}
 			
 		return True,employees
 		
