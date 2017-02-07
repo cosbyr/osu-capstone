@@ -13,7 +13,8 @@ $(document).ready(function(){
 	  	$.ajax('/get-employee', {
 		  	type: 'post',
 		  	data: data,
-	  		success: function(result) {
+		  	dataType: 'json',
+	  		success: function(data) {
 		      console.log("passed through " + data);
 		    },
 
