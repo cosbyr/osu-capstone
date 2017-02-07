@@ -7,16 +7,19 @@
 {% endblock navbar %}
 
 {% block content %}
+
+
+<div id="msgid">
+</div>
 	<div class="outter-container">
 		<header class="header-row">{{username}}, <a href="/logout">Logout</a></header>
 		<div class="page-title">Create New Award</div>
 
 		<div class="inner-container center-align">Find Employee</div>
 		<form action="/get-employee" method="POST" id="get-employee-form">
-			<input class="input-box-50 small-margin-top" type="text" name="recpLast" placeholder="Recipient Last Name" required />
+			<input class="input-box-50 small-margin-top" type="text" name="lname" placeholder="Recipient Last Name" required />
 			<input type="submit" value="send" />
 		</form>
-
 
 		<!-- Python needs to return possible employees, -->
 		<select class="input-box-50" name="employee">
@@ -91,4 +94,7 @@
 
 		</form>
 	</div>
+{% block javascript %}
+    <SCRIPT SRC="/static/js/uploadSig.js"></SCRIPT>
+{% endblock %}
 {% endblock content %}

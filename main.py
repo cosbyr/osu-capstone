@@ -193,6 +193,7 @@ def sign_s3():
 def renderPassword():
 	return render_template('password.html')
 
+
 @app.route('/latex', methods=['POST'])
 @login_required
 def renderPDF():
