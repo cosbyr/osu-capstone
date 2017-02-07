@@ -212,15 +212,15 @@ class PostgresDatabase(object):
 		results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
 		
 		if results is None:
-			return False, None
+			return {}
 			
 		for r in results:
 			employees[r.id] = {'fname':r.fname,'lname':r.lname,'email':r.email}
 			
-		return True,employees
+		return employees
 		
 		
-	
+	'''
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')
 		quest1 = 1
@@ -236,4 +236,4 @@ class PostgresDatabase(object):
 		db.session.add(account)
 		db.session.add(admin)
 		db.session.commit()
-	
+	'''
