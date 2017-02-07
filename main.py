@@ -202,7 +202,7 @@ def renderPDF():
 	status,award = alchemist.createAward(payload, session['email'])
 	
 	if status == False:
-		return abort(400) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
+		abort(400) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
 	
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
