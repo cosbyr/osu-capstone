@@ -207,9 +207,9 @@ class PostgresDatabase(object):
 			
 		return True,account
 	
-	def getEmployees(self,lname):
+	def getEmployees(self,req):
 		employees = {}
-		results = self.Employee.query.filter(self.Employee.lname.ilike('%' + lname + '%')).all()
+		results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
 		
 		if results is None:
 			return False, None
