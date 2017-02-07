@@ -13,12 +13,13 @@
 		<form action="/update-account" method="post">
 			
 
-				<input class="input-box-50" type="text" name="firstName" value="{{details.fname}}" required />
-				<input class="input-box-50" type="text" name="lastName" value="{{details.lname}}" required />
+				First Name:<input class="input-box-50" type="text" name="firstName" value="{{details.fname}}" required />
+				Last Name:<input class="input-box-50" type="text" name="lastName" value="{{details.lname}}" required />
 
-				<input class="input-box-50" type="email" id='email' name="email" value="{{details.email}}" required />
-				<input class="input-box-50" type="text" name="jobTitle" value="{{details.title}}" required />
+				Email:<input class="input-box-50" type="email" id='email' name="email" value="{{details.email}}" required />
+				Job Title:<input class="input-box-50" type="text" name="jobTitle" value="{{details.title}}" required />
 				
+				<div class="center-algin">Security questions</div>
 				<div class="input-box-50 input">{{details.question1}}</div>
 				<div class="input-box-50 input">{{details.answer1}}</div>
 

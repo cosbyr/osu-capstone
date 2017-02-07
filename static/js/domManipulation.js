@@ -1,35 +1,51 @@
 $(document).ready(function(){
 	
-	/* for find employee form */
+	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){
-	 
+	 event.preventDefault();
 	  var that = $(this),
 	      url = that.attr('action'),
 	      type = that.attr('method'),
-	      data = {};
-	      console.log(url);
+	      data = $("#last-name").val();
+	      data = '{"lname":"' + data + '"}';
+	      console.log(data);
 
-	  that.find('[name]').each(function(index, value) {
-	    console.log(index)
-	    var that = $(this),
-	        name = that.attr('name'),
-	        value = that.val();
-
-	    data[name] = value;
-	  });
-
-	  $.ajax({
-	  	
-	    url: url,
-	    type: type,
-	    data: data,
-	    success: function(response) {
-	      console.log(response);
-	    }
+	  	$.ajax('/get-employee', {
+		  	type: 'post',
+		  	data: data,
+	  		success: function(result) {
+		      console.log("passed through " + data);
+		    },
 
 
-	  });
+		    // url: url,
+		    // type: type,
+		    // data: data,
+		    // dataType: "json"
+
+		    error: function(){
+		    	console.log("sadly things didn't work as hoped" + data);
+		    }
+	  	});
 	  return false;
 	});
 
+
+	/* choosing to reset via email or password on /password*/
+	$("#reset-password").on('submit', function(){
+		
+		var that = $(this),
+	      url = that.attr('action'),
+	      type = that.attr('method'),
+	      radioValue = $("input[name='reset-method']:checked").val();
+	      console.log(radioValue);
+		
+
+		// $.ajax({
+
+
+		// });
+
+		return false;
+	});
 });

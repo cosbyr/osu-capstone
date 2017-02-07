@@ -189,7 +189,6 @@ def sign_s3():
 	})
 	
 @app.route('/password')
-@login_required
 def renderPassword():
 	return render_template('password.html')
 

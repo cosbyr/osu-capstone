@@ -9,15 +9,22 @@
 {% block content %}
 
 
-<div id="msgid">
 </div>
 	<div class="outter-container">
-		<header class="header-row">{{username}}, <a href="/logout">Logout</a></header>
+		<header class="header-row">
+			<ul>
+				<li style="color: black"> {{username}} </li>
+				<li><a href="/user">User Home</a></li>
+				<li  class="active"><a href="/create">Create Award</a></li>
+				<li><a href="/update-account">Update Account</a></li>
+				<li style="float:right"><a href="/logout">Logout</a></li>
+			</ul>
+		</header>
 		<div class="page-title">Create New Award</div>
 
 		<div class="inner-container center-align">Find Employee</div>
 		<form action="/get-employee" method="POST" id="get-employee-form">
-			<input class="input-box-50 small-margin-top" type="text" name="lname" placeholder="Recipient Last Name" required />
+			<input class="input-box-50 small-margin-top" id="last-name" type="text" name="lname" placeholder="Recipient Last Name" required />
 			<input type="submit" value="send" />
 		</form>
 
