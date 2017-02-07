@@ -14,7 +14,7 @@ $(document).ready(function(){
 		  	type: 'post',
 		  	data: data,
 		  	dataType: 'json',
-	  		success: function(data) {
+	  		success: function(response) {
 		      console.log("passed through " + data);
 		    },
 
@@ -24,9 +24,10 @@ $(document).ready(function(){
 		    // data: data,
 		    // dataType: "json"
 
-		    error: function(){
-		    	console.log("sadly things didn't work as hoped" + data);
-		    }
+		    error: function (jqXHR, exception) {
+    			console.log("in error" + jqXHR);
+    // Your error handling logic here..
+			}
 	  	});
 	  return false;
 	});
