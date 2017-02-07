@@ -13,8 +13,10 @@ $(document).ready(function(){
 	  	$.ajax('/get-employee', {
 		  	type: 'post',
 		  	data: data,
-		  	dataType: 'json',
-	  		success: function(response) {
+			dataType: 'application/json',
+			contentType: 'application/json; charset=utf-8'
+	  		success: function(data) {
+
 		      console.log("passed through " + data);
 		    },
 

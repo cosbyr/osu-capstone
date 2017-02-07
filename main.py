@@ -273,7 +273,9 @@ def renderPDF():
 
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
-	status,employees = alchemist.getEmployees(request.json['lname'])
+	print('HERE --------------------> {0}'.format(request.get_json(force=True)),file=sys.stderr)
+	sys.stdout.flush()
+	status,employees = alchemist.getEmployees(request.get_json(force=True))
 	
 	if status == False:
 		abort(400) #replace with an error on the create award page
