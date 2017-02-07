@@ -40,12 +40,14 @@ models.Award,
 models.AwardArchive,
 models.AwardBackground,
 models.AwardTheme,
-models.Employee)
+models.Employee,
+models.AwardBorder)
 
 emailer = email.Emailer()
 	
 @app.route('/')
 def renderIndex():
+	#alchemist.createRootAdmin()
 	return render_template('index.html')
 
 @app.route('/login',methods=['GET','POST'])
@@ -201,7 +203,7 @@ def renderPDF():
 	status,award = alchemist.createAward(payload, session['email'])
 	
 	if status == False:
-		return abort(400) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
+		abort(400) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
 	
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')

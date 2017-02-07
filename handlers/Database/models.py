@@ -9,6 +9,7 @@ class Account (database.db.Model):
 	answer2 = database.db.Column(database.db.Text, nullable=False)
 	created = database.db.Column(database.db.DateTime, nullable=False)
 	authenticated = database.db.Column(database.db.Boolean, default=False)
+	code = database.db.Column(database.db.String(5),default=None,nullable=True)
 	
 	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined')
 	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined')
@@ -102,10 +103,11 @@ class Award (database.db.Model):
 	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('manager.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
 	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	message = database.db.Column(database.db.String(255),nullable=False)
-	issuedOn = database.db.Column(database.db.DateTime,nullable=False)
+	issuedOn = database.db.Column(database.db.Date,nullable=False)
 	recepient = database.db.Column(database.db.Integer,database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
 	background_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_background.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	theme_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_theme.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
+	border_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_border.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	
 	def __init__(self,creator,typeId,message,issuedOn,recepient,background,theme):
 		self.creator = creator
@@ -158,7 +160,19 @@ class AwardTheme(database.db.Model):
 			
 		def __repr__(self):
 			return '<AwardTheme {0}>'.format(self.theme)
+
+class AwardBorder(database.db.Model):
+		id = database.db.Column(database.db.Integer, primary_key=True)
+		filename = database.db.Column(database.db.String(32), nullable=False)
+		
+		border = database.db.relationship('Award', backref='award_border', lazy='dynamic')
+		
+		def __init__(self,filename):
+			self.filename = filename
 			
+		def __repr__(self):
+			return '<AwardBorder {0}>'.format(self.filename)
+		
 class Employee(database.db.Model):
 	id = database.db.Column(database.db.Integer,primary_key=True)
 	fname = database.db.Column(database.db.String(32),nullable=False)
