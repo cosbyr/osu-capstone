@@ -132,7 +132,6 @@ def renderUpdateAccount():
 @login_required
 def renderCreate():
 	if session['role'] == 'user':
-		#details = alchemist.getUserDetails(session['email'])
 		awardBackgrounds = alchemist.getAwardBackgrounds()
 		awardThemes = alchemist.getAwardThemes()
 		awardTypes = alchemist.getAwardTypes()
@@ -202,7 +201,7 @@ def renderPDF():
 	status,award = alchemist.createAward(payload, session['email'])
 	
 	if status == False:
-		abort(500) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
+		return abort(400) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
 	
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
@@ -249,6 +248,15 @@ def renderPDF():
 		return send_file(pdf)
 	else:
 		abort(500) #change to proper error code
+
+@app.route('/get-employee',methods=['POST'])
+def getEmployees():
+	status,employees = alchemist.getEmployees(request.json['lname'])
+	
+	if status == False:
+		abort(400) #replace with an error on the create award page
+		
+	return jsonify(employees)
 
 @loginManager.user_loader
 def accountLoader(id):
