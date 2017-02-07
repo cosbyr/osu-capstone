@@ -13,7 +13,7 @@ db = SQLAlchemy()
 
 #consider making this a singleton class
 class PostgresDatabase(object):
-	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme,clsEmployee):
+	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme,clsEmployee,clsAwardBorder):
 		self.Question = clsQuestion
 		self.Account = clsAccount
 		self.Admin = clsAdmin
@@ -24,6 +24,7 @@ class PostgresDatabase(object):
 		self.AwardBackground = clsAwardBackground
 		self.AwardTheme = clsAwardTheme
 		self.Employee = clsEmployee
+		self.AwardBorder = clsAwardBorder
 
 	def getAwardThemes(self):
 		themes = {}
@@ -173,7 +174,7 @@ class PostgresDatabase(object):
 		creatorId = creator.id
 		typeId = awardType.id
 		message = payload['message']
-		issuedOn = datetime.now()
+		issuedOn = datetime.now() #change to payload['date'] or whatever the key is after Sarah adds the datepicker to the create award page
 		recepient = recvdBy.id
 		background = int(payload['background'])
 		theme = int(payload['theme'])
@@ -219,7 +220,7 @@ class PostgresDatabase(object):
 		return True,employees
 		
 		
-	'''
+	
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')
 		quest1 = 1
@@ -235,4 +236,4 @@ class PostgresDatabase(object):
 		db.session.add(account)
 		db.session.add(admin)
 		db.session.commit()
-	'''
+	

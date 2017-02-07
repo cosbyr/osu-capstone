@@ -40,12 +40,14 @@ models.Award,
 models.AwardArchive,
 models.AwardBackground,
 models.AwardTheme,
-models.Employee)
+models.Employee,
+models.AwardBorder)
 
 emailer = email.Emailer()
 	
 @app.route('/')
 def renderIndex():
+	#alchemist.createRootAdmin()
 	return render_template('index.html')
 
 @app.route('/login',methods=['GET','POST'])
@@ -189,7 +191,6 @@ def sign_s3():
 	})
 	
 @app.route('/password')
-@login_required
 def renderPassword():
 	return render_template('password.html')
 
