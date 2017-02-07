@@ -3,6 +3,7 @@ $(document).ready(function(){
 	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){
 	 event.preventDefault();
+
 	  var that = $(this),
 	      url = that.attr('action'),
 	      type = that.attr('method'),
@@ -14,7 +15,7 @@ $(document).ready(function(){
 		  	type: 'post',
 		  	data: data,
 			dataType: 'application/json',
-			contentType: 'application/json; charset=utf-8'
+			contentType: 'application/json; charset=utf-8',
 	  		success: function(data) {
 
 		      console.log("passed through " + data);
@@ -27,7 +28,9 @@ $(document).ready(function(){
 		    // dataType: "json"
 
 		    error: function (jqXHR, exception) {
-    			console.log("in error" + jqXHR);
+		    	console.log("in error state");
+		    	console.log(jqXHR.responseText);
+    			console.log(jqXHR);
     // Your error handling logic here..
 			}
 	  	});
