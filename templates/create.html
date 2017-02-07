@@ -22,18 +22,11 @@
 		</header>
 		<div class="page-title">Create New Award</div>
 
-		<div class="inner-container center-align">Find Employee</div>
+		<div class="outter-container center-align">Find Employee</div>
 		<form action="/get-employee" method="POST" id="get-employee-form">
 			<input class="input-box-50 small-margin-top" id="last-name" type="text" name="lname" placeholder="Recipient Last Name" required />
-			<input type="submit" value="send" />
+			<input class="input-box-50" type="submit" value="send" />
 		</form>
-
-		<!-- Python needs to return possible employees, -->
-		<select class="input-box-50" name="employee">
-			{% for key, fname, lname in names %}
-				<option value="key" >{{ fname }} {{ lname }}</option>
-			{% endfor %}
-		</select>
 
 
 		<form action="/latex" method="post">
@@ -42,6 +35,12 @@
 			<input class="input-box-50" type="text" name="recpLast" placeholder="Recipient Last Name" required />
 			<input class="input-box-50" type="text" name="message" placeholder="Award Message" required />
 			<input class="input-box-50" type="email" id='email' name="recpEmail" placeholder="Recipient Email" required /> -->
+
+			<!-- choose employee created via domManipulation.js -->
+			<div class="inner-container center-align margin-top">Choose employee -If desired employee not listed please contact your admin</div>
+			<div id="choose-employee" class="outter-container small-margin-top"></div>
+			
+
 
 			<!-- Choose award type -->
 			<div class="inner-container center-align margin-top">Choose Award Type</div>
@@ -95,7 +94,11 @@
 			<div class="inner-container small-margin-top">
 				<textarea rows="4" cols="50"  name="message"></textarea>
 			</div>
-	
+
+			<!--add time to send it-->
+			<div class="outter-container center-align margin-top">Schedule email
+				<input type="datetime-local" class="input-box-50 small-margin-top" name="send-time" />
+			</div>
 			
 			<input class="button-box" type="submit" value="Create Award">
 

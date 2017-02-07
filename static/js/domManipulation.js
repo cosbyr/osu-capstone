@@ -17,9 +17,16 @@ $(document).ready(function(){
 			contentType: 'application/json',
 		  	dataType: 'json',
 
-	  		success: function(data) {
-
-		      console.log("passed through " + data);
+	  		success: function(response) {
+	  			
+				console.log(response[2].email);
+				for (var i in response){
+					var details = response[i].fname + " " + response[i].lname + " " +response[i].email;
+					console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
+					
+					$("#choose-employee").append('<input type="radio" name="employee-to-get-award" value="'+i+'">' + details );
+				}
+				
 		    },
 
 
