@@ -35,18 +35,37 @@ $(document).ready(function(){
 
 	/* choosing to reset via email or password on /password*/
 	$("#reset-password").on('submit', function(){
-		
+		event.preventDefault();
 		var that = $(this),
 	      url = that.attr('action'),
 	      type = that.attr('method'),
 	      radioValue = $("input[name='reset-method']:checked").val();
-	      console.log(radioValue);
+	      email = $("input[name='email']").val();
+	      console.log(radioValue + " " + email + " " + url);
 		
 
-		// $.ajax({
+		$.ajax(url,{
+			type: type,
+
+			success: function(response){
+				console.log("sucess " + radioValue);
+				if(radioValue == "email"){
+					console.log("I will now display email stuff");
+					$("#display-security-questions").addClass("no-display");
+					$("#send-email-reset").removeClass("no-display");
+				}
+				else{
+					console.log("I will now display security question stuff");
+					$("#display-security-questions").removeClass("no-display");
+					$("#send-email-reset").addClass("no-display");
+				}
 
 
-		// });
+			},
+			error: function (jqXHR, exception) {
+    			console.log("in error" + jqXHR);
+    		}
+		});
 
 		return false;
 	});

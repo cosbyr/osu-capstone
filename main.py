@@ -280,6 +280,10 @@ def getEmployees():
 		
 	return jsonify(employees)
 
+@app.route('/get-password',methods=['POST'])
+def getPassword():
+	return render_template('get-password.html')
+
 @loginManager.user_loader
 def accountLoader(id):
 	return alchemist.getAccount(id)
