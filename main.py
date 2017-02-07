@@ -210,9 +210,29 @@ def renderPDF():
 	
 	details = alchemist.getUserDetails(session['email']) #get details in login route and add title to session var
 	
+	if payload['border'] == 'border1':
+		border = r'''{\border \char113} % up left
+				{\border \char109} % up
+				{\border \char112} % up right
+				{\border \char108} % left 
+				{\border \char110} % right
+				{\border \char114} % lower left
+				{\border \char111} % bottom
+				{\border \char115} % lower right'''
+	else:
+		border = r'''{\border \char005} % up left
+				{\border \char001} % up
+				{\border \char004} % up right
+				{\border \char002} % left 
+				{\border \char000} % right
+				{\border \char006} % lower left
+				{\border \char003} % bottom
+				{\border \char007} % lower right'''
+	
 	filename = 'award'
 	awdDetails = {
 	'background':'static/images/' + award.award_background.filename,
+	'border': border,
 	'color':award.award_theme.theme,
 	'logo':'static/images/gateway.png',
 	'company':'Gateway Mapping, Inc.',
