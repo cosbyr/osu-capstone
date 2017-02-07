@@ -44,7 +44,7 @@ models.Employee,
 models.AwardBorder)
 
 emailer = email.Emailer()
-	
+
 @app.route('/')
 def renderIndex():
 	#alchemist.createRootAdmin()
@@ -273,14 +273,11 @@ def renderPDF():
 
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
-	print('HERE --------------------> {0}'.format(request.get_json(force=True)),file=sys.stderr)
-	sys.stdout.flush()
-	status,employees = alchemist.getEmployees(request.get_json(force=True))
-	
-	if status == False:
-		abort(400) #replace with an error on the create award page
-		
-	return jsonify(employees)
+	if request.json:
+		employees = alchemist.getEmployees(request.get_json())
+		return jsonify(employees)
+	else:
+		abort(400) #put error on create page
 
 @app.route('/get-password',methods=['POST'])
 def getPassword():
