@@ -12,8 +12,10 @@
 		<div class="page-title">Create New Award</div>
 
 		<div class="inner-container center-align">Find Employee</div>
-		<input class="input-box-50 small-margin-top" type="text" name="recpLast" placeholder="Recipient Last Name" required />
-		<div id="get-employee" class="grey-button">Find Employees </div><br>
+		<form action="/get-employee" method="POST" id="get-employee-form">
+			<input class="input-box-50 small-margin-top" type="text" name="recpLast" placeholder="Recipient Last Name" required />
+			<input type="submit" value="send" />
+		</form>
 
 
 		<!-- Python needs to return possible employees, -->

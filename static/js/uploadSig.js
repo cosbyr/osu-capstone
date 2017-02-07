@@ -105,12 +105,51 @@ function checkPass()
     }
 }
 
-/*changes question on update account page*/
-$("#change-question1").click(function () {
-  $("#question1").addClass("no-display");
-  $(this).css("backgroundColor: yellow");
+/* for find employee form */
+
+$('#get-employee-form').on('submit', function(){
+  alert("button pressed");
+  var that = $(this),
+      url = that.attr('action'),
+      type = that.attr('method'),
+      data = {};
+
+  that.find('[name]').each(function(index, value) {
+    console.log(index)
+    var that = $(this),
+        name = that.attr('name'),
+        value = that.val();
+
+    data[name] = value;
+  });
+
+  $.ajax({
+
+    url: url,
+    type: type,
+    data: data,
+    success: function(response) {
+      console.log(response);
+    }
+
+  });
+  return false;
 });
 
-$("#change-question1").click(function () {
-          $("#question1").addClass("no-display");
-      });
+// $("button").click(function(e) {
+//     e.preventDefault();
+//     $.ajax({
+//         type: "POST",
+//         url: "/pages/test/",
+//         data: { 
+//             id: $(this).val(), // < note use of 'this' here
+//             access_token: $("#access_token").val() 
+//         },
+//         success: function(result) {
+//             alert('ok');
+//         },
+//         error: function(result) {
+//             alert('error');
+//         }
+//     });
+// });
