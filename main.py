@@ -191,33 +191,9 @@ def sign_s3():
 		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
 	})
 	
-@app.route('/password',methods=['GET','POST'])
+@app.route('/password'
 def renderPassword():
-	if request.method == 'GET':
-		return render_template('password.html')
-		
-	if request.method == 'POST':
-		payload = request.form
-		details = alchemist.getUserDetails(payload['email'])
-	
-	if details is None:
-		abort(404) #put error feedback on reset password page - i.e. no such email is tied to an existing account
-			
-	if payload['reset-method'] == 'question':
-		questions = {'1':str(details['question1']), '2':str(details['question2'])}
-		
-		return jsonify(questions)
-		#return redirect(url_for('renderPassword',jsonify(questions)))
-		
-	if payload['reset-method'] == 'email':
-		code = alchemist.genVerificationCode(details['account']) #remember to remove the code from the db after they reset their password
-		
-		if code is not None:
-			response = emailer.sendPasswordReset(payload['email'],code)
-		else:
-			abort(500)
-		
-		return redirect(url_for('renderLogin'))
+	return render_template('password.html')
 
 
 @app.route('/latex', methods=['POST'])
