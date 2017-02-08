@@ -53,11 +53,13 @@ $(document).ready(function(){
 	      type = that.attr('method'),
 	      radioValue = $("input[name='reset-method']:checked").val();
 	      email = $("input[name='email']").val();
-	      console.log(radioValue + " " + email + " " + url);
+	      data = '{ "email" : "' + email + '", "reset-method": "' + radiovalue '"}';
+	      console.log(data);
 		
 
 		$.ajax(url,{
 			type: type,
+			data: data,
 
 			success: function(response){
 				console.log("sucess " + radioValue);
