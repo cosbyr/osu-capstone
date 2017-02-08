@@ -20,10 +20,12 @@ $(document).ready(function(){
 	  		success: function(response) {
 	  			
 				for (var i in response){
-					var details = response[i].fname + " " + response[i].lname + " " +response[i].email;
-					console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
-					
-					$("#choose-employee").append('<input type="radio" name="employee-to-get-award" value="'+i+'">' + details );
+					if(i != 'status' && i != 'message'){
+						var details = response[i].fname + " " + response[i].lname + " " +response[i].email;
+						console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
+						
+						$("#choose-employee").append('<input type="radio" name="employee-to-get-award" value="'+i+'">' + details );
+					}
 				}
 				
 		    },

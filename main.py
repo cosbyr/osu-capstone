@@ -295,13 +295,12 @@ def getPassword():
 		details = alchemist.getUserDetails(payload['email'])
 		
 		if details is None:
-			abort(404) #put error feedback on reset password page - i.e. no such email is tied to an existing account
+			response = {'status':404,'message':'The given email is not linked to a user account.'}
+			return jsonify(response)
 				
 		if payload['reset-method'] == 'question':
-			questions = {'1':str(details['question1']), '2':str(details['question2'])}
-			
-			return jsonify(questions)
-			#return redirect(url_for('renderPassword',jsonify(questions)))
+			response = {'1':str(details['question1']), '2':str(details['question2']),'status':200}
+			return jsonify(response)
 		
 		if payload['reset-method'] == 'email':
 			code = alchemist.genVerificationCode(details['account']) #remember to remove the code from the db after they reset their password
@@ -313,7 +312,7 @@ def getPassword():
 			
 			return jsonify(response.status_code)
 	else:
-		abort(400) #put error on create page
+		abort(400)
 		
 @app.route('/get-question',methods=['POST'])
 def checkQuestions():
