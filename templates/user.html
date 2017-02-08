@@ -7,20 +7,42 @@
 {% endblock navbar %}
 
 {% block content %}
-	<div class="outter-container">
-		<header class="header-row">
-			<ul>
-				<li style="color: black"> {{username}} </li>
-				<li class="active"><a href="/user">User Home</a></li>
-				<li><a href="/create">Create Award</a></li>
-				<li><a href="/update-account">Update Account</a></li>
-				<li style="float:right"><a href="/logout">Logout</a></li>
-			</ul>
-		</header>
-		<p>user portal goes here</p>
+	<nav class="navbar navbar-inverse navbar-static-top">
+	  <div class="container">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-bar-main" aria-expanded="false">
+	        <span class="sr-only">Toggle navigation</span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	        <span class="icon-bar"></span>
+	      </button>
+	      <a class="navbar-brand" href="/">OSU Capstone</a>
+	    </div>
 
-		<br>
-		<a href="/update-account">Click to Update Account</a>
-		<p>Logged in as: {{email}}</p>
+	    <!-- Collect the nav links, forms, and other content for toggling -->
+	    <div class="collapse navbar-collapse" id="nav-bar-main">
+	      <ul class="nav navbar-nav">
+			<li class="active"><a href="/user"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
+			<li><a href="/create"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
+		  </ul>
+	      <ul class="nav navbar-nav navbar-right">
+			<li class="dropdown">
+				<a href="#" class="dropdown-toggle uppercase" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}} <span class="caret"></span></a>
+				<ul class="dropdown-menu">
+					<li class="dropdown-header">Logged in as: {{email}}</li>
+					<li><a href="/update-account">Update Account</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
+				</ul>
+			</li>
+	      </ul>
+	    </div><!-- /.navbar-collapse -->
+	  </div><!-- /.container-fluid -->
+	</nav>
+
+	<div class="container">
+		<h1>User Portal</h1>
+		<p>User portal goes here.</p>
 	</div>
 {% endblock content %}

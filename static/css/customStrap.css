@@ -23,3 +23,7 @@
 .is-hidden {
 	display: none;
 }
+
+.uppercase {
+	text-transform: uppercase;
+}
