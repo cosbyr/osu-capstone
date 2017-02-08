@@ -2,6 +2,7 @@ from __future__ import print_function #debug
 import sys,os #sys debug
 import logging
 import json, boto3
+import time
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
@@ -234,6 +235,9 @@ def renderPDF():
 				{\border \char007} % lower right'''
 	
 	filename = 'award'
+	
+	awardDate = award.issuedOn
+	awardDateString = awardDate.strftime("%m-%d-%Y")
 
 	awdDetails = {
 	'background':'static/images/' + award.award_background.filename,
@@ -246,7 +250,8 @@ def renderPDF():
 	'employee':award.employee.fname + ' ' + award.employee.lname,
 	'admin':session['name'],
 	'adminTitle':details['title'],
-	'signature':sigFile}
+	'signature':sigFile,
+	'granted':awardDateString}
 	
 	employeeAward = ah.Award(awdDetails,filename)
 	pdf = employeeAward.genAward()

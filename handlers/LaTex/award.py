@@ -67,12 +67,12 @@ class Award(object):
 
 		{\color{''' + awardDetails['color'] + r'''!40!black}
 		\scalebox{.8}{
-		\begin{tabular}{ccc}
-		\ & 
+		\begin{tabular}{ccccccccc}
+		\ & & & & & & ''' + awardDetails['granted'] + r'''\\[-18pt]
 		\includegraphics[height=1.1cm]{''' + awardDetails['signature'] + r'''}\\[-12pt]
-		\cline{1-3}\\[-4pt] 
-		\ ''' + r''' & ''' + awardDetails['admin'] + r''' & ''' + r'''\\
-		\ ''' + r''' & ''' + awardDetails['adminTitle'] + r''' & ''' + r'''\\
+		\cline{1-7}\\[-8pt] 
+		\ ''' + awardDetails['admin'] + r''' & & & & & & Date''' + r'''\\
+		\ ''' + awardDetails['adminTitle'] + r''' & & & & & & ''' + r'''\\
 		\end{tabular}
 		}}}}
 		\end{minipage}

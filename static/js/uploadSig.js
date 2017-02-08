@@ -32,8 +32,8 @@
     function getSignedRequest(file){
 		var email;
 		email = document.getElementById('email').value;
-		email = email.replace("@","_");
-		email = email.replace(".","_");
+		email = email.replace(/@/g , "_");
+		email = email.replace(/\./g , "_");
 		email = email + "_sig.png"
 		const xhr = new XMLHttpRequest();
 		xhr.open("GET", "/sign_s3?file_name="+email+"&file_type="+file.type);
