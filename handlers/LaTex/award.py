@@ -36,8 +36,8 @@ class Award(object):
 		\scalebox{3.0}{\color{''' + awardDetails['color'] + r'''!30!black!60}
 		\begin{minipage}{.33\textwidth}
 		\font\border=umrandb
-		\generalframe''' 
-		+ awardDetails['border'] + r'''
+		\generalframe 
+		''' + awardDetails['border'] + r'''
 		{\centering
 
 		\begin{minipage}{.9\textwidth}

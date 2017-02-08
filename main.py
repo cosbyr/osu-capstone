@@ -64,7 +64,7 @@ def renderLogin():
 		
 		session['email'] = payload['userName']
 		session['role'] = payload['account-type']
-		
+
 		status,account = alchemist.setAuthenticated(account,True)
 
 		if status == True:
@@ -200,10 +200,12 @@ def renderPassword():
 def renderPDF():
 	#still just a testing LaTex functionality
 	payload = request.form
+
 	award = alchemist.createAward(payload, session['email'])
+	status = alchemist.save(award)
 	
-	if award is None:
-		abort(400) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
+	if status is False:
+		abort(500)
 	
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
@@ -212,7 +214,7 @@ def renderPDF():
 	
 	details = alchemist.getUserDetails(session['email']) #get details in login route and add title to session var
 	
-	if payload['border'] == 'border1':
+	if payload['border'] == '1':
 		border = r'''{\border \char113} % up left
 				{\border \char109} % up
 				{\border \char112} % up right
@@ -232,6 +234,7 @@ def renderPDF():
 				{\border \char007} % lower right'''
 	
 	filename = 'award'
+
 	awdDetails = {
 	'background':'static/images/' + award.award_background.filename,
 	'border': border,
@@ -250,29 +253,25 @@ def renderPDF():
 	
 
 	if pdf is not None:
-		status = alchemist.save(award)
+		'''
+		#if response code is not 202 then something bad happened... added error checking
+		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
+		sender = session['email']
+		recepient = payload['recpEmail']
+		response = emailer.sendAward(sender,recepient,pdf)
 		
-		if status == True:
-			'''
-			#if response code is not 202 then something bad happened... added error checking
-			#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
-			sender = session['email']
-			recepient = payload['recpEmail']
-			response = emailer.sendAward(sender,recepient,pdf)
-			
-			#debug
-			print('Code: {0}'.format(response.status_code,file=sys.stderr))
-			sys.stdout.flush()
-			print('Body: {0}'.format(response.body,file=sys.stderr))
-			sys.stdout.flush()
-			print('Headers: {0}'.format(response.headers,file=sys.stderr))
-			sys.stdout.flush()
-			#end debug
-			'''
-			return send_file(pdf)
-		else:
-			abort(500)
+		#debug
+		print('Code: {0}'.format(response.status_code,file=sys.stderr))
+		sys.stdout.flush()
+		print('Body: {0}'.format(response.body,file=sys.stderr))
+		sys.stdout.flush()
+		print('Headers: {0}'.format(response.headers,file=sys.stderr))
+		sys.stdout.flush()
+		#end debug
+		'''
+		return send_file(pdf)
 	else:
+		alchemist.remove(award)
 		abort(500)
 
 @app.route('/get-employee',methods=['POST'])

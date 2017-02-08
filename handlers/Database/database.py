@@ -163,21 +163,18 @@ class PostgresDatabase(object):
 	def createAward(self,payload,email):
 		creator = self.Manager.query.filter_by(email=email).first()
 		awardType = self.AwardType.query.get(payload['type'])
-		recvdBy = self.Employee.query.filter_by(email=payload['recpEmail']).first()
-		
-		if recvdBy is None:
-			return None
-			
+
+		#('theme', u'3'), ('employee-to-get-award', u'2'), ('background', u'2'), ('type', u'1'), ('send-time', u'2017-02-09'), ('message', u'Test'), ('border', u'2')
 		creatorId = creator.id
 		typeId = awardType.id
 		message = payload['message']
-		issuedOn = datetime.now() #change to payload['date'] or whatever the key is after Sarah adds the datepicker to the create award page
-		recepient = recvdBy.id
+		issuedOn = payload['send-time']
+		recepient = int(payload['employee-to-get-award'])
 		background = int(payload['background'])
 		theme = int(payload['theme'])
+		border = int(payload['border'])
 		
-		
-		award = self.Award(creatorId,typeId,message,issuedOn,recepient,background,theme)
+		award = self.Award(creatorId,typeId,message,issuedOn,recepient,background,theme,border)
 			
 		return award
 	
@@ -195,10 +192,24 @@ class PostgresDatabase(object):
 			return False
 			
 		return True
+	
+	
+	def remove(self,obj):
+		try:
+			db.session.delete(obj)
+			db.session.commit()
+		except IntegrityError as e:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			return False
 			
+		return True
+	
+	
 	def getAccount(self,id):
 		return self.Account.query.get(id)
-		
+	
+	
 	def setAuthenticated(self,account,val):		
 		try:
 			account.authenticated = val
@@ -219,7 +230,7 @@ class PostgresDatabase(object):
 			return {}
 			
 		for r in results:
-			employees[r.id] = {'fname':r.fname,'lname':r.lname,'email':r.email}
+			employees[r.id] = {'id':r.id,'fname':r.fname,'lname':r.lname,'email':r.email}
 			
 		return employees
 		

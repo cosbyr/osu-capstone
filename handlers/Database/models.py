@@ -109,7 +109,7 @@ class Award (database.db.Model):
 	theme_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_theme.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	border_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_border.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	
-	def __init__(self,creator,typeId,message,issuedOn,recepient,background,theme):
+	def __init__(self,creator,typeId,message,issuedOn,recepient,background,theme,border):
 		self.creator = creator
 		self.type_id = typeId
 		self.message = message
@@ -117,6 +117,7 @@ class Award (database.db.Model):
 		self.recepient = recepient
 		self.background_id = background
 		self.theme_id = theme
+		self.border_id = border
 
 	def __repr__(self):
 		return '<Award {0} {1} {2}>'.format(self.creator,self.type_id,self.message)
