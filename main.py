@@ -191,7 +191,7 @@ def sign_s3():
 		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
 	})
 	
-@app.route('/password'
+@app.route('/password')
 def renderPassword():
 	return render_template('password.html')
 
@@ -311,7 +311,7 @@ def getPassword():
 			else:
 				abort(500)
 			
-			return redirect(url_for('renderLogin'))
+			return jsonify(response.status_code)
 	else:
 		abort(400) #put error on create page
 		
