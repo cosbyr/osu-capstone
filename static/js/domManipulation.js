@@ -19,7 +19,6 @@ $(document).ready(function(){
 
 	  		success: function(response) {
 	  			
-				console.log(response[2].email);
 				for (var i in response){
 					var details = response[i].fname + " " + response[i].lname + " " +response[i].email;
 					console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
