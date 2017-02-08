@@ -7,27 +7,54 @@
 {% endblock navbar %}
 
 {% block content %}
-	<div class="outter-container">
-		<header class="header-row"><a href="/">Employee Awards</a></header>
 
-			<div class="inner-container">
+	<nav class="navbar navbar-inverse navbar-static-top">
+	  <div class="container">
+	    <!-- Brand and toggle get grouped for better mobile display -->
+	    <div class="navbar-header">
+	      <a class="navbar-brand" href="#">OSU Capstone</a>
+	    </div>
+	  </div><!-- /.container -->
+	</nav>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-6 line-right">
+				<h1>Login</h1>
 				<form method="post" action="/login">
-					<input class="input-box" type="text" name="userName" placeholder="User name or Email">
-					<div>Please choose the account type you are logging in with
-					<div>
-						<input class="radio" type="radio" name="account-type" value="admin" required >Admin
-						<input class="radio" type="radio" name="account-type" value="user">User
+
+					<div class="form-group">
+						<label for="userNamer">Please enter email address</label>
+						<input class="form-control" id="userName" type="email" name="userName" placeholder="person@email.com">
 					</div>
-					<input class="input-box" type="password" name="password" placeholder="Password">
-					<a class="forgotPassword right-align" href="/password">* Forgot Password?</a><br>
 
+						
+					<p>Please choose the account type you are logging in with</p>
+					<div class="form-group">
+						<label class="radio-inline">
+							<input class="radio" type="radio" name="account-type" value="admin" required >Admin
+						</label>
+						<label class="radio-inline">
+							<input class="radio" type="radio" name="account-type" value="user">User
+						</label>
+					</div>
 
-					<div class="left-align"><input  class="button-box" type="submit" value="Login"></div>
+					<div class="form-group">
+						<label for="password">Password</label>
+						<input ic="password" class="form-control" type="password" name="password" placeholder="Password">
+						<span class="help-block">
+							<a href="/password">* Forgot Password?</a>
+						</span>
+					</div>
+
+					<button class="btn btn-primary" type="submit">Login</button>
 				</form>
-
-
-			<div class="left-align margin-top">New User?</div>
-			<a href="/new-account"><div class="button-box">Create New Account</div></a>
-
+			</div>
+			<div class="col-sm-6">
+				<h1>New User?</h1>
+				<a class="btn btn-default btn-lg" href="/new-account">Create New Account</a>
+			</div>
 		</div>
+	</div>
+	
 {% endblock content %}
