@@ -8,6 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from passlib.hash import argon2
 from botocore.exceptions import ClientError
 from boto3.s3.transfer import S3Transfer
+from random import randint
 
 db = SQLAlchemy()
 
@@ -80,7 +81,7 @@ class PostgresDatabase(object):
 			print(e,file=sys.stderr)
 			return None
 		return True
-		
+	
 	def getUserDetails(self,email):
 		user = self.Manager.query.filter_by(email=email).first()
 		
@@ -88,6 +89,7 @@ class PostgresDatabase(object):
 		
 		details = {
 		'id':user.id,
+		'account':user.account.id,#added account id - may cause error
 		'fname':user.fname,
 		'lname':user.lname,
 		'email':user.email,
@@ -138,14 +140,8 @@ class PostgresDatabase(object):
 		
 		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
 		manager = self.Manager(account,title,fname,lname,sign,email)
-		
-		try:
-			db.session.add_all([account,manager])
-			db.session.commit()
-		except IntegrityError:
-			return False
-		
-		return True
+			
+		return [account,manager]
 		
 	def updateAccount(self,payload,email):
 		user = self.Manager.query.filter_by(email=email).first()
@@ -156,6 +152,7 @@ class PostgresDatabase(object):
 		user.title = payload['jobTitle']
 		user.signature = payload['signature'] 
 		print(user.signature,file=sys.stderr)
+		
 		try:
 			db.session.commit()
 		except IntegrityError:
@@ -169,7 +166,7 @@ class PostgresDatabase(object):
 		recvdBy = self.Employee.query.filter_by(email=payload['recpEmail']).first()
 		
 		if recvdBy is None:
-			return False, None
+			return None
 			
 		creatorId = creator.id
 		typeId = awardType.id
@@ -181,17 +178,24 @@ class PostgresDatabase(object):
 		
 		
 		award = self.Award(creatorId,typeId,message,issuedOn,recepient,background,theme)
-
+			
+		return award
+	
+	def save(self,obj):
 		try:
-			db.session.add(award)
+			if type(obj) is list:
+				db.session.add_all(obj)
+			else:
+				db.session.add(obj)
+				
 			db.session.commit()
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
-			return False, None
+			return False
 			
-		return True, award
-	
+		return True
+			
 	def getAccount(self,id):
 		return self.Account.query.get(id)
 		
@@ -219,7 +223,21 @@ class PostgresDatabase(object):
 			
 		return employees
 		
+	#HAVE TO TEST
+	def genVerificationCode(self,id):
+		account = self.Account.query.get(id)
+		code = randint(10000,99999)
 		
+		try:
+			account.code = code
+			db.session.add(account)
+			db.session.commit()
+		except IntegrityError as e:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			return None
+			
+		return code
 	'''
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')

@@ -8,11 +8,11 @@ class Emailer(object):
 	def __init__(self):
 		self.key = os.environ['SENDGRID_API_KEY']
 		
-	def sendAward(self,sentBy,sentTo,image,sub='Your Award',text='Congrats!'):
+	def sendAward(self,sentBy,sendTo,image,sub='Your Award',text='Congrats!'):
 		sg = sendgrid.SendGridAPIClient(apikey=self.key)
 		sender = Email(sentBy)
 		subject = sub
-		recepient = Email(sentTo)
+		recepient = Email(sendTo)
 		content = Content("text/plain", text)
 		
 		with open(image,'rb') as file:
@@ -32,6 +32,24 @@ class Emailer(object):
 		mail.add_attachment(attachment)
 		
 		response = sg.client.mail.send.post(request_body=mail.get())
+		return response
+		
+	#HAVE TO TEST!
+	def sendPasswordReset(self,sendTo,code):
+		text = '''
+		<p>You have elected to reset your password by email. Please, click the link below an enter the verification code.<p>
+		<p>Verification Code: {0}</p>
+		<a href=u-capstone.herokuapp.com/reset-password>Reset your password</a>'''.format(code)
+		
+		sg = sendgrid.SendGridAPIClient(apikey=self.key)
+		sender = Email('root@admin.com') #may want to use more descriptive email... even though its fake
+		subject = 'Employee Awards Password Reset' #should put title of app
+		recepient = Email(sendTo)
+		content = Content('text/html',text)
+		
+		mail = Mail(sender,subject,recepient,content)
+		response = sg.client.mail.send.post(request_body=mail.get())
+		
 		return response
 		
 		

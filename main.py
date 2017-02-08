@@ -9,7 +9,7 @@ from handlers.Email import email
 from string import replace
 from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session, Response
 from flask_cors import CORS, cross_origin
-from flask.ext.login import LoginManager, login_required, current_user, login_user, logout_user
+from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 
 app = Flask('app',template_folder='./templates',static_folder='./static')
 app.secret_key = os.environ['SECRET_KEY']
@@ -96,7 +96,6 @@ def renderAdmin():
 @app.route('/user')
 @login_required
 def renderUser():
-	#details = alchemist.getUserDetails(session['email'])
 	#return render_template('user.html',details=details)
 	if session['role'] == 'user':
 		return render_template('user.html',username=session['name'],email=session['email'])
@@ -158,10 +157,11 @@ def renderNewAccount():
 	
 	if request.method == 'POST':
 		payload = request.form
-		status = alchemist.createAccount(payload)
+		account = alchemist.createAccount(payload)
+		status = alchemist.save(account)
 		
 		if status == False:
-			return render_template('new-account.html',status=status)
+			return render_template('new-account.html',status=status) #explain that account could not be created
 		
 		return redirect(url_for('renderLogin',status=status))
 
@@ -200,9 +200,9 @@ def renderPassword():
 def renderPDF():
 	#still just a testing LaTex functionality
 	payload = request.form
-	status,award = alchemist.createAward(payload, session['email'])
+	award = alchemist.createAward(payload, session['email'])
 	
-	if status == False:
+	if award is None:
 		abort(400) #instead of abort, redirect back to create page and inform user that the award could not be created (probably due to a bad email)
 	
 	sigFile = session['email']
@@ -245,31 +245,35 @@ def renderPDF():
 	'adminTitle':details['title'],
 	'signature':sigFile}
 	
-	award = ah.Award(awdDetails,filename)
-	pdf = award.genAward()
+	employeeAward = ah.Award(awdDetails,filename)
+	pdf = employeeAward.genAward()
 	
 
 	if pdf is not None:
-		#testing email functionality
-		#if response code is not 202 then something bad happened... added error checking
-		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
-		'''
-		sender = session['email']
-		recepient = payload['recpEmail']
-		response = emailer.sendAward(sender,recepient,pdf)
+		status = save(award)
 		
-		#debug
-		print('Code: {0}'.format(response.status_code,file=sys.stderr))
-		sys.stdout.flush()
-		print('Body: {0}'.format(response.body,file=sys.stderr))
-		sys.stdout.flush()
-		print('Headers: {0}'.format(response.headers,file=sys.stderr))
-		sys.stdout.flush()
-		#end debug
-		'''
-		return send_file(pdf)
+		if status == True:
+			'''
+			#if response code is not 202 then something bad happened... added error checking
+			#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
+			sender = session['email']
+			recepient = payload['recpEmail']
+			response = emailer.sendAward(sender,recepient,pdf)
+			
+			#debug
+			print('Code: {0}'.format(response.status_code,file=sys.stderr))
+			sys.stdout.flush()
+			print('Body: {0}'.format(response.body,file=sys.stderr))
+			sys.stdout.flush()
+			print('Headers: {0}'.format(response.headers,file=sys.stderr))
+			sys.stdout.flush()
+			#end debug
+			'''
+			return send_file(pdf)
+		else:
+			abort(500)
 	else:
-		abort(500) #change to proper error code
+		abort(500)
 
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
@@ -279,10 +283,32 @@ def getEmployees():
 	else:
 		abort(400) #put error on create page
 
+#HAVE TO TEST!
 @app.route('/get-password',methods=['POST'])
-def getPassword():
-	return render_template('get-password.html')
+def getPassword(): #i need her to send me the email and reset value. then i can return the questions
+	payload = request.form
+	details = alchemist.getUserDetails(payload['email'])
+	
+	if details is None:
+		abort(404) #put error feedback on reset password page - i.e. no such email is tied to an existing account
+			
+	if payload['reset-method'] == 'question':
+		questions = {'1':details['question1'], '2':details['question2']}
+		
+		return jsonify(questions)
+		
+	if payload['reset-method'] == 'email':
+		code = alchemist.genVerificationCode(details['account']) #remember to remove the code from the db after they reset their password
+		
+		if code is not None:
+			response = emailer.sendPasswordReset(payload['email'],code)
+		else:
+			abort(500)
 
+@app.route('/get-question',methods=['POST'])
+def checkQuestions():
+	pass
+	
 @loginManager.user_loader
 def accountLoader(id):
 	return alchemist.getAccount(id)
@@ -297,10 +323,20 @@ def serverError(e):
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred: ' + str(e), 500
 
+@app.errorhandler(404)
+def resourceNotFoundError(e):
+    logging.exception('An error occurred during a request.')
+    return 'An internal error occurred: ' + str(e), 400
+	
 @app.errorhandler(401)
-def unathorizedError(e):
+def unauthorizedError(e):
     return '<h1>You are not authorized to access this page.</h1> \
 	<p>Please login <a href=/login>here</a></p>', 401
+
+@app.errorhandler(400)
+def badRequestError(e):
+    logging.exception('An error occurred during a request.')
+    return 'An internal error occurred: ' + str(e), 400
 	
 if __name__ == "__main__":
     app.run()
