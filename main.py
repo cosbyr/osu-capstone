@@ -297,7 +297,7 @@ def getPassword(): #i need her to send me the email and reset value. then i can 
 		abort(404) #put error feedback on reset password page - i.e. no such email is tied to an existing account
 			
 	if payload['reset-method'] == 'question':
-		questions = {'1':details['question1'], '2':details['question2']}
+		questions = {'1':str(details['question1']), '2':str(details['question2'])}
 		
 		return jsonify(questions)
 		

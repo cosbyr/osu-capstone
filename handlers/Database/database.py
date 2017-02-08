@@ -69,7 +69,7 @@ class PostgresDatabase(object):
 		filename = replace(email,'@','_')
 		filename = replace(filename,'.','_')
 		filename += '_sig.png'
-		
+
 		client = boto3.client('s3')
 		
 		try:
@@ -164,7 +164,6 @@ class PostgresDatabase(object):
 		creator = self.Manager.query.filter_by(email=email).first()
 		awardType = self.AwardType.query.get(payload['type'])
 
-		#('theme', u'3'), ('employee-to-get-award', u'2'), ('background', u'2'), ('type', u'1'), ('send-time', u'2017-02-09'), ('message', u'Test'), ('border', u'2')
 		creatorId = creator.id
 		typeId = awardType.id
 		message = payload['message']

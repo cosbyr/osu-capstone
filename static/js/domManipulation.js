@@ -60,7 +60,9 @@ $(document).ready(function(){
 		$.ajax(url,{
 			type: type,
 			data: data,
-
+			contentType: 'application/json',
+		  	dataType: 'json',
+			
 			success: function(response){
 				console.log("sucess " + radioValue);
 				if(radioValue == "email"){
