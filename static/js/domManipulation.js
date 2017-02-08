@@ -53,7 +53,7 @@ $(document).ready(function(){
 	      type = that.attr('method'),
 	      radioValue = $("input[name='reset-method']:checked").val();
 	      email = $("input[name='email']").val();
-	      data = '{ "email" : "' + email + '", "reset-method": "' + radiovalue '"}';
+		  data = JSON.stringify({'email':email, 'reset-method':radioValue})
 	      console.log(data);
 		
 

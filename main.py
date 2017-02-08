@@ -191,9 +191,33 @@ def sign_s3():
 		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
 	})
 	
-@app.route('/password')
+@app.route('/password',methods=['GET','POST'])
 def renderPassword():
-	return render_template('password.html')
+	if request.method == 'GET':
+		return render_template('password.html')
+		
+	if request.method == 'POST':
+		payload = request.form
+		details = alchemist.getUserDetails(payload['email'])
+	
+	if details is None:
+		abort(404) #put error feedback on reset password page - i.e. no such email is tied to an existing account
+			
+	if payload['reset-method'] == 'question':
+		questions = {'1':str(details['question1']), '2':str(details['question2'])}
+		
+		return jsonify(questions)
+		#return redirect(url_for('renderPassword',jsonify(questions)))
+		
+	if payload['reset-method'] == 'email':
+		code = alchemist.genVerificationCode(details['account']) #remember to remove the code from the db after they reset their password
+		
+		if code is not None:
+			response = emailer.sendPasswordReset(payload['email'],code)
+		else:
+			abort(500)
+		
+		return redirect(url_for('renderLogin'))
 
 
 @app.route('/latex', methods=['POST'])
@@ -289,26 +313,32 @@ def getEmployees():
 
 #HAVE TO TEST!
 @app.route('/get-password',methods=['POST'])
-def getPassword(): #i need her to send me the email and reset value. then i can return the questions
-	payload = request.form
-	details = alchemist.getUserDetails(payload['email'])
-	
-	if details is None:
-		abort(404) #put error feedback on reset password page - i.e. no such email is tied to an existing account
+def getPassword():
+	if request.json:
+		payload = request.get_json()
+		details = alchemist.getUserDetails(payload['email'])
+		
+		if details is None:
+			abort(404) #put error feedback on reset password page - i.e. no such email is tied to an existing account
+				
+		if payload['reset-method'] == 'question':
+			questions = {'1':str(details['question1']), '2':str(details['question2'])}
 			
-	if payload['reset-method'] == 'question':
-		questions = {'1':str(details['question1']), '2':str(details['question2'])}
+			return jsonify(questions)
+			#return redirect(url_for('renderPassword',jsonify(questions)))
 		
-		return jsonify(questions)
+		if payload['reset-method'] == 'email':
+			code = alchemist.genVerificationCode(details['account']) #remember to remove the code from the db after they reset their password
+			
+			if code is not None:
+				response = emailer.sendPasswordReset(payload['email'],code)
+			else:
+				abort(500)
+			
+			return redirect(url_for('renderLogin'))
+	else:
+		abort(400) #put error on create page
 		
-	if payload['reset-method'] == 'email':
-		code = alchemist.genVerificationCode(details['account']) #remember to remove the code from the db after they reset their password
-		
-		if code is not None:
-			response = emailer.sendPasswordReset(payload['email'],code)
-		else:
-			abort(500)
-
 @app.route('/get-question',methods=['POST'])
 def checkQuestions():
 	pass
