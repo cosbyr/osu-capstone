@@ -250,7 +250,7 @@ def renderPDF():
 	
 
 	if pdf is not None:
-		status = save(award)
+		status = alchemist.save(award)
 		
 		if status == True:
 			'''
