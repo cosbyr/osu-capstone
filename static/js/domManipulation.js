@@ -82,4 +82,47 @@ $(document).ready(function(){
 
 		return false;
 	});
+
+	/*onlick for signature upload button*/
+	$("#file-load-button").click(function () {
+	    $("#file_input").click();
+	});
 });
+
+
+/*checks that the passwords are the same*/
+function checkPass() {
+    //Store the password field objects into variables ...
+    var pass1 = $('#pass1');
+    var pass2 = $('#pass2');
+    //Store the Confimation Message Object ...
+    var message = $('#confirmMessage');
+    //Remove Class
+    $(message).removeClass('is-hidden');
+    //Compare the values in the password field 
+    //and the confirmation field
+    if($(pass1).val() === $(pass2).val()){
+        //The passwords match. 
+        //Set the color to the good color and inform
+        //the user that they have entered the correct password
+		$(pass2).closest('.form-group').removeClass('has-error');
+        $(message).removeClass('text-danger');
+        //Add classes
+        $(pass2).closest('.form-group').addClass('has-success');
+        $(message).addClass('text-success');
+        $(message).html('Passwords Match!');
+    }else{
+        //The passwords do not match.
+        //Set the color to the bad color and
+        //notify the user.
+		$(pass2).closest('.form-group').removeClass('has-success');
+        $(message).removeClass('text-success');
+        //Add classes
+        $(pass2).closest('.form-group').addClass('has-error');
+        $(message).addClass('text-danger');
+        $(message).html('Passwords Do Not Match!');
+    }
+
+}
+
+

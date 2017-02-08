@@ -20,3 +20,6 @@
 	border-right: 1px solid #e1e1e1;
 }
 
+.is-hidden {
+	display: none;
+}
