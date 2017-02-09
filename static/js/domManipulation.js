@@ -28,20 +28,21 @@ $(document).ready(function(){
 				
 		    },
 
-
-		    // url: url,
-		    // type: type,
-		    // data: data,
-		    // dataType: "json"
-
 		    error: function (jqXHR, exception) {
 		    	console.log("in error state");
 		    	console.log(jqXHR.responseText);
     			console.log(jqXHR);
-    // Your error handling logic here..
 			}
 	  	});
 	  return false;
+	});
+
+
+
+	/*if choosing to reset password via email a warning box will apear */
+	$("#reset-via-email").on("click", function(){
+		$("#send-email-reset").removeClass("no-display");
+		console.log("button pressed");
 	});
 
 
