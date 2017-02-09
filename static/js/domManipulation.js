@@ -41,9 +41,10 @@ $(document).ready(function(){
 
 
 
-	/*if choosing to reset password via email a warning box will apear */
+	/*if choosing to reset password via email a warning box will apear  in /password*/
 	$("#reset-via-email").on("click", function(){
 		$("#send-email-reset").removeClass("no-display");
+		$("#display-security-questions").addClass("no-display");
 		console.log("button pressed");
 	});
 
@@ -87,6 +88,40 @@ $(document).ready(function(){
 		});
 
 		return false;
+	});
+
+	/*resetting password on /reset-password*/
+	$('#password-has-been-reset').on('submit', function(){
+		event.preventDefault();
+		var that = $(this),
+	      url = that.attr('action'),
+	      type = that.attr('method'),
+	      radioValue = $("input[name='account-type']:checked").val();
+	      email = $("input[name='userName']").val();
+	      password = $("input[name='password']").val();
+		  data = JSON.stringify({'email':email, 'account-type':radioValue, 'password' :password});
+	      console.log(data);
+
+	      $.ajax(url, {
+	      	type: type,
+	      	data: data,
+	      	contentType:'application/json',
+	      	dataType: 'json',
+
+	      	success: function(response){
+	      		//display success you have reset your password, show login link
+	      		$('#password-reset-sucess').removeClass('is-hidden');
+	      	},
+	      	error: function(jqXHR, exception){
+	      		console.log("error:");
+	      		console.log(jqXHR);
+	      		//display some error
+	      	}
+
+
+	      });
+	    return false;
+
 	});
 
 	/*onlick for signature upload button*/

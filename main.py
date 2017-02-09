@@ -313,6 +313,14 @@ def getPassword():
 			return jsonify(response.status_code)
 	else:
 		abort(400)
+
+@app.route('/reset-password', methods=['GET', 'POST'])
+def resetPassword():
+	return render_template('/reset-password.html')
+
+@app.route('/reset-pass-via-email', methods=['POST'])
+def resetPasswordViaEmail():
+	return 'password has been reset, or will be once this is connected to the database!'
 		
 @app.route('/get-question',methods=['POST'])
 def checkQuestions():
