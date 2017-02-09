@@ -99,7 +99,8 @@ $(document).ready(function(){
 	      radioValue = $("input[name='account-type']:checked").val();
 	      email = $("input[name='userName']").val();
 	      password = $("input[name='password']").val();
-		  data = JSON.stringify({'email':email, 'account-type':radioValue, 'password' :password});
+	      code = $("input[name='reset-code']").val();
+		  data = JSON.stringify({'email':email, 'account-type':radioValue, 'reset-code':code, 'password' :password});
 	      console.log(data);
 
 	      $.ajax(url, {
