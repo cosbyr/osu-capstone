@@ -85,6 +85,9 @@ class PostgresDatabase(object):
 	def getUserDetails(self,email):
 		user = self.Manager.query.filter_by(email=email).first()
 		
+		if user is None:
+			return None
+			
 		self.downloadUserSig(email)
 		
 		details = {
@@ -224,13 +227,14 @@ class PostgresDatabase(object):
 	def getEmployees(self,req):
 		employees = {}
 		results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
-		
-		if results is None:
-			return {}
+
+		if len(results) == 0:
+			return {'status':404,'message':'The search returned no results.'}
 			
 		for r in results:
 			employees[r.id] = {'id':r.id,'fname':r.fname,'lname':r.lname,'email':r.email}
-			
+		
+		employees['status'] = 200
 		return employees
 		
 	#HAVE TO TEST
