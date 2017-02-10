@@ -2,10 +2,10 @@ $(document).ready(function(){
 
 	$body = $("body");
 
-	$(document).on({
-	    ajaxStart: function() { $body.addClass("loading");    },
+	//$(document).on({
+	    //ajaxStart: function() { $body.addClass("loading");    },
 	    //ajaxComplete: function() { $body.removeClass("loading"); }    
-	});
+	//});
 	
 	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){

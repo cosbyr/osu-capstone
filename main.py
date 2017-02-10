@@ -171,6 +171,13 @@ def renderNewAccount():
 			return render_template('new-account.html',status=status) #explain that account could not be created
 		
 		return redirect(url_for('renderLogin',status=status))
+		
+@app.route('/awards')
+@login_required
+def renderAwards():
+	awards = alchemist.getAwards(session['email'])
+	return render_template('user-awards-list.html', awards=awards)
+
 
 		
 @app.route('/sign_s3/')
@@ -220,7 +227,7 @@ def renderPDF():
 	sigFile = replace(sigFile,'.','_')
 	sigFile += '_sig.png'
 	
-	#details = alchemist.getUserDetails(session['email'],session['role'])
+	alchemist.downloadUserSig(session['email'])
 	
 	if payload['border'] == '1':
 		border = r'''{\border \char113} % up left

@@ -25,7 +25,6 @@
 	      <ul class="nav navbar-nav">
 			<li class="active"><a href="/user"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
 			<li><a href="/create"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
-			<li><a href="/awards"><span class="glyphicon glyphicon-tower"></span> List Awards</a></li>
 		  </ul>
 	      <ul class="nav navbar-nav navbar-right">
 			<li class="dropdown">
@@ -43,7 +42,21 @@
 	</nav>
 
 	<div class="container">
-		<h1>User Portal</h1>
-		<p>User portal goes here.</p>
+		<div>
+			<table class="table">
+				<tr>
+					<th>Recipient</th>
+					<th>Award Type</th>
+					<th>Date Granted</th>
+				</tr>
+				{% for award in awards %}
+				<tr>
+					<td>{{awards[award].recipient}}</td>
+					<td>{{awards[award].type}}</td>
+					<td>{{awards[award].issuedOn}}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</div>
 	</div>
 {% endblock content %}

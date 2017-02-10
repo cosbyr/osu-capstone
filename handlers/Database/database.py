@@ -1,6 +1,7 @@
 from __future__ import print_function #debug
 import os,sys #sys debug
 import boto3
+import time
 from string import replace
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
@@ -37,6 +38,19 @@ class PostgresDatabase(object):
 			
 		return themes
 
+	def getAwards(self,email):
+		awards = {}
+		creator = self.Manager.query.filter_by(email=email).first()
+		results = self.Award.query.filter_by(creator=creator.id).all()
+		
+		for r in results:
+			issuedOnString = r.issuedOn
+			issuedOnString = issuedOnString.strftime("%m-%d-%Y")
+			recipient = r.employee.fname + ' ' + r.employee.lname
+			awards[r.id] = {'id':r.id,'issuedOn':issuedOnString,'recipient':recipient,'type':r.award_type.name}
+			
+		return awards
+			
 		
 	def getAwardBackgrounds(self):
 		backgrounds = {}
@@ -129,7 +143,6 @@ class PostgresDatabase(object):
 			
 			return details
 		
-			
 	def login(self,payload):
 		email = payload['userName']
 		pword = payload['password']
