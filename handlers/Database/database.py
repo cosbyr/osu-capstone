@@ -27,6 +27,7 @@ class PostgresDatabase(object):
 		self.Employee = clsEmployee
 		self.AwardBorder = clsAwardBorder
 
+		
 	def getAwardThemes(self):
 		themes = {}
 		results = db.session.query(self.AwardTheme).all()
@@ -35,6 +36,7 @@ class PostgresDatabase(object):
 			themes[r.id] = r.theme
 			
 		return themes
+
 		
 	def getAwardBackgrounds(self):
 		backgrounds = {}
@@ -44,7 +46,8 @@ class PostgresDatabase(object):
 			backgrounds[r.id] = r.filename
 			
 		return backgrounds
-	
+
+		
 	def getAwardTypes(self):
 		types = {}
 		results = db.session.query(self.AwardType).all()
@@ -54,6 +57,7 @@ class PostgresDatabase(object):
 			
 		return types
 
+		
 	def getQuestions(self):
 		questions = {}
 		results = db.session.query(self.Question).all()
@@ -62,7 +66,8 @@ class PostgresDatabase(object):
 			questions[r.id] = r.prompt
 			
 		return questions
-	
+
+		
 	def downloadUserSig(self,email):
 		bucket = os.environ.get('S3_BUCKET_NAME')
 		
@@ -81,29 +86,48 @@ class PostgresDatabase(object):
 			print(e,file=sys.stderr)
 			return None
 		return True
-	
-	def getUserDetails(self,email):
-		user = self.Manager.query.filter_by(email=email).first()
+
 		
-		if user is None:
-			return None
+	def getUserDetails(self,email,type):
+		if type == 'user':
+			user = self.Manager.query.filter_by(email=email).first()
 			
-		self.downloadUserSig(email)
-		
-		details = {
-		'id':user.id,
-		'account':user.account.id,#added account id - may cause error
-		'fname':user.fname,
-		'lname':user.lname,
-		'email':user.email,
-		'title':user.title,
-		'question1':user.account.q1,
-		'question2':user.account.q2,
-		'answer1':user.account.answer1,
-		'answer2':user.account.answer2,
-		'signature':user.signature}
-		
-		return details
+			if user is None:
+				return None
+				
+			self.downloadUserSig(email)
+			
+			details = {
+			'id':user.id,
+			'account':user.account.id,#added account id - may cause error
+			'fname':user.fname,
+			'lname':user.lname,
+			'email':user.email,
+			'title':user.title,
+			'question1':user.account.q1,
+			'question2':user.account.q2,
+			'answer1':user.account.answer1,
+			'answer2':user.account.answer2,
+			'signature':user.signature}
+			
+			return details
+			
+		if type == 'admin':
+			admin = self.Admin.query.filter_by(email=email).first()
+			
+			if admin is None:
+				return None
+			
+			details = {
+			'id':admin.id,
+			'account':admin.account.id,
+			'email':admin.email,
+			'question1':admin.account.q1,
+			'question2':admin.account.q2,
+			'answer1':admin.account.answer1,
+			'answer2':admin.account.answer2}
+			
+			return details
 		
 			
 	def login(self,payload):
@@ -145,6 +169,7 @@ class PostgresDatabase(object):
 		manager = self.Manager(account,title,fname,lname,sign,email)
 			
 		return [account,manager]
+
 		
 	def updateAccount(self,payload,email):
 		user = self.Manager.query.filter_by(email=email).first()
@@ -153,8 +178,7 @@ class PostgresDatabase(object):
 		user.lname = payload['lastName']
 		user.email = payload['email']
 		user.title = payload['jobTitle']
-		user.signature = payload['signature'] 
-		print(user.signature,file=sys.stderr)
+		user.signature = payload['signature']
 		
 		try:
 			db.session.commit()
@@ -162,6 +186,7 @@ class PostgresDatabase(object):
 			return False
 			
 		return True
+
 		
 	def createAward(self,payload,email):
 		creator = self.Manager.query.filter_by(email=email).first()
@@ -179,7 +204,8 @@ class PostgresDatabase(object):
 		award = self.Award(creatorId,typeId,message,issuedOn,recepient,background,theme,border)
 			
 		return award
-	
+
+		
 	def save(self,obj):
 		try:
 			if type(obj) is list:
@@ -223,7 +249,8 @@ class PostgresDatabase(object):
 			return False,None
 			
 		return True,account
-	
+
+		
 	def getEmployees(self,req):
 		employees = {}
 		results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
@@ -237,7 +264,7 @@ class PostgresDatabase(object):
 		employees['status'] = 200
 		return employees
 		
-	#HAVE TO TEST
+
 	def genVerificationCode(self,id):
 		account = self.Account.query.get(id)
 		code = randint(10000,99999)
@@ -252,7 +279,39 @@ class PostgresDatabase(object):
 			return None
 			
 		return code
-	'''
+	
+	
+	def resetPassword(self,payload):
+		status = True
+		msg = 'Your password has been reset.'
+		
+		user = self.getUserDetails(payload['userName'],payload['account-type'])
+
+		if user is None:
+			status = False
+			msg = 'There is no account linked to that email address.'
+			return status,msg
+			
+		account = self.Account.query.get(user['account'])
+
+		if int(payload['reset-code']) != account.code:
+			status = False
+			msg = 'Incorrect verification number. You will have to get another code.'
+		else:	
+			account.pword = argon2.using(rounds=4).hash(payload['password'])
+			
+		account.code = None
+		
+		try:
+			db.session.commit()
+		except IntegrityError:
+			status = False
+			msg = 'Unable to reset password.'
+			return status, msg
+			
+		return status,msg 
+	
+	
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')
 		quest1 = 1
@@ -268,4 +327,4 @@ class PostgresDatabase(object):
 		db.session.add(account)
 		db.session.add(admin)
 		db.session.commit()
-	'''
+	

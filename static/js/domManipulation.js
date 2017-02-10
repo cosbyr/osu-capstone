@@ -68,11 +68,12 @@ $(document).ready(function(){
 		  	dataType: 'json',
 			
 			success: function(response){
-				console.log("sucess " + radioValue);
+				console.log("success " + radioValue);
 				if(radioValue == "email"){
 					console.log("I will now display email stuff");
 					$("#display-security-questions").addClass("no-display");
 					$("#send-email-reset").removeClass("no-display");
+					window.location.replace("/reset-password");
 				}
 				else{
 					console.log("I will now display security question stuff");
@@ -91,7 +92,7 @@ $(document).ready(function(){
 	});
 
 	/*resetting password on /reset-password*/
-	$('#password-has-been-reset').on('submit', function(){
+	/*$('#password-has-been-reset').on('submit', function(){
 		event.preventDefault();
 		var that = $(this),
 	      url = that.attr('action'),
@@ -123,7 +124,7 @@ $(document).ready(function(){
 	      });
 	    return false;
 
-	});
+	});*/
 
 	/*onlick for signature upload button*/
 	$("#file-load-button").click(function () {

@@ -39,7 +39,7 @@ class Emailer(object):
 		text = '''
 		<p>You have elected to reset your password by email. Please, click the link below an enter the verification code.<p>
 		<p>Verification Code: {0}</p>
-		<a href=u-capstone.herokuapp.com/reset-password>Reset your password</a>'''.format(code)
+		<a href=localhost:5000/reset-password>Reset your password</a>'''.format(code) #change link to heroku url
 		
 		sg = sendgrid.SendGridAPIClient(apikey=self.key)
 		sender = Email('root@admin.com') #may want to use more descriptive email... even though its fake

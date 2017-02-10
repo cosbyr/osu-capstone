@@ -2,14 +2,14 @@ from handlers.Database import database
 			
 class Account (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
-	pword = database.db.Column(database.db.String(100), nullable=False)
+	pword = database.db.Column(database.db.String(255), nullable=False)
 	q1_id = database.db.Column(database.db.Integer, database.db.ForeignKey('question.id',ondelete='RESTRICT',onupdate='RESTRICT'), nullable=False)
 	q2_id = database.db.Column(database.db.Integer, database.db.ForeignKey('question.id',ondelete='RESTRICT',onupdate='RESTRICT'), nullable=False)
 	answer1 = database.db.Column(database.db.Text, nullable=False)
 	answer2 = database.db.Column(database.db.Text, nullable=False)
 	created = database.db.Column(database.db.DateTime, nullable=False)
 	authenticated = database.db.Column(database.db.Boolean, default=False)
-	code = database.db.Column(database.db.String(5),default=None,nullable=True)
+	code = database.db.Column(database.db.Integer,default=None,nullable=True)
 	
 	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined')
 	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined')
