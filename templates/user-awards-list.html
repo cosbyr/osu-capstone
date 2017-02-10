@@ -49,12 +49,14 @@
 					<th>Recipient</th>
 					<th>Award Type</th>
 					<th>Date Granted</th>
+					<th>Delete Award?</th>
 				</tr>
 				{% for award in awards %}
 				<tr>
 					<td>{{awards[award].recipient}}</td>
 					<td>{{awards[award].type}}</td>
 					<td>{{awards[award].issuedOn}}</td>
+					<td><a href="/remove-award/?awd={{awards[award].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
 				</tr>
 				{% endfor %}
 			</table>

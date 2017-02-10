@@ -177,8 +177,14 @@ def renderNewAccount():
 def renderAwards():
 	awards = alchemist.getAwards(session['email'])
 	return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
-
-
+	
+@app.route('/remove-award/')
+def removeAward():
+	awardID = request.args.get('awd')
+	award = alchemist.getAward(awardID)
+	status = alchemist.remove(award)
+	awards = alchemist.getAwards(session['email'])
+	return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
 		
 @app.route('/sign_s3/')
 def sign_s3():
