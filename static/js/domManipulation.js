@@ -75,11 +75,13 @@ $(document).ready(function(){
 		  	dataType: 'json',
 			
 			success: function(response){
-				console.log("sucess " + radioValue);
-				$body.removeClass("loading");
 
+				$body.removeClass("loading");
 				if(radioValue == "email"){
-					$("email-sent").removeClass("is-hidden");
+					console.log("I will now display email stuff");
+					$("#display-security-questions").addClass("no-display");
+					$("#send-email-reset").removeClass("no-display");
+					window.location.replace("/reset-password");
 				}
 				else{
 					// $('#reset-password-main-form').addClass("is-hidden");
@@ -140,7 +142,7 @@ $(document).ready(function(){
 	// Reset password via sqcurity questions in /password
 
 	/*resetting password on /reset-password*/
-	$('#password-has-been-reset').on('submit', function(){
+	/*$('#password-has-been-reset').on('submit', function(){
 		event.preventDefault();
 		var that = $(this),
 	      url = that.attr('action'),
@@ -172,7 +174,7 @@ $(document).ready(function(){
 	      });
 	    return false;
 
-	});
+	});*/
 
 	/*onlick for signature upload button*/
 	$("#file-load-button").click(function () {

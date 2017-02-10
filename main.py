@@ -74,6 +74,7 @@ def renderLogin():
 				return redirect(url_for('renderAdmin'))
 			else:
 				session['name'] = '{0} {1}'.format(account.manager.fname,account.manager.lname)
+				session['title'] = account.manager.title
 				return redirect(url_for('renderUser'))			
 		else:
 			abort(401)
@@ -108,7 +109,7 @@ def renderUser():
 def renderUpdateAccount():	
 	if session['role'] == 'user':
 		if request.method == 'GET':
-			details = alchemist.getUserDetails(session['email'])
+			details = alchemist.getUserDetails(session['email'],session['role'])
 			
 			if details is None:
 				abort(500) #this should flash a message rather than abort. will fix later
@@ -145,7 +146,6 @@ def renderCreate():
 @login_required
 def renderHistory():
 	if session['role'] == 'user':
-		#details = alchemist.getUserDetails(session['email'])	
 		return render_template('history.html',username=session['name'])
 	else:
 		abort(401)
@@ -213,7 +213,7 @@ def renderPDF():
 	sigFile = replace(sigFile,'.','_')
 	sigFile += '_sig.png'
 	
-	details = alchemist.getUserDetails(session['email']) #get details in login route and add title to session var
+	#details = alchemist.getUserDetails(session['email'],session['role'])
 	
 	if payload['border'] == '1':
 		border = r'''{\border \char113} % up left
@@ -249,7 +249,7 @@ def renderPDF():
 	'type': award.award_type.name,
 	'employee':award.employee.fname + ' ' + award.employee.lname,
 	'admin':session['name'],
-	'adminTitle':details['title'],
+	'adminTitle':session['title'],
 	'signature':sigFile,
 	'granted':awardDateString}
 	
@@ -287,12 +287,12 @@ def getEmployees():
 	else:
 		abort(400) #put error on create page
 
-#HAVE TO TEST!
+		
 @app.route('/get-password',methods=['POST'])
 def getPassword():
 	if request.json:
 		payload = request.get_json()
-		details = alchemist.getUserDetails(payload['email'])
+		details = alchemist.getUserDetails(payload['email'],session['role'])
 		
 		if details is None:
 			response = {'status':404,'message':'The given email is not linked to a user account.'}
@@ -303,7 +303,7 @@ def getPassword():
 			return jsonify(response)
 		
 		if payload['reset-method'] == 'email':
-			code = alchemist.genVerificationCode(details['account']) #remember to remove the code from the db after they reset their password
+			code = alchemist.genVerificationCode(details['account'])
 			
 			if code is not None:
 				response = emailer.sendPasswordReset(payload['email'],code)
@@ -316,6 +316,7 @@ def getPassword():
 
 @app.route('/reset-password', methods=['GET', 'POST'])
 def resetPassword():
+<<<<<<< HEAD
 	return render_template('/reset-password.html')
 
 @app.route('/reset-pass-via-email', methods=['POST'])
@@ -327,8 +328,22 @@ def resetPasswordViaEmail():
 @app.route('/reset-pass-via-question', methods=['POST'])
 def resetPasswordVieQuestion():
 	#you get the email and new password
-	return 'password has been reset..or will be in the future!'
 
+	if request.method == 'GET':
+		return render_template('/reset-password.html')
+		
+	if request.method == 'POST':
+		payload = request.form
+		print('HERE---------------> {0}'.format(payload),file=sys.stderr)
+		sys.stdout.flush()
+		
+		status,msg = alchemist.resetPassword(payload)
+		print('HERE---------------> {0} {1}'.format(status,msg),file=sys.stderr)
+		sys.stdout.flush()
+		if status == False:
+			return redirect(url_for('resetPassword',status=status))
+			
+		return redirect(url_for('renderLogin'))
 
 @app.route('/get-question',methods=['POST'])
 def checkQuestions():
