@@ -34,7 +34,7 @@ class Emailer(object):
 		response = sg.client.mail.send.post(request_body=mail.get())
 		return response
 		
-	#HAVE TO TEST!
+		
 	def sendPasswordReset(self,sendTo,code):
 		text = '''
 		<p>You have elected to reset your password by email. Please, click the link below an enter the verification code.<p>
@@ -50,8 +50,7 @@ class Emailer(object):
 		mail = Mail(sender,subject,recepient,content)
 		response = sg.client.mail.send.post(request_body=mail.get())
 		
-		return response
-		
+		return {'status':response.status_code,'message':'Password reset email was sent.'}
 		
 	
 		

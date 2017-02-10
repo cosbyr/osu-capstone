@@ -113,7 +113,7 @@ def renderUser():
 def renderUpdateAccount():	
 	if session['role'] == 'user':
 		if request.method == 'GET':
-			details = alchemist.getUserDetails(session['email'],session['role'])
+			details = alchemist.getUserDetails(session['email'])
 			
 			if details is None:
 				abort(500) #this should flash a message rather than abort. will fix later
@@ -227,6 +227,7 @@ def renderPDF():
 	sigFile = replace(sigFile,'.','_')
 	sigFile += '_sig.png'
 	
+
 	alchemist.downloadUserSig(session['email'])
 	
 	if payload['border'] == '1':
@@ -297,7 +298,8 @@ def renderPDF():
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
 	if request.json:
-		employees = alchemist.getEmployees(request.get_json())
+		payload = request.get_json()
+		employees = alchemist.getEmployees(payload)
 		return jsonify(employees)
 	else:
 		abort(400) #put error on create page
@@ -307,11 +309,14 @@ def getEmployees():
 def getPassword():
 	if request.json:
 		payload = request.get_json()
-		details = alchemist.getUserDetails(payload['email'],session['role'])
+		details = alchemist.getUserDetails(payload['email'])
 		
 		if details is None:
-			response = {'status':404,'message':'The given email is not linked to a user account.'}
-			return jsonify(response)
+			details = alchemist.getAdminDetails(payload['email'])
+			
+			if details is None:
+				response = {'status':404,'message':'The given email is not linked to an account.'}
+				return jsonify(response)
 				
 		if payload['reset-method'] == 'question':
 			response = {'one':str(details['question1']), 'two':str(details['question2']),'status':200}
@@ -325,7 +330,7 @@ def getPassword():
 			else:
 				abort(500)
 			
-			return jsonify(response.status_code)
+			return jsonify(response)
 	else:
 		abort(400)
 
@@ -338,39 +343,34 @@ def resetPasswordViaEmail():
 	if request.method == 'POST':
 		payload = request.form
 		
-		status,msg = alchemist.resetPassword(payload)
+		response = alchemist.resetPasswordByEmail(payload)
 
-		if status == False:
-			return redirect(url_for('resetPasswordViaEmail',status=status))
+		if response['status'] == False:
+			return redirect(url_for('renderPassword',status=response))
 			
 		return redirect(url_for('renderLogin'))
 		
 
 @app.route('/reset-pass-via-question', methods=['POST'])
 def resetPasswordViaQuestion():
-	#you get the email and new password
-	if request.method == 'GET':
-		return render_template('/reset-password.html')
+	payload = request.form
+	status = alchemist.resetPasswordByQuestions(payload)
+	
+	if status == False:
+		abort(500)
 		
-	if request.method == 'POST':
-		payload = request.form
+	return redirect(url_for('renderLogin'))
 		
-		status,msg = alchemist.resetPassword(payload)
 		
-		if status == False:
-			return redirect(url_for('resetPasswordViaQuestion',status=status))
-			
-		return redirect(url_for('renderLogin'))
-
-@app.route('/get-question',methods=['POST'])
+@app.route('/check-questions',methods=['POST'])
 def checkQuestions():
-	pass
-
-# @app.route('/check-questions', methods=['POST'])
-# def checkQuestions():
-# 	#you get the questions in form
-# 	#data = JSON.stringify({'email': email, 'answer1':answer1Value, 'answer2':answer2Value}) 
-# 	return 'if the questions are correct, can they be sent as a bool?'
+	if request.json:
+		payload = request.get_json()
+		response = alchemist.verifyAnswers(payload)
+		
+		return jsonify(response)
+	else:
+		abort(400)
 	
 @loginManager.user_loader
 def accountLoader(id):

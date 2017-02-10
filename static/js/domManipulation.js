@@ -83,7 +83,13 @@ $(document).ready(function(){
 					$("#send-email-reset").removeClass("no-display");
 					
 					//added this to test locally cuz i cant get the email to link to localhost:5000
-					window.location.replace("/reset-password"); 
+					if(response['status'] == 404){
+						window.location.replace("/password");
+					}
+					else{
+						window.location.replace("/reset-password");
+					}
+					 
 				}
 				else{
 					// $('#reset-password-main-form').addClass("is-hidden");
@@ -122,16 +128,19 @@ $(document).ready(function(){
 			type: type,
 			data: data,
 			contentType: 'application/json',
-			dataTyep: 'json',
+			dataType: 'json',
 
 			success: function(response){
 				$('#security-questions').addClass("is-hidden");
 
-				/*if response == true
-				$('password-has-been-reset-questions').removeClass('is-hidden');
-			  if resonse == false
-			    $('password-reset-failure').removeClass('is-hidden');	 
-			*/
+				if(response['status'] == 200){
+					$('#password-has-been-reset-questions').removeClass('is-hidden');
+					$('#password-has-been-reset-questions').append('<input type="hidden" name="account" value="' + response['account'] + '"/>');
+				}
+				else{
+					$('#password-reset-failure').removeClass('is-hidden');
+				}			
+			
 			},
 			error: function(jqXHR, exception){
 	      		console.log("error:");
@@ -140,43 +149,6 @@ $(document).ready(function(){
 	      	}
 	    });
 	});
-
-	// Reset password via sqcurity questions in /password
-
-	/*resetting password on /reset-password*/
-	/*$('#password-has-been-reset').on('submit', function(){
-		event.preventDefault();
-		var that = $(this),
-	      url = that.attr('action'),
-	      type = that.attr('method'),
-	      radioValue = $("input[name='account-type']:checked").val();
-	      email = $("input[name='userName']").val();
-	      password = $("input[name='password']").val();
-	      code = $("input[name='reset-code']").val();
-		  data = JSON.stringify({'email':email, 'account-type':radioValue, 'reset-code':code, 'password' :password});
-	      console.log(data);
-
-	      $.ajax(url, {
-	      	type: type,
-	      	data: data,
-	      	contentType:'application/json',
-	      	dataType: 'json',
-
-	      	success: function(response){
-	      		//display success you have reset your password, show login link
-	      		$('#password-reset-sucess').removeClass('is-hidden');
-	      	},
-	      	error: function(jqXHR, exception){
-	      		console.log("error:");
-	      		console.log(jqXHR);
-	      		//display some error
-	      	}
-
-
-	      });
-	    return false;
-
-	});*/
 
 	/*onlick for signature upload button*/
 	$("#file-load-button").click(function () {

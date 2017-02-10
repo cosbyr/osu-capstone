@@ -13,6 +13,7 @@ from random import randint
 
 db = SQLAlchemy()
 
+
 #consider making this a singleton class
 class PostgresDatabase(object):
 	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme,clsEmployee,clsAwardBorder):
@@ -102,46 +103,46 @@ class PostgresDatabase(object):
 		return True
 
 		
-	def getUserDetails(self,email,type):
-		if type == 'user':
-			user = self.Manager.query.filter_by(email=email).first()
+	def getUserDetails(self,email):
+		user = self.Manager.query.filter_by(email=email).first()
+		
+		if user is None:
+			return None
 			
-			if user is None:
-				return None
-				
-			self.downloadUserSig(email)
-			
-			details = {
-			'id':user.id,
-			'account':user.account.id,#added account id - may cause error
-			'fname':user.fname,
-			'lname':user.lname,
-			'email':user.email,
-			'title':user.title,
-			'question1':user.account.q1,
-			'question2':user.account.q2,
-			'answer1':user.account.answer1,
-			'answer2':user.account.answer2,
-			'signature':user.signature}
-			
-			return details
-			
-		if type == 'admin':
-			admin = self.Admin.query.filter_by(email=email).first()
-			
-			if admin is None:
-				return None
-			
-			details = {
-			'id':admin.id,
-			'account':admin.account.id,
-			'email':admin.email,
-			'question1':admin.account.q1,
-			'question2':admin.account.q2,
-			'answer1':admin.account.answer1,
-			'answer2':admin.account.answer2}
-			
-			return details
+		self.downloadUserSig(email)
+		
+		details = {
+		'id':user.id,
+		'account':user.account.id,
+		'fname':user.fname,
+		'lname':user.lname,
+		'email':user.email,
+		'title':user.title,
+		'question1':user.account.q1,
+		'question2':user.account.q2,
+		'answer1':user.account.answer1,
+		'answer2':user.account.answer2,
+		'signature':user.signature}
+		
+		return details
+	
+	
+	def getAdminDetails(self,email):
+		admin = self.Admin.query.filter_by(email=email).first()
+		
+		if admin is None:
+			return None
+		
+		details = {
+		'id':admin.id,
+		'account':admin.account.id,
+		'email':admin.email,
+		'question1':admin.account.q1,
+		'question2':admin.account.q2,
+		'answer1':admin.account.answer1,
+		'answer2':admin.account.answer2}
+		
+		return details
 		
 	def login(self,payload):
 		email = payload['userName']
@@ -294,22 +295,22 @@ class PostgresDatabase(object):
 		return code
 	
 	
-	def resetPassword(self,payload):
-		status = True
-		msg = 'Your password has been reset.'
+	def resetPasswordByEmail(self,payload):
+		response = {'status':True,'message':'Your password has been reset.'}
 		
-		user = self.getUserDetails(payload['userName'],payload['account-type'])
-
+		if payload['account-type'] == 'user':
+			user = self.getUserDetails(payload['userName'])
+		elif payload['account-type'] == 'admin':
+			user = self.getAdminDetails(payload['userName'])
+			
 		if user is None:
-			status = False
-			msg = 'There is no account linked to that email address.'
-			return status,msg
+			response = {'status':False,'message':'There is no account linked to that email address.'}
+			return response
 			
 		account = self.Account.query.get(user['account'])
 
 		if int(payload['reset-code']) != account.code:
-			status = False
-			msg = 'Incorrect verification number. You will have to get another code.'
+			response = {'status':False,'message':'Incorrect verification number. You will have to get another code.'}
 		else:	
 			account.pword = argon2.using(rounds=4).hash(payload['password'])
 			
@@ -318,13 +319,44 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
-			status = False
-			msg = 'Unable to reset password.'
+			response = {'status':False,'message':'Unable to reset password.'}
 			return status, msg
 			
-		return status,msg 
+		return response 
 	
 	
+	def verifyAnswers(self,payload):
+		accountType = 'user'
+		details = self.getUserDetails(payload['email'])
+		
+		if details is None:
+			accountType = 'admin'
+			details = self.getAdminDetails(payload['email'])
+			
+			if details is None:
+				response = {'status':404, 'message':'The provided email is not linked to an account.'}
+				return response
+		
+		if details['answer1'] != payload['answer1'] or details['answer2'] != payload['answer2']:
+			response = {'status':400, 'message':'One or more of the given security question answers are incorrect.'}
+			return response
+			
+		response = {'status':200, 'message':'The answers to your security questions have been verified.','account':details['account']}
+
+		return response
+			
+		
+	def resetPasswordByQuestions(self,payload):
+		account = self.Account.query.get(payload['account'])
+		account.pword = argon2.using(rounds=4).hash(payload['password']) 
+			
+		try:
+			db.session.commit()
+		except IntegrityError:
+			return False
+			
+		return True
+	'''
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')
 		quest1 = 1
@@ -340,4 +372,4 @@ class PostgresDatabase(object):
 		db.session.add(account)
 		db.session.add(admin)
 		db.session.commit()
-	
+	'''
