@@ -51,6 +51,7 @@ def renderIndex():
 	#alchemist.createRootAdmin()
 	return render_template('index.html')
 
+	
 @app.route('/login',methods=['GET','POST'])
 def renderLogin():
 	if request.method == 'GET':			
@@ -87,6 +88,7 @@ def renderLogout():
 	logout_user()
 	return render_template('logout.html')
 
+	
 @app.route('/admin')
 @login_required
 def renderAdmin():
@@ -94,6 +96,7 @@ def renderAdmin():
 		return render_template('admin.html')
 	else:
 		abort(401)
+
 
 @app.route('/user')
 @login_required
@@ -103,6 +106,7 @@ def renderUser():
 		return render_template('user.html',username=session['name'],email=session['email'])
 	else:
 		abort(401)
+
 
 @app.route('/update-account',methods=['GET','POST'])
 @login_required
@@ -142,6 +146,7 @@ def renderCreate():
 	else:
 		abort(401)
 
+
 @app.route('/history')
 @login_required
 def renderHistory():
@@ -149,6 +154,7 @@ def renderHistory():
 		return render_template('history.html',username=session['name'])
 	else:
 		abort(401)
+
 
 @app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
@@ -190,6 +196,7 @@ def sign_s3():
 		'data': presigned_post,
 		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
 	})
+
 	
 @app.route('/password')
 def renderPassword():
@@ -279,6 +286,7 @@ def renderPDF():
 		alchemist.remove(award)
 		abort(500)
 
+
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
 	if request.json:
@@ -314,34 +322,36 @@ def getPassword():
 	else:
 		abort(400)
 
+
 @app.route('/reset-password', methods=['GET', 'POST'])
-def resetPassword():
-<<<<<<< HEAD
-	return render_template('/reset-password.html')
-
-@app.route('/reset-pass-via-email', methods=['POST'])
 def resetPasswordViaEmail():
-	#you get the email, reset code, new password
-	return 'password has been reset, or will be once this is connected to the database!'
-		
-
-@app.route('/reset-pass-via-question', methods=['POST'])
-def resetPasswordVieQuestion():
-	#you get the email and new password
-
 	if request.method == 'GET':
 		return render_template('/reset-password.html')
 		
 	if request.method == 'POST':
 		payload = request.form
-		print('HERE---------------> {0}'.format(payload),file=sys.stderr)
-		sys.stdout.flush()
 		
 		status,msg = alchemist.resetPassword(payload)
-		print('HERE---------------> {0} {1}'.format(status,msg),file=sys.stderr)
-		sys.stdout.flush()
+
 		if status == False:
-			return redirect(url_for('resetPassword',status=status))
+			return redirect(url_for('resetPasswordViaEmail',status=status))
+			
+		return redirect(url_for('renderLogin'))
+		
+
+@app.route('/reset-pass-via-question', methods=['POST'])
+def resetPasswordViaQuestion():
+	#you get the email and new password
+	if request.method == 'GET':
+		return render_template('/reset-password.html')
+		
+	if request.method == 'POST':
+		payload = request.form
+		
+		status,msg = alchemist.resetPassword(payload)
+		
+		if status == False:
+			return redirect(url_for('resetPasswordViaQuestion',status=status))
 			
 		return redirect(url_for('renderLogin'))
 
@@ -354,15 +364,16 @@ def checkQuestions():
 # 	#you get the questions in form
 # 	#data = JSON.stringify({'email': email, 'answer1':answer1Value, 'answer2':answer2Value}) 
 # 	return 'if the questions are correct, can they be sent as a bool?'
-
 	
 @loginManager.user_loader
 def accountLoader(id):
 	return alchemist.getAccount(id)
+
 	
 @app.route('/jquery')
 def jquerytest():
     return render_template('jquery.html')
+
 	
 @app.errorhandler(500)
 def serverError(e):
@@ -370,20 +381,24 @@ def serverError(e):
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred: ' + str(e), 500
 
+
 @app.errorhandler(404)
 def resourceNotFoundError(e):
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred: ' + str(e), 400
+
 	
 @app.errorhandler(401)
 def unauthorizedError(e):
     return '<h1>You are not authorized to access this page.</h1> \
 	<p>Please login <a href=/login>here</a></p>', 401
 
+	
 @app.errorhandler(400)
 def badRequestError(e):
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred: ' + str(e), 400
+
 	
 if __name__ == "__main__":
     app.run()

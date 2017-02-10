@@ -81,7 +81,9 @@ $(document).ready(function(){
 					console.log("I will now display email stuff");
 					$("#display-security-questions").addClass("no-display");
 					$("#send-email-reset").removeClass("no-display");
-					window.location.replace("/reset-password");
+					
+					//added this to test locally cuz i cant get the email to link to localhost:5000
+					window.location.replace("/reset-password"); 
 				}
 				else{
 					// $('#reset-password-main-form').addClass("is-hidden");
