@@ -1,4 +1,11 @@
 $(document).ready(function(){
+
+	$body = $("body");
+
+	$(document).on({
+	    ajaxStart: function() { $body.addClass("loading");    },
+	    //ajaxComplete: function() { $body.removeClass("loading"); }    
+	});
 	
 	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){
@@ -43,14 +50,14 @@ $(document).ready(function(){
 
 	/*if choosing to reset password via email a warning box will apear  in /password*/
 	$("#reset-via-email").on("click", function(){
-		$("#send-email-reset").removeClass("no-display");
-		$("#display-security-questions").addClass("no-display");
+		$("#send-email-reset").removeClass("is-hidden");
+		$("#display-security-questions").addClass("is-hidden");
 		console.log("button pressed");
 	});
 
 
 	/* choosing to reset via email or password on /password*/
-	$("#reset-password").on('submit', function(){
+	var email = $("#reset-password").on('submit', function(){
 		event.preventDefault();
 		var that = $(this),
 	      url = that.attr('action'),
@@ -69,26 +76,68 @@ $(document).ready(function(){
 			
 			success: function(response){
 				console.log("sucess " + radioValue);
+				$body.removeClass("loading");
+
 				if(radioValue == "email"){
-					console.log("I will now display email stuff");
-					$("#display-security-questions").addClass("no-display");
-					$("#send-email-reset").removeClass("no-display");
+					$("email-sent").removeClass("is-hidden");
 				}
 				else{
-					console.log("I will now display security question stuff");
-					$("#display-security-questions").removeClass("no-display");
-					$("#send-email-reset").addClass("no-display");
+					// $('#reset-password-main-form').addClass("is-hidden");
+					$("#security-questions").removeClass("is-hidden");
+					$("#send-email-reset").addClass("is-hidden");
+					
+					var question1 = response.one;
+					var question2 = response.two;
+
+					$('#question-1').append(question1);
+					$('#question-2').append(question2);
 				}
-
-
 			},
+			
 			error: function (jqXHR, exception) {
+				$body.removeClass("loading");
     			console.log("in error" + jqXHR);
     		}
 		});
 
-		return false;
+		return email;
 	});
+
+	// Check security questions in /password
+	$('#security-questions').on('submit', function(){
+		event.preventDefault();
+		var that = $(this),
+	      url = that.attr('action'),
+	      type = that.attr('method'),
+	      answer1Value = $("input[name='security-answer-1']").val();
+	      answer2Value = $("input[name='security-answer-2']").val();
+		  data = JSON.stringify({'email': email, 'answer1':answer1Value, 'answer2':answer2Value})
+	      console.log(data);
+
+		$.ajax(url, {
+			type: type,
+			data: data,
+			contentType: 'application/json',
+			dataTyep: 'json',
+
+			success: function(response){
+				$('#security-questions').addClass("is-hidden");
+
+				/*if response == true
+				$('password-has-been-reset-questions').removeClass('is-hidden');
+			  if resonse == false
+			    $('password-reset-failure').removeClass('is-hidden');	 
+			*/
+			},
+			error: function(jqXHR, exception){
+	      		console.log("error:");
+	      		console.log(jqXHR);
+	      		//display some error
+	      	}
+	    });
+	});
+
+	// Reset password via sqcurity questions in /password
 
 	/*resetting password on /reset-password*/
 	$('#password-has-been-reset').on('submit', function(){

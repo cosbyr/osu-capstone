@@ -299,7 +299,7 @@ def getPassword():
 			return jsonify(response)
 				
 		if payload['reset-method'] == 'question':
-			response = {'1':str(details['question1']), '2':str(details['question2']),'status':200}
+			response = {'one':str(details['question1']), 'two':str(details['question2']),'status':200}
 			return jsonify(response)
 		
 		if payload['reset-method'] == 'email':
@@ -320,11 +320,26 @@ def resetPassword():
 
 @app.route('/reset-pass-via-email', methods=['POST'])
 def resetPasswordViaEmail():
+	#you get the email, reset code, new password
 	return 'password has been reset, or will be once this is connected to the database!'
 		
+
+@app.route('/reset-pass-via-question', methods=['POST'])
+def resetPasswordVieQuestion():
+	#you get the email and new password
+	return 'password has been reset..or will be in the future!'
+
+
 @app.route('/get-question',methods=['POST'])
 def checkQuestions():
 	pass
+
+# @app.route('/check-questions', methods=['POST'])
+# def checkQuestions():
+# 	#you get the questions in form
+# 	#data = JSON.stringify({'email': email, 'answer1':answer1Value, 'answer2':answer2Value}) 
+# 	return 'if the questions are correct, can they be sent as a bool?'
+
 	
 @loginManager.user_loader
 def accountLoader(id):
