@@ -176,7 +176,7 @@ def renderNewAccount():
 @login_required
 def renderAwards():
 	awards = alchemist.getAwards(session['email'])
-	return render_template('user-awards-list.html', awards=awards)
+	return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
 
 
 		
