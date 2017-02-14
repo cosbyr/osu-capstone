@@ -10,29 +10,28 @@
 
 {% block content %}
 
-
-<!-- REMOVE THIS AT THE END!!!!!! -->
-<link rel="stylesheet" href="static/css/stylesheet.css">
-	<div class="outter-container">
-		<header class="header-row">
-			<ul>
-				<li style="color: black"> {{username}} </li>
-				<li><a href="/user">User Home</a></li>
-				<li  class="active"><a href="/create">Create Award</a></li>
-				<li><a href="/update-account">Update Account</a></li>
-				<li style="float:right"><a href="/logout">Logout</a></li>
-			</ul>
-		</header>
-		<div class="page-title">Create New Award</div>
-
-		<div class="outter-container center-align">Find Employee</div>
-		<form action="/get-employee" method="POST" id="get-employee-form">
-			<input class="input-box-50 small-margin-top" id="last-name" type="text" name="lname" placeholder="Recipient Last Name" required />
-			<input class="input-box-50" type="submit" value="send" />
+	<div class="container">
+		<div class="col-sm-12">
+			<h1>Create New Award</h1>
+		</div>
+		<form class="form-horizontal" action="/get-employee" method="post" id="get-employee-form">
+			<div class="row">
+				<label class="col-sm-4 control-label" for="last-name">Find Employee</label>
+				<div class="col-sm-6">
+					<div class="input-group">
+						<input type="text" class="form-control" id="last-name" name="lname" placeholder="Recipient Last Name">
+						<span class="input-group-btn">
+							<button class="btn btn-default" type="submit">Go!</button>
+						</span>
+					</div><!-- /input-group -->
+				</div><!-- /.col-lg-6 -->
+			</div><!-- /.row -->
 		</form>
 
 
-		<form action="/latex" method="post">
+<br>
+		<!-- ADD is-hidden BACK IN -->
+		<form action="/latex" method="post" class="form-horizontal row " id="find-employees">
 			
 		<!-- 	<input class="input-box-50" type="text" name="recpFirst" placeholder="Recipient First Name" required />
 			<input class="input-box-50" type="text" name="recpLast" placeholder="Recipient Last Name" required />
@@ -40,30 +39,45 @@
 			<input class="input-box-50" type="email" id='email' name="recpEmail" placeholder="Recipient Email" required /> -->
 
 			<!-- choose employee created via domManipulation.js -->
-			<div class="inner-container center-align margin-top">Choose employee -If desired employee not listed please contact your admin</div>
-			<div id="choose-employee" class="outter-container small-margin-top"></div>
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="choose-employee">Choose employee</label>
+				<div class="col-sm-6">
+					<select class="form-control" id="choose-employee" class=""></select>
+				</div>
+			</div>
 			
 
 
 			<!-- Choose award type -->
-			<div class="inner-container center-align margin-top">Choose Award Type</div>
-			<div class="outter-container small-margin-top">
-				<select class="input-box-50" name="type">
-					{% for key,value in awardTypes.iteritems() %}
-						<option value="{{ key }}">{{ value }}</option>
-					{% endfor %}
-				</select>
-			</div>
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="select-award-type">Choose Award Type</label>
+				<div class="col-sm-6">
+					<select class="form-control" name="type" id="select-award-type">
+						{% for key,value in awardTypes.iteritems() %}
+							<option value="{{ key }}">{{ value }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			<div>
 
 			<!-- Display background options -->
-			<div class="outter-container">
-				<div class="inner-container center-align margin-top">Choose Award Background</div>
+			<div class="form-group">
+				<div class="col-sm-12">
+					<h2>Choose Award Background</h2><br>
+				</div>
+				<div class="container-fluid">
+					<div class="row">
 				{% for key,value in awardBackgrounds.iteritems() %}
-					<label>
-						<input class="no-display" type="radio" name="background" value="{{ key }}" />
-						<img class="award-image" src="../static/images/{{ value }}"" alt="{{ value }}" />
-					</label>
+					
+						<div class="col-sm-6">
+							<label>
+								<input class="is-hidden" type="radio" name="background" value="{{ key }}" />
+								<img class="img-responsive thumbnail  fill" src="../static/images/{{ value }}"" alt="{{ value }}" />
+							</label>							
+						</div>
+					
 				{% endfor %}
+				</div>
 			</div>
 
 			<!-- Display border options -->

@@ -36,6 +36,11 @@
 	margin-top: 20px;
 }
 
+.fill {
+	min-width: 100%;
+	min-height: 100%;
+}
+
 /* Creates loading spinner */
 
 /* Start by setting display:none to make this hidden.
