@@ -8,9 +8,12 @@ from handlers.Database import database
 from handlers.Database import models
 from handlers.Email import email
 from string import replace
-from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session, Response
+from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session, Response, flash
 from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
+
+ERROR = 'red'
+SUCCESS = 'green'
 
 app = Flask('app',template_folder='./templates',static_folder='./static')
 app.secret_key = os.environ['SECRET_KEY']
@@ -72,7 +75,7 @@ def renderLogin():
 		if status == True:
 			login_user(account)
 			if payload['account-type'] == 'admin':
-				return redirect(url_for('renderAdmin'), )
+				return redirect(url_for('renderAdmin'))
 			else:
 				session['name'] = '{0} {1}'.format(account.manager.fname,account.manager.lname)
 				session['title'] = account.manager.title
@@ -168,21 +171,16 @@ def renderNewAccount():
 		status = alchemist.save(account)
 		
 		if status == False:
-			return render_template('new-account.html',status=status) #explain that account could not be created
+			return redirect(url_for('renderNewAccount',status=status)) #explain that account could not be created
 		
 		return redirect(url_for('renderLogin',status=status))
-		
+	
+	
 @app.route('/awards')
 @login_required
 def renderAwards():
 	awards = alchemist.getAwards(session['email'])
 	return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
-	
-@app.route('/users')
-@login_required
-def renderUsers():
-	users = alchemist.getUsers()
-	return render_template('users-list.html', users=users, username=session['name'], email=session['email'])
 	
 @app.route('/remove-award/')
 def removeAward():
@@ -191,6 +189,7 @@ def removeAward():
 	status = alchemist.remove(award)
 	awards = alchemist.getAwards(session['email'])
 	return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
+		
 		
 @app.route('/sign_s3/')
 def sign_s3():
@@ -321,13 +320,37 @@ def getEmployees():
 def getPassword():
 	if request.json:
 		payload = request.get_json()
-		details = alchemist.getUserDetails(payload['email'])
+		user = alchemist.findUser(payload['email'])
+		
+		if user['role'] == None:
+			response = {'status':404,'message':'The email you provided is not linked to an account.'}
+			return jsonify(response)
+			
+		if user['role'] == 'user':
+			details = alchemist.getUserDetails(payload['email'])	
+		elif user['role'] == 'admin':
+			details = alchemist.getAdminDetails(payload['email'])
+			
+		if payload['reset-method'] == 'question':
+			response = {'one':str(details['question1']), 'two':str(details['question2']),'status':200}
+			return jsonify(response)
+		elif payload['reset-method'] == 'email':
+			code = alchemist.genVerificationCode(details['account'])
+			
+			if code is not None:
+				response = emailer.sendPasswordReset(payload['email'],code)
+			else:
+				abort(500)
+			
+			return jsonify(response)
+			
+		'''details = alchemist.getUserDetails(payload['email'])
 		
 		if details is None:
 			details = alchemist.getAdminDetails(payload['email'])
 			
 			if details is None:
-				response = {'status':404,'message':'The given email is not linked to an account.'}
+				response = {'status':404,'message':'The email you provided is not linked to an account.'}
 				return jsonify(response)
 				
 		if payload['reset-method'] == 'question':
@@ -342,7 +365,7 @@ def getPassword():
 			else:
 				abort(500)
 			
-			return jsonify(response)
+			return jsonify(response)'''
 	else:
 		abort(400)
 
@@ -354,12 +377,13 @@ def resetPasswordViaEmail():
 		
 	if request.method == 'POST':
 		payload = request.form
-		
 		response = alchemist.resetPasswordByEmail(payload)
-
-		if response['status'] == False:
-			return redirect(url_for('renderPassword',status=response))
-			
+		
+		if response['status'] != 200:
+			flash(response['message'],ERROR)
+			return redirect(url_for('resetPasswordViaEmail'))
+		
+		flash(response['message'],SUCCESS)		
 		return redirect(url_for('renderLogin'))
 		
 
@@ -383,7 +407,8 @@ def checkQuestions():
 		return jsonify(response)
 	else:
 		abort(400)
-	
+
+		
 @loginManager.user_loader
 def accountLoader(id):
 	return alchemist.getAccount(id)

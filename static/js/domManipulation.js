@@ -1,7 +1,7 @@
 $(document).ready(function(){
 
 	$body = $("body");
-
+	
 	//$(document).on({
 	    //ajaxStart: function() { $body.addClass("loading");    },
 	    //ajaxComplete: function() { $body.removeClass("loading"); }    
@@ -25,13 +25,15 @@ $(document).ready(function(){
 		  	dataType: 'json',
 
 	  		success: function(response) {
-	  			
+	  			//$("input[type=radio][name=employee-to-get-award]").remove()
+				$("input[type=radio][name=employee-to-get-award],label[for=employee-to-get-award]").remove()
+				
 				for (var i in response){
 					if(i != 'status' && i != 'message'){
 						var details = response[i].fname + " " + response[i].lname + " " +response[i].email;
-						console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
-						
-						$("#choose-employee").append('<input type="radio" name="employee-to-get-award" value="'+i+'">' + details );
+						//console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
+						$("#choose-employee").append('<label for="employee-to-get-award">' + details +'</label>' );
+						$("#choose-employee").append('<input type="radio" name="employee-to-get-award" value="'+ i +'">');
 					}
 				}
 				
@@ -78,29 +80,38 @@ $(document).ready(function(){
 
 				$body.removeClass("loading");
 				if(radioValue == "email"){
-					console.log("I will now display email stuff");
+					
+					//console.log("I will now display email stuff");
 					$("#display-security-questions").addClass("no-display");
 					$("#send-email-reset").removeClass("no-display");
 					
 					//added this to test locally cuz i cant get the email to link to localhost:5000
-					if(response['status'] == 404){
-						window.location.replace("/password");
+					if(response['status'] == 200 || response['status'] == 202){
+						alert(response['message']);
+						window.location.replace("/reset-password");
 					}
 					else{
-						window.location.replace("/reset-password");
+						alert(response['message']);
+						window.location.replace("/password");
 					}
 					 
 				}
 				else{
 					// $('#reset-password-main-form').addClass("is-hidden");
-					$("#security-questions").removeClass("is-hidden");
-					$("#send-email-reset").addClass("is-hidden");
-					
-					var question1 = response.one;
-					var question2 = response.two;
+					if(response['status'] == 200){
+						$("#security-questions").removeClass("is-hidden");
+						$("#send-email-reset").addClass("is-hidden");
+						
+						var question1 = response.one;
+						var question2 = response.two;
 
-					$('#question-1').append(question1);
-					$('#question-2').append(question2);
+						$('#question-1').append(question1);
+						$('#question-2').append(question2);
+					}
+					else{
+						alert(response['message']);
+						window.location.replace("/password");
+					}
 				}
 			},
 			
