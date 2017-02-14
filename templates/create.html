@@ -1,10 +1,12 @@
-{% extends "base.html" %}
+{% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
-{% block meta %}{% endblock meta %}
 
-{% block navbar %}
-{% endblock navbar %}
+{% block activeNav %}
+	<li><a href="/user"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
+	<li class="active"><a href="/create"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
+	<li><a href="/awards"><span class="glyphicon glyphicon-tower"></span> List Awards</a></li>
+{% endblock activeNav %}
 
 {% block content %}
 

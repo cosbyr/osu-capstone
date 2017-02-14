@@ -155,14 +155,14 @@ class PostgresDatabase(object):
 		if type == 'admin':
 			admin = self.Admin.query.filter_by(email=email).first()
 			if admin is None:
-				return False, None #we should indicate why the login failed on the login page
+				return False, None #replace with status code and message in dict
 			else:
 				return argon2.verify(pword,admin.account.pword), admin.account
 				
 		if type == 'user':
 			user = self.Manager.query.filter_by(email=email).first()
 			if user is None:
-				return False, None #we should indicate why the login failed on the login page
+				return False, None #replace with status code and message in dict
 			else:
 				return argon2.verify(pword,user.account.pword), user.account
 				
@@ -299,7 +299,7 @@ class PostgresDatabase(object):
 	
 	
 	def resetPasswordByEmail(self,payload):
-		response = {'status':True,'message':'Your password has been reset.'}
+		response = {'status':200,'message':'Your password has been reset.'}
 		
 		if payload['account-type'] == 'user':
 			user = self.getUserDetails(payload['userName'])
@@ -307,13 +307,13 @@ class PostgresDatabase(object):
 			user = self.getAdminDetails(payload['userName'])
 			
 		if user is None:
-			response = {'status':False,'message':'There is no account linked to that email address.'}
+			response = {'status':404,'message':'There is no account linked to that email address.'}
 			return response
 			
 		account = self.Account.query.get(user['account'])
 
 		if int(payload['reset-code']) != account.code:
-			response = {'status':False,'message':'Incorrect verification number. You will have to get another code.'}
+			response = {'status':400,'message':'Incorrect verification number. You will have to get another code.'}
 		else:	
 			account.pword = argon2.using(rounds=4).hash(payload['password'])
 			
@@ -322,8 +322,8 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
-			response = {'status':False,'message':'Unable to reset password.'}
-			return status, msg
+			response = {'status':500,'message':'Unable to reset password.'}
+			return response
 			
 		return response 
 	
@@ -359,6 +359,20 @@ class PostgresDatabase(object):
 			return False
 			
 		return True
+		
+	def findUser(self,email):
+		user = self.Manager.query.filter_by(email=email).first()
+		
+		if user is None:
+			user = self.Admin.query.filter_by(email=email).first()
+			if user is None:
+				return {'status':404,'message':'The email you provided is not linked to an account.','role':None,'email':None}
+			else:
+				return {'status':200,'message':'User found.','role':'admin','email':email}
+		
+		return {'status':200,'message':'User found.','role':'user','email':email}	
+		
+		
 	'''
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')

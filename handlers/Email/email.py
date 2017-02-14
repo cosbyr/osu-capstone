@@ -37,9 +37,9 @@ class Emailer(object):
 		
 	def sendPasswordReset(self,sendTo,code):
 		text = '''
-		<p>You have elected to reset your password by email. Please, click the link below an enter the verification code.<p>
+		<p>You have elected to reset your password by email. Please, click the link below and enter the verification code.<p>
 		<p>Verification Code: {0}</p>
-		<a href=localhost:5000/reset-password>Reset your password</a>'''.format(code) #change link to heroku url
+		<p>link to deployed site goes here...'''.format(code) #change link to heroku url
 		
 		sg = sendgrid.SendGridAPIClient(apikey=self.key)
 		sender = Email('root@admin.com') #may want to use more descriptive email... even though its fake
@@ -50,7 +50,7 @@ class Emailer(object):
 		mail = Mail(sender,subject,recepient,content)
 		response = sg.client.mail.send.post(request_body=mail.get())
 		
-		return {'status':response.status_code,'message':'Password reset email was sent.'}
+		return {'status':response.status_code,'message':'An email has been sent to ' + sendTo + '. Please, check your email and reset your password.'}
 		
 	
 		
