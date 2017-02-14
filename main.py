@@ -75,7 +75,7 @@ def renderLogin():
 		if status == True:
 			login_user(account)
 			if payload['account-type'] == 'admin':
-				return redirect(url_for('renderAdmin'))
+				return redirect(url_for('renderAdmin'), )
 			else:
 				session['name'] = '{0} {1}'.format(account.manager.fname,account.manager.lname)
 				session['title'] = account.manager.title
@@ -96,7 +96,7 @@ def renderLogout():
 @login_required
 def renderAdmin():
 	if session['role'] == 'admin':
-		return render_template('admin.html')
+		return render_template('admin.html', username=session['name'],email=session['email'])
 	else:
 		abort(401)
 
