@@ -28,6 +28,14 @@
 	text-transform: uppercase;
 }
 
+.admin-button{
+	font-size: 75px;
+}
+
+.row-buffer{
+	margin-top: 20px;
+}
+
 /* Creates loading spinner */
 
 /* Start by setting display:none to make this hidden.
