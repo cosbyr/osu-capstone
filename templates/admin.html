@@ -3,45 +3,12 @@
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<li class="active"><a href="/user"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
+	<li class="active"><a href="/admin"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-tower"></span> List Awards</a></li>
 {% endblock activeNav %}
 
 {% block content %}
-	<nav class="navbar navbar-inverse navbar-static-top">
-	  <div class="container">
-	    <!-- Brand and toggle get grouped for better mobile display -->
-	    <div class="navbar-header">
-	      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#nav-bar-main" aria-expanded="false">
-	        <span class="sr-only">Toggle navigation</span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>
-	      </button>
-	      <a class="navbar-brand" href="/">OSU Capstone</a>
-	    </div>
-
-	    <!-- Collect the nav links, forms, and other content for toggling -->
-	    <div class="collapse navbar-collapse" id="nav-bar-main">
-	      <ul class="nav navbar-nav">
-			<li class="active"><a href="/user"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
-			<li><a href="/create"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
-			<li><a href="/awards"><span class="glyphicon glyphicon-tower"></span> List Awards</a></li>
-		  </ul>
-	      <ul class="nav navbar-nav navbar-right">
-			<li class="dropdown">
-				<a href="#" class="dropdown-toggle uppercase" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">{{username}} <span class="caret"></span></a>
-				<ul class="dropdown-menu">
-					<li class="dropdown-header">Logged in as: {{email}}</li>
-					<li><a href="/update-account">Update Account</a></li>
-					<li role="separator" class="divider"></li>
-					<li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Logout</a></li>
-				</ul>
-			</li>
-	      </ul>
-	    </div><!-- /.navbar-collapse -->
-	  </div><!-- /.container-fluid -->
-	</nav>
-
 	<div class="container">
 		<div class="row row-buffer">
 			<div class="col-md-6">
