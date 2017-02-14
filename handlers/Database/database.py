@@ -6,6 +6,7 @@ from string import replace
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import asc
 from passlib.hash import argon2
 from botocore.exceptions import ClientError
 from boto3.s3.transfer import S3Transfer
@@ -128,6 +129,19 @@ class PostgresDatabase(object):
 		'signature':user.signature}
 		
 		return details
+		
+	def getUsers(self):
+		managers = {}
+		results = self.Manager.query.order_by(asc(self.Manager.lname)).all()
+		
+		for r in results:
+			createdOnString = r.account.created
+			createdOnString = createdOnString.strftime("%m-%d-%Y")
+			user = r.fname + ' ' + r.lname
+			
+			managers[r.id] = {'id':r.id,'createdOn':createdOnString,'title':r.title,'user':user, 'useremail': r.email}
+			
+		return managers
 	
 	
 	def getAdminDetails(self,email):

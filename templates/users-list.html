@@ -23,9 +23,7 @@
 	    <!-- Collect the nav links, forms, and other content for toggling -->
 	    <div class="collapse navbar-collapse" id="nav-bar-main">
 	      <ul class="nav navbar-nav">
-			<li class="active"><a href="/user"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
-			<li><a href="/create"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
-			<li><a href="/awards"><span class="glyphicon glyphicon-tower"></span> List Awards</a></li>
+			<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 		  </ul>
 	      <ul class="nav navbar-nav navbar-right">
 			<li class="dropdown">
@@ -43,26 +41,31 @@
 	</nav>
 
 	<div class="container">
-		<div class="row row-buffer">
-			<div class="col-md-6">
-				<a href="/users" class="btn btn-primary btn-lg btn-block btn-huge">View Users<br><br><span class="glyphicon glyphicon-user admin-button"></span></a>
-			</div>
-			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add New User<br><br><span class="glyphicon glyphicon-plus-sign admin-button"></span></a>
-			</div>
-		</div>
-		<div class="row row-buffer">
-			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">View Other Admins<br><br><span class="glyphicon glyphicon-globe admin-button"></span></a>
-			</div>
-			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add New Admin<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
-			</div>
-		</div>
-		<div class="row row-buffer">
-			<div class="col-md-12">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Reporting Dashboard<br><br><span class="glyphicon glyphicon-dashboard admin-button"></span></a>
-			</div>
+		<div>
+			{% if users|length > 0 %}
+			<table class="table">
+				<tr>
+					<th>User</th>
+					<th>Create Date</th>
+					<th>Title</th>
+					<th>Email</th>
+					<th>Edit User?</th>
+					<th>Delete User?</th>
+				</tr>
+				{% for user in users %}
+				<tr>
+					<td>{{users[user].user}}</td>
+					<td>{{users[user].createdOn}}</td>
+					<td>{{users[user].title}}</td>
+					<td>{{users[user].useremail}}</td>
+					<td><a href="#"<span class="glyphicon glyphicon-pencil"></span></a></td>
+					<td><a href="#"<span class="glyphicon glyphicon-remove"></span></a></td>
+				</tr>
+				{% endfor %}
+			</table>
+			{% else %}
+			<p>There are no users in the system.</p>
+			{% endif %}
 		</div>
 	</div>
 {% endblock content %}
