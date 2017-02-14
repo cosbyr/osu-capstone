@@ -29,35 +29,34 @@
 		</form>
 
 
-<br>
+		<br>
 		<!-- ADD is-hidden BACK IN -->
-		<form action="/latex" method="post" class="form-horizontal row " id="find-employees">
+		<form class="form-horizontal" action="/latex" method="post"  id="find-employees">
 			
-		<!-- 	<input class="input-box-50" type="text" name="recpFirst" placeholder="Recipient First Name" required />
-			<input class="input-box-50" type="text" name="recpLast" placeholder="Recipient Last Name" required />
-			<input class="input-box-50" type="text" name="message" placeholder="Award Message" required />
-			<input class="input-box-50" type="email" id='email' name="recpEmail" placeholder="Recipient Email" required /> -->
-
 			<!-- choose employee created via domManipulation.js -->
-			<div class="form-group">
-				<label class="col-sm-4 control-label" for="choose-employee">Choose employee</label>
-				<div class="col-sm-6">
-					<select class="form-control" id="choose-employee" class=""></select>
-				</div>
+			
+				<div class="form-group">
+					<label class="col-sm-4 control-label" for="choose-employee">Choose employee</label>
+					<div class="col-sm-6">
+						<select class="form-control" id="choose-employee" class=""></select>
+					</div>
+	
 			</div>
 			
 
 
 			<!-- Choose award type -->
 			<div class="form-group">
-				<label class="col-sm-4 control-label" for="select-award-type">Choose Award Type</label>
-				<div class="col-sm-6">
-					<select class="form-control" name="type" id="select-award-type">
-						{% for key,value in awardTypes.iteritems() %}
-							<option value="{{ key }}">{{ value }}</option>
-						{% endfor %}
-					</select>
-				</div>
+		
+					<label class="col-sm-4 control-label" for="select-award-type">Choose Award Type</label>
+					<div class="col-sm-6">
+						<select class="form-control" name="type" id="select-award-type">
+							{% for key,value in awardTypes.iteritems() %}
+								<option value="{{ key }}">{{ value }}</option>
+							{% endfor %}
+						</select>
+					</div>
+			
 			<div>
 
 			<!-- Display background options -->
@@ -65,45 +64,52 @@
 				<div class="col-sm-12">
 					<h2>Choose Award Background</h2><br>
 				</div>
-				<div class="container-fluid">
 					<div class="row">
-				{% for key,value in awardBackgrounds.iteritems() %}
-					
+					{% for key,value in awardBackgrounds.iteritems() %}
 						<div class="col-sm-6">
 							<label>
 								<input class="is-hidden" type="radio" name="background" value="{{ key }}" />
-								<img class="img-responsive thumbnail  fill" src="../static/images/{{ value }}"" alt="{{ value }}" />
+								<img class="img-responsive thumbnail" src="../static/images/{{ value }}"" alt="{{ value }}" />
 							</label>							
 						</div>
-					
-				{% endfor %}
-				</div>
+					{% endfor %}
+					</div>
 			</div>
 
 			<!-- Display border options -->
-			<div class="outter-container">
-				<div class="inner-container center-align margin-top">Choose Award Border</div>
-				<label>
-					<input class="no-display" type="radio" name="border" value="1" />
-					<img class="award-image" src="../static/images/border1.png" alt="Employee of the month" />
-				</label>
-				<label>
-					<input class="no-display" type="radio" name="border" value="2" />
-					<img class="award-image" src="../static/images/border2.png" alt="Most Improved" />
-				</label>
+			<div class="form-group">
+				<label for="border-choice" class="col-sm-4 control-label">Choose Award Border</label>
+				<div class="col-sm-6">
+					
+						<label>
+							<input class="is-hidden" type="radio" name="border" value="1" />
+							<img class="img-responsive thumbnail center-block" src="../static/images/border1.png" alt="border 1" />
+						</label>
+					
+					
+						<label>
+							<input class="is-hidden" type="radio" name="border" value="2" />
+							<img class="img-responsive thumbnail center-block" src="../static/images/border2.png" alt="border 2" />
+						</label>
+					
+				</div>
 			</div>
 
 			
 			
 			
 			<!-- Display color options -->
-			<div class="inner-container center-align margin-top">Choose Color Scheme</div>
-			<div class="outter-container small-margin-top">
-				<select class="input-box-50" name="theme">
-					{% for key,value in awardThemes.iteritems() %}
-						<option style="color:{{value}}" value="{{ key }}">{{ value }}</option>
-					{% endfor %}
-				</select>
+			<div class="form-group">
+				<div class="row">
+					<label class="col-sm-4 control-label" for="choose-color">Choose Color Scheme</label>
+					<div class="col-sm-6">
+						<select class="form-control"  id="choose-color" name="theme">
+							{% for key,value in awardThemes.iteritems() %}
+								<option style="color:{{value}}" value="{{ key }}">{{ value }}</option>
+							{% endfor %}
+						</select>
+					</div>
+				</div>
 			</div>
 
 			<!-- Add personalized message -->
@@ -121,4 +127,5 @@
 
 		</form>
 	</div>
+
 {% endblock content %}

@@ -36,9 +36,8 @@
 	margin-top: 20px;
 }
 
-.fill {
-	min-width: 100%;
-	min-height: 100%;
+.center-block{
+	float: none;
 }
 
 /* Creates loading spinner */

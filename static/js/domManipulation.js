@@ -32,11 +32,13 @@ $(document).ready(function(){
 				
 				for (var i in response){
 					if(i != 'status' && i != 'message'){
+
 						var details = response[i].fname + " " + response[i].lname + " " +response[i].email;
 						//console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
 						// $("#choose-employee").append('<label for="employee-to-get-award">' + details +'</label>' );
-						$("#choose-employee").append('<option name="employee-to-get-award" value="'+ i +'">' + details + '</option>');
+						$("#choose-employee").append('<option name="employee-to-get-award" value="'+ response[i].id +'">' + details + '</option>');
 					}
+
 				}
 				$("#choose-employee").append('<option name="employee-to-get-award" value="'+ i +'">If desired employee is not listed please contact your admin</option>');
 				
