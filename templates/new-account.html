@@ -5,9 +5,6 @@
 {% block content %}
 
 	<div class="container">
-		{% if status == 1 %}
-		<p style="color:red">Unable to create account. The given email is already linked to an existing account.</p>
-		{% endif %}
 		<h1>Create New User Account</h1>
 		<form class="form-horizontal" action="/new-account" method="post">
 			

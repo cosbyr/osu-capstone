@@ -45,17 +45,19 @@
 			</div><!-- /.container-fluid -->
 		</nav>
 		{% endblock navbar %}
-		<!--add div class container here -->
+		
 		{% block feedback %}
-			{% with messages = get_flashed_messages(with_categories=true) %}
-				{% if messages %}
-					{% for category, message in messages %}
-					<p style="color:{{ category }}">{{ message }}</p>
-					{% endfor %}
-				{% endif %}
-			{% endwith %}
+		<div class="container">
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% if messages %}
+				{% for category, message in messages %}
+				<p style="color:{{ category }}">{{ message }}</p>
+				{% endfor %}
+			{% endif %}
+		{% endwith %}
+		</div>
 		{% endblock feedback %}
-			
+	
 		{% block content %}{% endblock content %}
 		
 	</body>

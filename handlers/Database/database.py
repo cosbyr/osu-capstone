@@ -169,18 +169,26 @@ class PostgresDatabase(object):
 		if type == 'admin':
 			admin = self.Admin.query.filter_by(email=email).first()
 			if admin is None:
-				return False, None #replace with status code and message in dict
+				return {'status':404,'account':admin,'message':'The provided email is not linked to an existing account.'}
 			else:
-				return argon2.verify(pword,admin.account.pword), admin.account
+				password = argon2.verify(pword,admin.account.pword)
+				if password == True:
+					return {'status':200,'account':admin.account,'message':'Login successful.'} 
+				else:
+					return {'status':404,'account':admin.account,'message':'An incorrect password was provided.'}
 				
 		if type == 'user':
 			user = self.Manager.query.filter_by(email=email).first()
 			if user is None:
-				return False, None #replace with status code and message in dict
+				return {'status':404,'account':user,'message':'The provided email is not linked to an existing account.'}
 			else:
-				return argon2.verify(pword,user.account.pword), user.account
+				password = argon2.verify(pword,user.account.pword)
+				if password == True:
+					return {'status':200,'account':user.account,'message':'Login successful.'}
+				else:
+					return {'status':404,'account':user.account,'message':'An incorrect password was provided.'}
 				
-		return False
+		return {'status':400,'account':None,'message':'An invalid account type was given.'}
 		
 		
 	def createAccount(self,payload):
@@ -277,9 +285,9 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
-			return False,None
+			return False
 			
-		return True,account
+		return True
 
 		
 	def getEmployees(self,req):

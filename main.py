@@ -62,24 +62,25 @@ def renderLogin():
 	
 	if request.method == 'POST':
 		payload = request.form
-		status,account = alchemist.login(payload)
+		response = alchemist.login(payload)
 
-		if status == False:
-			return render_template('login.html',status=status)
+		if response['status'] != 200:
+			flash(response['message'],ERROR)
+			return render_template('login.html')
 		
 		session['email'] = payload['userName']
 		session['role'] = payload['account-type']
 
-		status,account = alchemist.setAuthenticated(account,True)
+		status = alchemist.setAuthenticated(response['account'],True)
 
 		if status == True:
-			login_user(account)
+			login_user(response['account'])
 			if payload['account-type'] == 'admin':
 				session['name'] = 'Admin Dude'
 				return redirect(url_for('renderAdmin'))
 			else:
-				session['name'] = '{0} {1}'.format(account.manager.fname,account.manager.lname)
-				session['title'] = account.manager.title
+				session['name'] = '{0} {1}'.format(response['account'].manager.fname,response['account'].manager.lname)
+				session['title'] = response['account'].manager.title
 				return redirect(url_for('renderUser'))			
 		else:
 			abort(401)
@@ -87,7 +88,6 @@ def renderLogin():
 
 @app.route('/logout')
 def renderLogout():
-	#session.pop('email', None)
 	alchemist.setAuthenticated(current_user,False)
 	logout_user()
 	return render_template('logout.html')
@@ -120,7 +120,7 @@ def renderUpdateAccount():
 			details = alchemist.getUserDetails(session['email'])
 			
 			if details is None:
-				abort(500) #this should flash a message rather than abort. will fix later
+				abort(500)
 				
 			return render_template('update-account.html',username=session['name'],details=details)
 			
@@ -129,13 +129,15 @@ def renderUpdateAccount():
 			status = alchemist.updateAccount(payload,session['email'])
 			
 			if status == False:
-				#print some error message on the update page after the redirect as to why the account could not be updated
+				flash('Unable to update account. Either the email provided is already linked to an account or there was a server error. Please, try again.', ERROR)
 				return redirect(url_for('renderUpdateAccount'))
 				
 			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
 			session['email'] = payload['email']
+			flash('Account was successfully updated.',SUCCESS)
 			return redirect(url_for('renderUser'))
 	else:
+		#admin stuff will replace abort(401)
 		abort(401)
 	
 
@@ -172,9 +174,11 @@ def renderNewAccount():
 		status = alchemist.save(account)
 		
 		if status == False:
-			return redirect(url_for('renderNewAccount',status=status)) #explain that account could not be created
+			flash('Unable to create account. The email provided is already linked to an account.',ERROR)
+			return redirect(url_for('renderNewAccount'))
 		
-		return redirect(url_for('renderLogin',status=status))
+		flash('Account created.',SUCCESS)
+		return redirect(url_for('renderLogin'))
 	
 	
 @app.route('/awards')
@@ -401,7 +405,8 @@ def resetPasswordViaQuestion():
 	
 	if status == False:
 		abort(500)
-		
+	
+	flash('Password was reset.',SUCCESS)
 	return redirect(url_for('renderLogin'))
 		
 		
