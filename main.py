@@ -182,6 +182,12 @@ def renderAwards():
 	awards = alchemist.getAwards(session['email'])
 	return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
 	
+@app.route('/users')
+@login_required
+def renderUsers():
+	users = alchemist.getUsers()
+	return render_template('users-list.html', users=users, username=session['name'], email=session['email'])
+	
 @app.route('/remove-award/')
 def removeAward():
 	awardID = request.args.get('awd')
