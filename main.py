@@ -75,6 +75,7 @@ def renderLogin():
 		if status == True:
 			login_user(account)
 			if payload['account-type'] == 'admin':
+				session['name'] = 'Admin Dude'
 				return redirect(url_for('renderAdmin'))
 			else:
 				session['name'] = '{0} {1}'.format(account.manager.fname,account.manager.lname)
