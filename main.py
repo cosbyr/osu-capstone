@@ -2,7 +2,7 @@ from __future__ import print_function #debug
 import sys,os #sys debug
 import logging
 import json, boto3
-import time
+#from datetime import datetime
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
@@ -299,12 +299,13 @@ def renderPDF():
 	payload = request.form
 	print('HERE-----> {0}'.format(payload),file=sys.stderr)
 	sys.stdout.flush()
+	
 	award = alchemist.createAward(payload, session['email'])
 	status = alchemist.save(award)
-	
-	if status is False:
+			
+	if status == False:
 		abort(500)
-	
+				
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
 	sigFile = replace(sigFile,'.','_')
@@ -357,12 +358,9 @@ def renderPDF():
 
 	if pdf is not None:
 		if 'preview-btn' in payload:
-			print('HERE-----> preview-btn',file=sys.stderr)
-			sys.stdout.flush()
+			alchemist.remove(award)
 			return send_file(pdf, as_attachment=True)
-		elif 'email-btn' in payload:
-			print('HERE-----> email-btn',file=sys.stderr)
-			sys.stdout.flush()
+		elif 'email-btn' in payload:				
 			sender = session['email']
 			recipient = award.employee.email
 			response = emailer.sendAward(sender,recipient,pdf)
