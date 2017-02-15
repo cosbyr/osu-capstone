@@ -76,7 +76,7 @@ def renderLogin():
 		if status == True:
 			login_user(response['account'])
 			if payload['account-type'] == 'admin':
-				session['name'] = 'Admin Dude'
+				session['name'] = '{0} {1}'.format(response['account'].admin.fname,response['account'].admin.lname)
 				return redirect(url_for('renderAdmin'))
 			else:
 				session['name'] = '{0} {1}'.format(response['account'].manager.fname,response['account'].manager.lname)
@@ -134,6 +134,7 @@ def renderUpdateAccount():
 				
 			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
 			session['email'] = payload['email']
+			session['title'] = payload['jobTitle']
 			flash('Account was successfully updated.',SUCCESS)
 			return redirect(url_for('renderUser'))
 	else:
@@ -235,9 +236,9 @@ def renderPassword():
 @app.route('/latex', methods=['POST'])
 @login_required
 def renderPDF():
-	#still just a testing LaTex functionality
 	payload = request.form
-
+	print('HERE-----> {0}'.format(payload),file=sys.stderr)
+	sys.stdout.flush()
 	award = alchemist.createAward(payload, session['email'])
 	status = alchemist.save(award)
 	
@@ -295,28 +296,28 @@ def renderPDF():
 	
 
 	if pdf is not None:
-		'''
-		#if response code is not 202 then something bad happened... added error checking
-		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
-		sender = session['email']
-		recepient = payload['recpEmail']
-		response = emailer.sendAward(sender,recepient,pdf)
-		
-		#debug
-		print('Code: {0}'.format(response.status_code,file=sys.stderr))
-		sys.stdout.flush()
-		print('Body: {0}'.format(response.body,file=sys.stderr))
-		sys.stdout.flush()
-		print('Headers: {0}'.format(response.headers,file=sys.stderr))
-		sys.stdout.flush()
-		#end debug
-		'''
-		return send_file(pdf)
+		if 'preview-btn' in payload:
+			print('HERE-----> preview-btn',file=sys.stderr)
+			sys.stdout.flush()
+			return send_file(pdf, as_attachment=True)
+		elif 'email-btn' in payload:
+			print('HERE-----> email-btn',file=sys.stderr)
+			sys.stdout.flush()
+			sender = session['email']
+			recipient = award.employee.email
+			response = emailer.sendAward(sender,recipient,pdf)
+			
+			if response.status_code != 200 and response.status_code != 202:
+				flash('An error occured and the email was not sent. Please, try again.',ERROR)
+			else:
+				flash('The award has been emailed.',SUCCESS)
+				
+			return redirect(url_for('renderCreate'))
 	else:
 		alchemist.remove(award)
 		abort(500)
 
-
+	
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
 	if request.json:
@@ -354,29 +355,6 @@ def getPassword():
 				abort(500)
 			
 			return jsonify(response)
-			
-		'''details = alchemist.getUserDetails(payload['email'])
-		
-		if details is None:
-			details = alchemist.getAdminDetails(payload['email'])
-			
-			if details is None:
-				response = {'status':404,'message':'The email you provided is not linked to an account.'}
-				return jsonify(response)
-				
-		if payload['reset-method'] == 'question':
-			response = {'one':str(details['question1']), 'two':str(details['question2']),'status':200}
-			return jsonify(response)
-		
-		if payload['reset-method'] == 'email':
-			code = alchemist.genVerificationCode(details['account'])
-			
-			if code is not None:
-				response = emailer.sendPasswordReset(payload['email'],code)
-			else:
-				abort(500)
-			
-			return jsonify(response)'''
 	else:
 		abort(400)
 

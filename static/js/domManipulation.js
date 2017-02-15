@@ -2,10 +2,11 @@ $(document).ready(function(){
 
 	$body = $("body");
 	
-	$(document).on({
+	//causes freeze after answering security questions
+	/*$(document).on({
 	    ajaxStart: function() { $body.addClass("loading");    },
 	   // ajaxComplete: function() { $body.removeClass("loading"); }    
-	});
+	});*/
 	
 	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){
@@ -16,7 +17,7 @@ $(document).ready(function(){
 	      type = that.attr('method'),
 	      data = $("#last-name").val();
 	      data = '{"lname":"' + data + '"}';
-	      console.log(data);
+	      //console.log(data);
 
 	  	$.ajax('/get-employee', {
 		  	type: 'post',
@@ -25,23 +26,22 @@ $(document).ready(function(){
 		  	dataType: 'json',
 
 	  		success: function(response) {
-	  			//$("input[type=radio][name=employee-to-get-award]").remove()
 	  			$body.removeClass("loading");
 	  			$('#find-employees').removeClass('is-hidden');
-				$("input[type=radio][name=employee-to-get-award],label[for=employee-to-get-award]").remove()
-				
-				for (var i in response){
-					if(i != 'status' && i != 'message'){
+				$("#choose-employee option").remove()
 
-						var details = response[i].fname + " " + response[i].lname + " " +response[i].email;
-						//console.log(response[i].fname + " " + response[i].lname + " " +response[i].email);
-						// $("#choose-employee").append('<label for="employee-to-get-award">' + details +'</label>' );
-						$("#choose-employee").append('<option name="employee-to-get-award" value="'+ response[i].id +'">' + details + '</option>');
+				if(response['status'] == 200){
+					for (var i in response){
+						if(i != 'status' && i != 'message'){
+							var details = response[i].fname + " " + response[i].lname + " (" + response[i].email + ")";
+							$("#choose-employee").append('<option name="employee-to-get-award" value="'+ response[i].id +'">' + details + '</option>');
+						}
 					}
-
+					$("#choose-employee").append('<option name="employee-to-get-award" value="'+ i +'">If desired employee is not listed, please contact your admin</option>');
 				}
-				$("#choose-employee").append('<option name="employee-to-get-award" value="'+ i +'">If desired employee is not listed please contact your admin</option>');
-				
+				else{
+					$("#choose-employee").append('<option name="employee-to-get-award" value="'+ i +'">' + response['message'] + '</option>');
+				}
 		    },
 
 		    error: function (jqXHR, exception) {

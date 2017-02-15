@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
+{% block head %}
 	<head>
-		{% block head %}
-		
 		{% block meta %}
 		<meta charset="utf-8">
 	    <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -25,11 +24,9 @@
 
 
 		{% block title %}Employee Recognition{% endblock title %}
-		
-		{% endblock head %}
 	</head>
-	<body>
-		
+{% endblock head %}
+	<body>		
 		{% block navbar %}
 		<nav class="navbar navbar-inverse navbar-static-top">
 			<div class="container">
@@ -58,7 +55,6 @@
 		</div>
 		{% endblock feedback %}
 	
-		{% block content %}{% endblock content %}
-		
+		{% block content %}{% endblock content %}	
 	</body>
 </html>

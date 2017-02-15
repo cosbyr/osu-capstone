@@ -53,13 +53,17 @@ class Admin (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	account_id = database.db.Column(database.db.Integer, database.db.ForeignKey('account.id',ondelete='CASCADE',onupdate='RESTRICT'), nullable=False)
 	email = database.db.Column(database.db.String(32), nullable=False, unique=True)
+	fname = database.db.Column(database.db.String(32), nullable=False)
+	lname = database.db.Column(database.db.String(32), nullable=False)
 	
-	def __init__(self,account,email):
+	def __init__(self,account,email,fname,lname):
 		self.account = account
 		self.email = email
+		self.fname = fname
+		self.lname = lname
 		
 	def __repr__(self):
-		return '<Admin {0}>'.format(self.account_id)
+		return '<Admin {0} {1}>'.format(self.fname,self.lname)
 
 
 class Manager (database.db.Model):

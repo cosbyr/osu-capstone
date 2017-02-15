@@ -154,6 +154,8 @@ class PostgresDatabase(object):
 		'id':admin.id,
 		'account':admin.account.id,
 		'email':admin.email,
+		'fname':admin.fname,
+		'lname':admin.lname,
 		'question1':admin.account.q1,
 		'question2':admin.account.q2,
 		'answer1':admin.account.answer1,
@@ -235,12 +237,12 @@ class PostgresDatabase(object):
 		typeId = awardType.id
 		message = payload['message']
 		issuedOn = payload['send-time']
-		recepient = int(payload['employee-to-get-award'])
+		recipient = int(payload['employee-to-get-award'])
 		background = int(payload['background'])
 		theme = int(payload['theme'])
 		border = int(payload['border'])
 		
-		award = self.Award(creatorId,typeId,message,issuedOn,recepient,background,theme,border)
+		award = self.Award(creatorId,typeId,message,issuedOn,recipient,background,theme,border)
 			
 		return award
 
@@ -291,17 +293,17 @@ class PostgresDatabase(object):
 
 		
 	def getEmployees(self,req):
-		employees = {}
-		results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
-
-		if len(results) == 0:
-			return {'status':404,'message':'The search returned no results.'}
+		if req['lname'] != "":
+			employees = {}
+			results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
+				
+			for r in results:
+				employees[r.id] = {'id':r.id,'fname':r.fname,'lname':r.lname,'email':r.email}
 			
-		for r in results:
-			employees[r.id] = {'id':r.id,'fname':r.fname,'lname':r.lname,'email':r.email}
-		
-		employees['status'] = 200
-		return employees
+			employees['status'] = 200
+			return employees
+		else:
+			return {'status':404,'message':'The search returned no results.'} 
 		
 
 	def genVerificationCode(self,id):
