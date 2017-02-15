@@ -21,7 +21,7 @@
 					<div class="input-group">
 						<input type="text" class="form-control" id="last-name" name="lname" placeholder="Recipient Last Name">
 						<span class="input-group-btn">
-							<button class="btn btn-default" type="submit">Go!</button>
+							<button class="btn btn-primary" type="submit">Search</button>
 						</span>
 					</div><!-- /input-group -->
 				</div><!-- /.col-lg-6 -->
@@ -40,31 +40,28 @@
 					<div class="col-sm-6">
 						<select class="form-control" id="choose-employee" class=""></select>
 					</div>
-	
-			</div>
+				</div>
 			
 
 
 			<!-- Choose award type -->
 			<div class="form-group">
-		
-					<label class="col-sm-4 control-label" for="select-award-type">Choose Award Type</label>
-					<div class="col-sm-6">
-						<select class="form-control" name="type" id="select-award-type">
-							{% for key,value in awardTypes.iteritems() %}
-								<option value="{{ key }}">{{ value }}</option>
-							{% endfor %}
-						</select>
-					</div>
-			
-			<div>
+				<label class="col-sm-4 control-label" for="select-award-type">Choose Award Type</label>
+				<div class="col-sm-6">
+					<select class="form-control" name="type" id="select-award-type">
+						{% for key,value in awardTypes.iteritems() %}
+							<option value="{{ key }}">{{ value }}</option>
+						{% endfor %}
+					</select>
+				</div>
+			</div>
 
 			<!-- Display background options -->
 			<div class="form-group">
-				<div class="col-sm-12">
-					<h2>Choose Award Background</h2><br>
-				</div>
-					<div class="row">
+				<label class="col-sm-4 control-label" for="award-background">Choose Award Background</label>
+				
+					<div class="col-sm-6" id="award-background">
+
 					{% for key,value in awardBackgrounds.iteritems() %}
 						<div class="col-sm-6">
 							<label>
@@ -74,24 +71,25 @@
 						</div>
 					{% endfor %}
 					</div>
+				
 			</div>
 
 			<!-- Display border options -->
 			<div class="form-group">
 				<label for="border-choice" class="col-sm-4 control-label">Choose Award Border</label>
 				<div class="col-sm-6">
-					
+					<div class="col-sm-6">
 						<label>
 							<input class="is-hidden" type="radio" name="border" value="1" />
-							<img class="img-responsive thumbnail center-block" src="../static/images/border1.png" alt="border 1" />
+							<img class="img-responsive thumbnail" src="../static/images/border1.png" alt="border 1" />
 						</label>
-					
-					
+					</div>
+					<div class="col-sm-6">					
 						<label>
 							<input class="is-hidden" type="radio" name="border" value="2" />
 							<img class="img-responsive thumbnail center-block" src="../static/images/border2.png" alt="border 2" />
 						</label>
-					
+					</div>
 				</div>
 			</div>
 
@@ -100,32 +98,42 @@
 			
 			<!-- Display color options -->
 			<div class="form-group">
-				<div class="row">
-					<label class="col-sm-4 control-label" for="choose-color">Choose Color Scheme</label>
-					<div class="col-sm-6">
-						<select class="form-control"  id="choose-color" name="theme">
-							{% for key,value in awardThemes.iteritems() %}
-								<option style="color:{{value}}" value="{{ key }}">{{ value }}</option>
-							{% endfor %}
-						</select>
-					</div>
+				<label class="col-sm-4 control-label" for="choose-color">Choose Color Scheme</label>
+				<div class="col-sm-6">
+					<select class="form-control"  id="choose-color" name="theme">
+						{% for key,value in awardThemes.iteritems() %}
+							<option style="color:{{value}}" value="{{ key }}">{{ value }}</option>
+						{% endfor %}
+					</select>
 				</div>
 			</div>
 
 			<!-- Add personalized message -->
-			<div class="inner-container center-align margin-top">Add message</div>
-			<div class="inner-container small-margin-top">
-				<textarea rows="4" cols="50"  name="message"></textarea>
+			<div class="form-group">
+				<label class="control-label col-sm-4">Add message</label>
+				<div class="col-sm-6">
+					<textarea class="form-control" rows="4" name="message"></textarea>
+				</div>
 			</div>
 
 			<!--add time to send it-->
-			<div class="outter-container center-align margin-top">Date Received
-				<input type="date" class="input-box-50 small-margin-top" name="send-time" />
+			<div class="form-group">
+				<label class="control-label col-sm-4">Date Created</label>
+				<div class="col-sm-6">
+					<input type="date" class="form-control" name="send-time">
+				</div>
 			</div>
 			
-			<input class="button-box" type="submit" value="Create Award">
+			<!-- input class="btn btn-primary col-sm-offset-4" type="submit" value="Create Award"> -->
+			<div class="form-group">
+				<div class="col-sm-6 col-sm-offset-4">
+					<button class="btn btn-primary" type="submit">Create Award</button>
+				</div>
+			</div>
 
 		</form>
+
 	</div>
+
 
 {% endblock content %}
