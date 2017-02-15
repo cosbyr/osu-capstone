@@ -9,43 +9,78 @@
 {% endblock activeNav %}
 
 {% block content %}
-	<div class="outter-container">
-		<header class="header-row">{{username}}, <a href="/logout">Logout</a></header>
-		<div class="page-title">Update Account</div>
-		<form action="/update-account" method="post">
+	<div class="container">
+		<h1>Update User Account</h1>
+		<form class="form-horizontal" action="/update-account" method="post">
 			
-
-				First Name:<input class="input-box-50" type="text" name="firstName" value="{{details.fname}}" required />
-				Last Name:<input class="input-box-50" type="text" name="lastName" value="{{details.lname}}" required />
-
-				Email:<input class="input-box-50" type="email" id='email' name="email" value="{{details.email}}" required />
-				Job Title:<input class="input-box-50" type="text" name="jobTitle" value="{{details.title}}" required />
-				
-				<div class="center-algin">Security questions</div>
-				<div class="input-box-50 input">{{details.question1}}</div>
-				<div class="input-box-50 input">{{details.answer1}}</div>
-
-				<div class="input-box-50 input">{{details.question2}}</div>
-				<div class="input-box-50 input">{{details.answer2}}</div>
-				
-				<!-- the file upload. the input is hidden behind my button -->
-				
-				<div id="file-load-button" class="input input-box-50 center-algin"> 
-				    Upload signature image
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="firstName">First Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="firstName" name="firstName" value="{{details.fname}}" required>
 				</div>
-				<div class="no-display">
-					<input type="file" name="sigfile" value="{{details.signature}}" id="file_input" accept=".png"/>
-				</div>
-
-				<div class="center-algin" id="status">Preview of signature
-					<p><img id="preview" src="{{details.signature}}" /></p>
-				</div>
-
-				<input type="hidden" id="sig-url" name="signature" value="{{details.signature}}" />
+			</div>
 				
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="lastName">Last Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="lastName" name="lastName" value="{{details.lname}}" required>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="email">Email</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="email" id='email' name="email" value="{{details.email}}" required >
+				</div>
+			</div>
+	
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="job-title">Job Title</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="job-title" name="jobTitle" value="{{details.title}}" required>
+				</div>
+			</div>
 
 
-				<input class="button-box" type="submit" value="Update Account">
+			<div class="form-group">
+				<label class="col-sm-4 control-label">{{details.question1}}</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer1}}" disabled >
+				</div>
+			</div>	
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">{{details.question2}}</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer2}}" disabled >
+				</div>
+			</div>
+
+			
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Upload Signature</label>
+				<div class="col-sm-6">
+					<span class="btn btn-default" id="file-load-button">Upload</span>
+				</div>
+			</div>
+			<div class="is-hidden">
+				<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">Preview Signature</label>
+				<div class="col-sm-6">
+					<div id="status"><img id="preview" class="img-thumbnail img-responsive" src="{{details.signature}}"></div>
+				</div>
+			</div>
+
+				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png" >
+				
+			<div class="form-group">
+				<div class="col-sm-6 col-sm-offset-4">
+					<button type="submit" class="btn btn-primary">Update Account</button>
+				</div>
+			</div>				
 		</form>
 	</div>
 	
