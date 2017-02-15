@@ -38,7 +38,7 @@
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="choose-employee">Choose employee</label>
 					<div class="col-sm-6">
-						<select class="form-control" id="choose-employee" class=""></select>
+						<select class="form-control" id="choose-employee" name="employee-to-get-award"></select>
 					</div>
 				</div>
 			
@@ -112,7 +112,7 @@
 			<div class="form-group">
 				<label class="control-label col-sm-4">Add message</label>
 				<div class="col-sm-6">
-					<textarea class="form-control" rows="4" name="message"></textarea>
+					<textarea class="form-control" rows="4" name="message" required></textarea>
 				</div>
 			</div>
 
@@ -120,14 +120,15 @@
 			<div class="form-group">
 				<label class="control-label col-sm-4">Date Created</label>
 				<div class="col-sm-6">
-					<input type="date" class="form-control" name="send-time">
+					<input type="date" class="form-control" name="send-time" required>
 				</div>
 			</div>
 			
 			<!-- input class="btn btn-primary col-sm-offset-4" type="submit" value="Create Award"> -->
 			<div class="form-group">
 				<div class="col-sm-6 col-sm-offset-4">
-					<button class="btn btn-primary" type="submit">Create Award</button>
+					<button name="preview-btn" class="btn btn-primary" type="submit">Preview Award</button>
+					<button name="email-btn" class="btn btn-primary" type="submit">Email Award</button>
 				</div>
 			</div>
 

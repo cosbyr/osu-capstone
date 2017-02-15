@@ -17,7 +17,6 @@ class Emailer(object):
 		
 		with open(image,'rb') as file:
 			data = file.read()
-			#f.close()
 
 		encoded = base64.b64encode(data)
 
