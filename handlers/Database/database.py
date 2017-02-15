@@ -142,6 +142,9 @@ class PostgresDatabase(object):
 			managers[r.id] = {'id':r.id,'createdOn':createdOnString,'title':r.title,'user':user, 'useremail': r.email}
 			
 		return managers
+		
+	def getUser(self, id):
+		return self.Manager.query.get(id)
 	
 	
 	def getAdminDetails(self,email):

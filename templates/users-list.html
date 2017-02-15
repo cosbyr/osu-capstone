@@ -3,7 +3,12 @@
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<li class="active"><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<li class="active" data-toggle="tab"><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
+	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
 {% endblock activeNav %}
 
 {% block content %}
@@ -25,8 +30,8 @@
 					<td>{{users[user].createdOn}}</td>
 					<td>{{users[user].title}}</td>
 					<td>{{users[user].useremail}}</td>
-					<td><a href="#"<span class="glyphicon glyphicon-pencil"></span></a></td>
-					<td><a href="#"<span class="glyphicon glyphicon-remove"></span></a></td>
+					<td><a href="/update-manager-account/?usremail={{users[user].useremail}}"<span class="glyphicon glyphicon-pencil"></span></a></td>
+					<td><a href="/remove-user/?usr={{users[user].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
 				</tr>
 				{% endfor %}
 			</table>

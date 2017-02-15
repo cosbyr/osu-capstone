@@ -179,7 +179,51 @@ def renderNewAccount():
 		
 		flash('Account created.',SUCCESS)
 		return redirect(url_for('renderLogin'))
+		
+@app.route('/new-manager-account',methods=['GET','POST'])
+def renderNewUserAccount():
+	if request.method == 'GET':
+		questions = alchemist.getQuestions()
+		return render_template('new-manager-account.html',questions=questions, username=session['name'], email=session['email'])
 	
+	if request.method == 'POST':
+		payload = request.form
+		account = alchemist.createAccount(payload)
+		status = alchemist.save(account)
+		
+		if status == False:
+			flash('Unable to create account. The email provided is already linked to an account.',ERROR)
+			return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+		
+		flash('Account created.',SUCCESS)
+		return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+
+@app.route('/update-manager-account/',methods=['GET','POST'])
+@login_required
+def renderUpdateUserAccount():	
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			session['manager-email'] = request.args.get('usremail')
+			details = alchemist.getUserDetails(session['manager-email'])
+			
+			if details is None:
+				abort(500)
+				
+			return render_template('update-manager-account.html',username=session['name'], email=session['email'], details=details)
+			
+		if request.method == 'POST':
+			payload = request.form
+			status = alchemist.updateAccount(payload,session['manager-email'])
+			
+			if status == False:
+				flash('Unable to update account. Either the email provided is already linked to an account or there was a server error. Please, try again.', ERROR)
+				return redirect(url_for('renderUpdateUserAccount', username=session['name'], email=session['email'], details=details))
+				
+			flash('Account was successfully updated.',SUCCESS)
+			return redirect(url_for('renderUsers'))
+	else:
+		#admin stuff will replace abort(401)
+		abort(401)
 	
 @app.route('/awards')
 @login_required
@@ -199,7 +243,23 @@ def removeAward():
 	award = alchemist.getAward(awardID)
 	status = alchemist.remove(award)
 	awards = alchemist.getAwards(session['email'])
+	if status == False:
+		flash('Unable to remove award. System Error.', ERROR)
+		return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
+	flash('Award record deleted', SUCCESS)
 	return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
+	
+@app.route('/remove-user/')
+def removeUser():
+	userID = request.args.get('usr')
+	user = alchemist.getUser(userID)
+	status = alchemist.remove(user)
+	users = alchemist.getUsers()
+	if status == False:
+		flash('Unable to remove user. System Error.', ERROR)
+		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
+	flash('User deleted.', SUCCESS)
+	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
 		
 @app.route('/sign_s3/')
