@@ -29,7 +29,8 @@ class PostgresDatabase(object):
 		self.AwardTheme = clsAwardTheme
 		self.Employee = clsEmployee
 		self.AwardBorder = clsAwardBorder
-
+		self.database = db
+		
 		
 	def getAwardThemes(self):
 		themes = {}
@@ -398,7 +399,6 @@ class PostgresDatabase(object):
 				return {'status':200,'message':'User found.','role':'admin','email':email}
 		
 		return {'status':200,'message':'User found.','role':'user','email':email}	
-		
 		
 	'''
 	def createRootAdmin(self):

@@ -7,6 +7,7 @@ from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
 from handlers.Email import email
+from handlers.Report import report
 from string import replace
 from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session, Response, flash
 from flask_cors import CORS, cross_origin
@@ -48,6 +49,8 @@ models.Employee,
 models.AwardBorder)
 
 emailer = email.Emailer()
+
+reporter = report.Reporter(alchemist.database)
 
 @app.route('/')
 def renderIndex():
@@ -153,7 +156,8 @@ def renderCreate():
 	else:
 		abort(401)
 
-
+'''
+#i think this functionality is actually handled by the awards route down below
 @app.route('/history')
 @login_required
 def renderHistory():
@@ -161,7 +165,7 @@ def renderHistory():
 		return render_template('history.html',username=session['name'])
 	else:
 		abort(401)
-
+'''
 
 @app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
@@ -182,22 +186,27 @@ def renderNewAccount():
 		return redirect(url_for('renderLogin'))
 		
 @app.route('/new-manager-account',methods=['GET','POST'])
+@login_required
 def renderNewUserAccount():
-	if request.method == 'GET':
-		questions = alchemist.getQuestions()
-		return render_template('new-manager-account.html',questions=questions, username=session['name'], email=session['email'])
-	
-	if request.method == 'POST':
-		payload = request.form
-		account = alchemist.createAccount(payload)
-		status = alchemist.save(account)
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			questions = alchemist.getQuestions()
+			return render_template('new-manager-account.html',questions=questions, username=session['name'], email=session['email'])
 		
-		if status == False:
-			flash('Unable to create account. The email provided is already linked to an account.',ERROR)
+		if request.method == 'POST':
+			payload = request.form
+			account = alchemist.createAccount(payload)
+			status = alchemist.save(account)
+			
+			if status == False:
+				flash('Unable to create account. The email provided is already linked to an account.',ERROR)
+				return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+			
+			flash('Account created.',SUCCESS)
 			return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+	else:
+		abort(401)
 		
-		flash('Account created.',SUCCESS)
-		return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
 
 @app.route('/update-manager-account/',methods=['GET','POST'])
 @login_required
@@ -223,20 +232,25 @@ def renderUpdateUserAccount():
 			flash('Account was successfully updated.',SUCCESS)
 			return redirect(url_for('renderUsers'))
 	else:
-		#admin stuff will replace abort(401)
 		abort(401)
 	
 @app.route('/awards')
 @login_required
 def renderAwards():
-	awards = alchemist.getAwards(session['email'])
-	return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
+	if session['role'] == 'user':
+		awards = alchemist.getAwards(session['email'])
+		return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
+	else:
+		abort(401)
 	
 @app.route('/users')
 @login_required
 def renderUsers():
-	users = alchemist.getUsers()
-	return render_template('users-list.html', users=users, username=session['name'], email=session['email'])
+	if session['role'] == 'admin':
+		users = alchemist.getUsers()
+		return render_template('users-list.html', users=users, username=session['name'], email=session['email'])
+	else:
+		abort(401)
 	
 @app.route('/remove-award/')
 def removeAward():
@@ -262,7 +276,31 @@ def removeUser():
 	flash('User deleted.', SUCCESS)
 	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
+	
+@app.route('/reports',methods=['GET','POST'])
+@login_required
+def renderReports():
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			return render_template('reports.html',username=session['name'], email=session['email'])
 		
+		if request.method == 'POST':
+			if request.json:
+				payload = request.get_json()
+				
+				if payload['report'] == '1':
+					response = reporter.getAwardsByType()
+				else:
+					abort(400)
+					
+				return jsonify(response)
+					
+			else:
+				abort(400)
+	else:
+		abort(401)
+
+
 @app.route('/sign_s3/')
 def sign_s3():
 	S3_BUCKET = os.environ.get('S3_BUCKET_NAME')

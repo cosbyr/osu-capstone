@@ -1,0 +1,31 @@
+{% extends "loggedInBase.html" %}
+
+{% block head %}
+	{{super()}}
+	{% block title %}<title>Award Reports</title>{% endblock title %}
+	<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+	<script type="text/javascript" src="./static/js/genReports.js"></script>
+{% endblock head %}
+
+{% block activeNav %}
+	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
+	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
+	<li class="active" data-toggle="tab"><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
+{% endblock activeNav %}
+
+{% block content %}
+	<div class="container">
+		<form id="award-by-type-form" method="post" action="/reports">
+			<div class="form-group">
+				<label for="award-by-type-btn">Get Awards By Type</label>
+				<input type="hidden" name="award-by-type" value="1">
+				<button type="submit" class="btn btn-primary" id="award-by-type-btn">Submit</button>
+			</div>
+		</form>
+		<div id="award-by-type-report"></div>
+  </div>
+	</div>
+{% endblock content %}
