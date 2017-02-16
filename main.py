@@ -354,6 +354,8 @@ def renderReports():
 				
 				if payload['report'] == '1':
 					response = reporter.getAwardsByType()
+				elif payload['report'] == '2':
+					response = reporter.getAwardsByManager()
 				else:
 					abort(400)
 					
