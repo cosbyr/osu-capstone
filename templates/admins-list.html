@@ -1,0 +1,41 @@
+{% extends "loggedInBase.html" %}
+
+{% block title %}<title>Capstone Project</title>{% endblock title %}
+
+{% block activeNav %}
+	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
+	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
+	<li class="active" data-toggle="tab"><a href="/admins"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
+	<li><a href="/new-admin-account"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
+	<li><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
+{% endblock activeNav %}
+
+{% block content %}
+	<div class="container">
+		<div>
+			{% if admins|length > 0 %}
+			<table class="table">
+				<tr>
+					<th>Admin</th>
+					<th>Create Date</th>
+					<th>Email</th>
+					<th>Edit Admin?</th>
+					<th>Delete Admin?</th>
+				</tr>
+				{% for admin in admins %}
+				<tr>
+					<td>{{admins[admin].admin}}</td>
+					<td>{{admins[admin].createdOn}}</td>
+					<td>{{admins[admin].adminEmail}}</td>
+					<td><a href="/update-admin-account/?adminemail={{admins[admin].adminEmail}}"<span class="glyphicon glyphicon-pencil"></span></a></td>
+					<td><a href="/remove-admin/?admin={{admins[admin].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
+				</tr>
+				{% endfor %}
+			</table>
+			{% else %}
+			<p>There are no admins other than yourself in the system.</p>
+			{% endif %}
+		</div>
+	</div>
+{% endblock content %}

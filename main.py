@@ -104,6 +104,14 @@ def renderAdmin():
 	else:
 		abort(401)
 
+@app.route('/admins')
+@login_required
+def renderAdmins():
+	if session['role'] == 'admin':
+		admins = alchemist.getAdmins(session['email'])
+		return render_template('admins-list.html', admins=admins, username=session['name'], email=session['email'])
+	else:
+		abort(401)
 
 @app.route('/user')
 @login_required
@@ -184,6 +192,62 @@ def renderNewAccount():
 		
 		flash('Account created.',SUCCESS)
 		return redirect(url_for('renderLogin'))
+
+@app.route('/new-admin-account',methods=['GET','POST'])
+def renderNewAdminAccount():
+	if request.method == 'GET':
+		questions = alchemist.getQuestions()
+		return render_template('new-admin-account.html',questions=questions, username=session['name'], email=session['email'])
+	
+	if request.method == 'POST':
+		payload = request.form
+		account = alchemist.createAdminAccount(payload)
+		status = alchemist.save(account)
+		
+		if status == False:
+			flash('Unable to create admin account. The email provided is already linked to an account.',ERROR)
+			return redirect(url_for('renderNewAdminAccount', username=session['name'], email=session['email']))
+		
+		flash('Admin account created.',SUCCESS)
+		return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+
+@app.route('/update-admin-account/',methods=['GET','POST'])
+@login_required
+def renderUpdateAdminAccount():	
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			session['admin-email'] = request.args.get('adminemail')
+			details = alchemist.getAdminDetails(session['admin-email'])
+			
+			if details is None:
+				abort(500)
+				
+			return render_template('update-admin-account.html',username=session['name'], email=session['email'], details=details)
+			
+		if request.method == 'POST':
+			payload = request.form
+			status = alchemist.updateAdminAccount(payload,session['admin-email'])
+			
+			if status == False:
+				flash('Unable to update admin account. Either the email provided is already linked to an account or there was a server error. Please, try again.', ERROR)
+				return redirect(url_for('renderUpdateAdminAccount', username=session['name'], email=session['email'], details=details))
+				
+			flash('Admin account was successfully updated.',SUCCESS)
+			return redirect(url_for('renderAdmins'))
+	else:
+		abort(401)
+		
+@app.route('/remove-admin/')
+def removeAdminUser():
+	adminID = request.args.get('admin')
+	admin = alchemist.getAdmin(adminID)
+	status = alchemist.remove(admin)
+	admins = alchemist.getAdmins(session['email'])
+	if status == False:
+		flash('Unable to remove admin. System Error.', ERROR)
+		return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
+	flash('Admin deleted.', SUCCESS)
+	return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
 		
 @app.route('/new-manager-account',methods=['GET','POST'])
 @login_required
@@ -200,7 +264,7 @@ def renderNewUserAccount():
 			
 			if status == False:
 				flash('Unable to create account. The email provided is already linked to an account.',ERROR)
-				return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+				return redirect(url_for('renderNewUserAccount', username=session['name'], email=session['email']))
 			
 			flash('Account created.',SUCCESS)
 			return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))

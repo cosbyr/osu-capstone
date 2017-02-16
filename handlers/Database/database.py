@@ -147,6 +147,18 @@ class PostgresDatabase(object):
 	def getUser(self, id):
 		return self.Manager.query.get(id)
 	
+	def getAdmins(self, email):
+		admins = {}
+		results = self.Admin.query.filter(self.Admin.email != email, self.Admin.email != 'root@admin.com').all()
+		for r in results:
+			createdOnString = r.account.created
+			createdOnString = createdOnString.strftime("%m-%d-%Y")
+			admin = r.fname + ' ' + r.lname
+			admins[r.id] = {'id':r.id, 'createdOn': createdOnString, 'admin':admin, 'adminEmail': r.email}
+		return admins
+		
+	def getAdmin(self, id):
+		return self.Admin.query.get(id)
 	
 	def getAdminDetails(self,email):
 		admin = self.Admin.query.filter_by(email=email).first()
@@ -214,6 +226,22 @@ class PostgresDatabase(object):
 		manager = self.Manager(account,title,fname,lname,sign,email)
 			
 		return [account,manager]
+		
+	def createAdminAccount(self,payload):
+		fname = payload['firstName']
+		lname = payload['lastName']
+		email = payload['email']
+		pword = argon2.using(rounds=4).hash(payload['password'])
+		quest1 = int(payload['security-question-1'])
+		quest2 = int(payload['security-question-2'])
+		answ1 = payload['security-answer-1']
+		answ2 = payload['security-answer-2']
+		created = datetime.now()
+		
+		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
+		admin = self.Admin(account,email,fname,lname)
+			
+		return [account,admin]
 
 		
 	def updateAccount(self,payload,email):
@@ -224,6 +252,20 @@ class PostgresDatabase(object):
 		user.email = payload['email']
 		user.title = payload['jobTitle']
 		user.signature = payload['signature']
+		
+		try:
+			db.session.commit()
+		except IntegrityError:
+			return False
+			
+		return True
+		
+	def updateAdminAccount(self,payload,email):
+		admin = self.Admin.query.filter_by(email=email).first()
+		
+		admin.fname = payload['firstName']
+		admin.lname = payload['lastName']
+		admin.email = payload['email']
 		
 		try:
 			db.session.commit()
