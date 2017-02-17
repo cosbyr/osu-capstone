@@ -100,9 +100,6 @@ $(document).ready(function(){
 						}
 					});
 					
-					console.log('info:')
-					console.log(info);
-					
 					var dataTable = google.visualization.arrayToDataTable(info);
 
 					var options = {
@@ -110,6 +107,7 @@ $(document).ready(function(){
 						legend: { position: 'top', maxLines: 3 },
 						bar: { groupWidth: '75%' },
 						isStacked: true,
+						animation:{startup:true,duration:1000}
 					};
 					
 					var chart = new google.visualization.ColumnChart(document.getElementById('award-report'));
