@@ -29,7 +29,8 @@ class PostgresDatabase(object):
 		self.AwardTheme = clsAwardTheme
 		self.Employee = clsEmployee
 		self.AwardBorder = clsAwardBorder
-
+		self.database = db
+		
 		
 	def getAwardThemes(self):
 		themes = {}
@@ -105,6 +106,19 @@ class PostgresDatabase(object):
 			print(e,file=sys.stderr)
 			return None
 		return True
+	
+	def deleteUserSig(self, filename):
+		bucket = os.environ.get('S3_BUCKET_NAME')
+		client = boto3.client('s3')
+		try:
+			client.delete_object(bucket, filename)
+		except ClientError as e:
+			print(e.response['Error']['Message'],file=sys.stderr)
+			return None
+		except IOError as e:
+			print(e,file=sys.stderr)
+			return None
+		return True	
 
 		
 	def getUserDetails(self,email):
@@ -142,7 +156,22 @@ class PostgresDatabase(object):
 			managers[r.id] = {'id':r.id,'createdOn':createdOnString,'title':r.title,'user':user, 'useremail': r.email}
 			
 		return managers
+		
+	def getUser(self, id):
+		return self.Manager.query.get(id)
 	
+	def getAdmins(self, email):
+		admins = {}
+		results = self.Admin.query.filter(self.Admin.email != email, self.Admin.email != 'root@admin.com').all()
+		for r in results:
+			createdOnString = r.account.created
+			createdOnString = createdOnString.strftime("%m-%d-%Y")
+			admin = r.fname + ' ' + r.lname
+			admins[r.id] = {'id':r.id, 'createdOn': createdOnString, 'admin':admin, 'adminEmail': r.email}
+		return admins
+		
+	def getAdmin(self, id):
+		return self.Admin.query.get(id)
 	
 	def getAdminDetails(self,email):
 		admin = self.Admin.query.filter_by(email=email).first()
@@ -154,6 +183,8 @@ class PostgresDatabase(object):
 		'id':admin.id,
 		'account':admin.account.id,
 		'email':admin.email,
+		'fname':admin.fname,
+		'lname':admin.lname,
 		'question1':admin.account.q1,
 		'question2':admin.account.q2,
 		'answer1':admin.account.answer1,
@@ -208,6 +239,22 @@ class PostgresDatabase(object):
 		manager = self.Manager(account,title,fname,lname,sign,email)
 			
 		return [account,manager]
+		
+	def createAdminAccount(self,payload):
+		fname = payload['firstName']
+		lname = payload['lastName']
+		email = payload['email']
+		pword = argon2.using(rounds=4).hash(payload['password'])
+		quest1 = int(payload['security-question-1'])
+		quest2 = int(payload['security-question-2'])
+		answ1 = payload['security-answer-1']
+		answ2 = payload['security-answer-2']
+		created = datetime.now()
+		
+		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
+		admin = self.Admin(account,email,fname,lname)
+			
+		return [account,admin]
 
 		
 	def updateAccount(self,payload,email):
@@ -222,6 +269,26 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
+			return False
+			
+		return True
+		
+	def updateAdminAccount(self,payload,email):
+		admin = self.Admin.query.filter_by(email=email).first()
+		
+		admin.fname = payload['firstName']
+		admin.lname = payload['lastName']
+		admin.email = payload['email']
+		
+		try:
+			db.session.commit()
+		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -235,12 +302,12 @@ class PostgresDatabase(object):
 		typeId = awardType.id
 		message = payload['message']
 		issuedOn = payload['send-time']
-		recepient = int(payload['employee-to-get-award'])
+		recipient = int(payload['employee-to-get-award'])
 		background = int(payload['background'])
 		theme = int(payload['theme'])
 		border = int(payload['border'])
 		
-		award = self.Award(creatorId,typeId,message,issuedOn,recepient,background,theme,border)
+		award = self.Award(creatorId,typeId,message,issuedOn,recipient,background,theme,border)
 			
 		return award
 
@@ -256,18 +323,22 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
 	
 	
 	def remove(self,obj):
+		print('HERE------> {0}'.format(obj),file=sys.stderr)
+		sys.stdout.flush()
 		try:
 			db.session.delete(obj)
 			db.session.commit()
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -285,23 +356,24 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
 
 		
 	def getEmployees(self,req):
-		employees = {}
-		results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
-
-		if len(results) == 0:
-			return {'status':404,'message':'The search returned no results.'}
+		if req['lname'] != "":
+			employees = {}
+			results = self.Employee.query.filter(self.Employee.lname.ilike('%' + req['lname'] + '%')).all()
+				
+			for r in results:
+				employees[r.id] = {'id':r.id,'fname':r.fname,'lname':r.lname,'email':r.email}
 			
-		for r in results:
-			employees[r.id] = {'id':r.id,'fname':r.fname,'lname':r.lname,'email':r.email}
-		
-		employees['status'] = 200
-		return employees
+			employees['status'] = 200
+			return employees
+		else:
+			return {'status':404,'message':'The search returned no results.'} 
 		
 
 	def genVerificationCode(self,id):
@@ -315,6 +387,7 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return None
 			
 		return code
@@ -345,6 +418,9 @@ class PostgresDatabase(object):
 			db.session.commit()
 		except IntegrityError:
 			response = {'status':500,'message':'Unable to reset password.'}
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return response
 			
 		return response 
@@ -378,6 +454,9 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -393,6 +472,33 @@ class PostgresDatabase(object):
 				return {'status':200,'message':'User found.','role':'admin','email':email}
 		
 		return {'status':200,'message':'User found.','role':'user','email':email}	
+	
+
+	def archiveAwards(self,user):
+		awards = self.Award.query.filter_by(creator=user).all()
+		lst = []
+		
+		if awards is not None:
+			for a in awards:
+				fnameCreator = a.manager.fname
+				lnameCreator = a.manager.lname
+				fnameRecepient = a.employee.fname
+				lnameRecepient = a.employee.lname
+				typeId = a.type_id
+				issuedOn = a.issuedOn
+				archive = self.AwardArchive(fnameCreator,lnameCreator,fnameRecepient,lnameRecepient,typeId,issuedOn)	
+				lst.append(archive)
+			
+			try:
+				db.session.add_all(lst)
+				db.session.commit()
+			except IntegrityError as e:
+				print(e,file=sys.stderr)
+				sys.stdout.flush()
+				db.session.rollback()
+				return False
+			
+		return True
 		
 		
 	'''

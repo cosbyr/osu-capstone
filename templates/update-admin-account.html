@@ -1,0 +1,61 @@
+{% extends "loggedInBase.html" %}
+
+{% block title %}<title>Capstone Project</title>{% endblock title %}
+
+{% block activeNav %}
+	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
+	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
+	<li class="active" data-toggle="tab"><a href="/admins"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
+	<li><a href="/new-admin-account"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
+	<li><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
+{% endblock activeNav %}
+
+{% block content %}
+	<div class="container">
+		<h1>Update Admin Account: {{details.fname}} {{details.lname}}</h1>
+		<form class="form-horizontal" action="/update-admin-account/" method="post">
+			
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="firstName">First Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="firstName" name="firstName" value="{{details.fname}}" required>
+				</div>
+			</div>
+				
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="lastName">Last Name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" id="lastName" name="lastName" value="{{details.lname}}" required>
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="email">Email</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="email" id='email' name="email" value="{{details.email}}" required >
+				</div>
+			</div>
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">{{details.question1}}</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer1}}" disabled >
+				</div>
+			</div>	
+
+			<div class="form-group">
+				<label class="col-sm-4 control-label">{{details.question2}}</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="security-answer-1" placeholder="{{details.answer2}}" disabled >
+				</div>
+			</div>
+				
+			<div class="form-group">
+				<div class="col-sm-6 col-sm-offset-4">
+					<button type="submit" class="btn btn-primary">Update Admin Account</button>
+				</div>
+			</div>				
+		</form>
+	</div>
+{% endblock content %}

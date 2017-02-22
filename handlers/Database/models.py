@@ -11,8 +11,8 @@ class Account (database.db.Model):
 	authenticated = database.db.Column(database.db.Boolean, default=False)
 	code = database.db.Column(database.db.Integer,default=None,nullable=True)
 	
-	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined')
-	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined')
+	admin = database.db.relationship('Admin', backref='account',uselist=False,lazy='joined',cascade='all, delete-orphan')
+	manager = database.db.relationship('Manager', backref='account', uselist=False, lazy='joined',cascade='all, delete-orphan')
 	q1 = database.db.relationship('Question',foreign_keys=[q1_id])
 	q2 = database.db.relationship('Question',foreign_keys=[q2_id])
 	
@@ -53,13 +53,17 @@ class Admin (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	account_id = database.db.Column(database.db.Integer, database.db.ForeignKey('account.id',ondelete='CASCADE',onupdate='RESTRICT'), nullable=False)
 	email = database.db.Column(database.db.String(32), nullable=False, unique=True)
+	fname = database.db.Column(database.db.String(32), nullable=False)
+	lname = database.db.Column(database.db.String(32), nullable=False)
 	
-	def __init__(self,account,email):
+	def __init__(self,account,email,fname,lname):
 		self.account = account
 		self.email = email
+		self.fname = fname
+		self.lname = lname
 		
 	def __repr__(self):
-		return '<Admin {0}>'.format(self.account_id)
+		return '<Admin {0} {1}>'.format(self.fname,self.lname)
 
 
 class Manager (database.db.Model):
@@ -71,7 +75,7 @@ class Manager (database.db.Model):
 	signature = database.db.Column(database.db.Text, nullable=False)
 	email = database.db.Column(database.db.String(32), nullable=False, unique=True)
 	
-	created = database.db.relationship('Award', backref='manager',lazy='dynamic')
+	created = database.db.relationship('Award', backref='manager',lazy='dynamic',cascade='all, delete-orphan')
 	
 	def __init__(self,account,title,fname,lname,signature,email):
 		self.account = account
@@ -124,19 +128,25 @@ class Award (database.db.Model):
 
 class AwardArchive (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
-	fname = database.db.Column(database.db.String(32),nullable=False)
-	lname = database.db.Column(database.db.String(32),nullable=False)
+	fname_creator = database.db.Column(database.db.String(32),nullable=False)
+	lname_creator = database.db.Column(database.db.String(32),nullable=False)
+	fname_recepient = database.db.Column(database.db.String(32),nullable=False)
+	lname_recepient = database.db.Column(database.db.String(32),nullable=False)
 	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
-	recvd = database.db.Column(database.db.DateTime,nullable=False)
+	issued_on = database.db.Column(database.db.Date,nullable=False)
 
-	def __init__(self,fname,lname,typeId,recvd):
-		self.fname = fname
-		self.lname = lname
+	def __init__(self,fnameCreator,lnameCreator,fnameRecepient,lnameRecepient,typeId,issuedOn):
+		self.fname_creator = fnameCreator
+		self.lname_creator = lnameCreator
+		self.fname_recepient = fnameRecepient
+		self.lname_recepient = lnameRecepient
 		self.type_id = typeId
-		self.recvd = recvd
+		self.issued_on = issuedOn
 
 	def __repr__(self):
-		return '<AwardArchive {0} {1} {2}>'.format(self.fname,self.lname,self.type_id)
+		creator = self.fname_creator + ' ' + self.lname_creator
+		recvdBy = self.fname_recepient + ' ' + self.lname_recepient
+		return '<AwardArchive Created by: {0} Given to: {1}>'.format(creator,recvdBy)
 		
 class AwardBackground(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)

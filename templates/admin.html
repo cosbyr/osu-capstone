@@ -3,9 +3,7 @@
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<li class="active"><a href="/admin"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-tower"></span> List Awards</a></li>
+	<li class="active"><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 {% endblock activeNav %}
 
 {% block content %}
@@ -15,20 +13,28 @@
 				<a href="/users" class="btn btn-primary btn-lg btn-block btn-huge">View Users<br><br><span class="glyphicon glyphicon-user admin-button"></span></a>
 			</div>
 			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add New User<br><br><span class="glyphicon glyphicon-plus-sign admin-button"></span></a>
+				<a href="/new-manager-account" class="btn btn-primary btn-lg btn-block btn-huge">Add New User<br><br><span class="glyphicon glyphicon-plus-sign admin-button"></span></a>
 			</div>
 		</div>
 		<div class="row row-buffer">
 			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">View Other Admins<br><br><span class="glyphicon glyphicon-globe admin-button"></span></a>
+				<a href="/admins" class="btn btn-primary btn-lg btn-block btn-huge">View Other Admins<br><br><span class="glyphicon glyphicon-globe admin-button"></span></a>
 			</div>
 			<div class="col-md-6">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add New Admin<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
+				<a href="/new-admin-account" class="btn btn-primary btn-lg btn-block btn-huge">Add New Admin<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
+			</div>
+		</div>
+		<div class="row row-buffer">
+			<div class="col-md-6">
+				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add Award Types<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
+			</div>
+			<div class="col-md-6">
+				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Add New Employee<br><br><span class="glyphicon glyphicon-plus admin-button"></span></a>
 			</div>
 		</div>
 		<div class="row row-buffer">
 			<div class="col-md-12">
-				<a href="#" class="btn btn-primary btn-lg btn-block btn-huge">Reporting Dashboard<br><br><span class="glyphicon glyphicon-dashboard admin-button"></span></a>
+				<a href="/reports" class="btn btn-primary btn-lg btn-block btn-huge">Reporting Dashboard<br><br><span class="glyphicon glyphicon-dashboard admin-button"></span></a>
 			</div>
 		</div>
 	</div>

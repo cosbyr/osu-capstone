@@ -2,11 +2,11 @@ from __future__ import print_function #debug
 import sys,os #sys debug
 import logging
 import json, boto3
-import time
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
 from handlers.Email import email
+from handlers.Report import report
 from string import replace
 from flask import Flask, render_template, send_file, abort, request, redirect, url_for, jsonify, session, Response, flash
 from flask_cors import CORS, cross_origin
@@ -49,6 +49,8 @@ models.AwardBorder)
 
 emailer = email.Emailer()
 
+reporter = report.Reporter(alchemist.database)
+
 @app.route('/')
 def renderIndex():
 	#alchemist.createRootAdmin()
@@ -76,7 +78,7 @@ def renderLogin():
 		if status == True:
 			login_user(response['account'])
 			if payload['account-type'] == 'admin':
-				session['name'] = 'Admin Dude'
+				session['name'] = '{0} {1}'.format(response['account'].admin.fname,response['account'].admin.lname)
 				return redirect(url_for('renderAdmin'))
 			else:
 				session['name'] = '{0} {1}'.format(response['account'].manager.fname,response['account'].manager.lname)
@@ -97,10 +99,18 @@ def renderLogout():
 @login_required
 def renderAdmin():
 	if session['role'] == 'admin':
-		return render_template('admin.html', username=session['name'],email=session['email'])
+		return render_template('admin.html', username=session['name'],email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
 
+@app.route('/admins')
+@login_required
+def renderAdmins():
+	if session['role'] == 'admin':
+		admins = alchemist.getAdmins(session['email'])
+		return render_template('admins-list.html', admins=admins, username=session['name'], email=session['email'],updateRoute='update-admin-account')
+	else:
+		abort(401)
 
 @app.route('/user')
 @login_required
@@ -134,6 +144,7 @@ def renderUpdateAccount():
 				
 			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
 			session['email'] = payload['email']
+			session['title'] = payload['jobTitle']
 			flash('Account was successfully updated.',SUCCESS)
 			return redirect(url_for('renderUser'))
 	else:
@@ -152,7 +163,8 @@ def renderCreate():
 	else:
 		abort(401)
 
-
+'''
+#i think this functionality is actually handled by the awards route down below
 @app.route('/history')
 @login_required
 def renderHistory():
@@ -160,7 +172,7 @@ def renderHistory():
 		return render_template('history.html',username=session['name'])
 	else:
 		abort(401)
-
+'''
 
 @app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
@@ -179,19 +191,130 @@ def renderNewAccount():
 		
 		flash('Account created.',SUCCESS)
 		return redirect(url_for('renderLogin'))
+
+@app.route('/new-admin-account',methods=['GET','POST'])
+def renderNewAdminAccount():
+	if request.method == 'GET':
+		questions = alchemist.getQuestions()
+		return render_template('new-admin-account.html',questions=questions, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 	
+	if request.method == 'POST':
+		payload = request.form
+		account = alchemist.createAdminAccount(payload)
+		status = alchemist.save(account)
+		
+		if status == False:
+			flash('Unable to create admin account. The email provided is already linked to an account.',ERROR)
+			return redirect(url_for('renderNewAdminAccount', username=session['name'], email=session['email']))###,updateRoute='update-admin-account' maybe
+		
+		flash('Admin account created.',SUCCESS)
+		return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+
+@app.route('/update-admin-account/',methods=['GET','POST'])
+@login_required
+def renderUpdateAdminAccount():	
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			details = alchemist.getAdminDetails(session['email'])
+			
+			if details is None:
+				abort(500)
+				
+			return render_template('update-admin-account.html',username=session['name'], email=session['email'], details=details,updateRoute='update-admin-account')
+			
+		if request.method == 'POST':
+			payload = request.form
+			status = alchemist.updateAdminAccount(payload,session['email'])
+			
+			if status == False:
+				flash('Unable to update admin account. Either the email provided is already linked to an account or there was a server error. Please, try again.', ERROR)
+				return redirect(url_for('renderUpdateAdminAccount', username=session['name'], email=session['email'], details=details))
+				
+			session['email'] = payload['email']
+			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
+			flash('Admin account was successfully updated.',SUCCESS)
+			return redirect(url_for('renderAdmins'))
+	else:
+		abort(401)
+		
+@app.route('/remove-admin/')
+def removeAdminUser():
+	adminID = request.args.get('admin')
+	admin = alchemist.getAdmin(adminID)
+	status = alchemist.remove(admin.account)
+	admins = alchemist.getAdmins(session['email'])
+	if status == False:
+		flash('Unable to remove admin. System Error.', ERROR)
+		return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
+	flash('Admin deleted.', SUCCESS)
+	return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
+		
+@app.route('/new-manager-account',methods=['GET','POST'])
+@login_required
+def renderNewUserAccount():
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			questions = alchemist.getQuestions()
+			return render_template('new-manager-account.html',questions=questions, username=session['name'], email=session['email'],updateRoute='update-admin-account')
+		
+		if request.method == 'POST':
+			payload = request.form
+			account = alchemist.createAccount(payload)
+			status = alchemist.save(account)
+			
+			if status == False:
+				flash('Unable to create account. The email provided is already linked to an account.',ERROR)
+				return redirect(url_for('renderNewUserAccount', username=session['name'], email=session['email']))
+			
+			flash('Account created.',SUCCESS)
+			return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
+	else:
+		abort(401)
+		
+
+@app.route('/update-manager-account/',methods=['GET','POST'])
+@login_required
+def renderUpdateUserAccount():	
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			session['manager-email'] = request.args.get('usremail')
+			details = alchemist.getUserDetails(session['manager-email'])
+			
+			if details is None:
+				abort(500)
+				
+			return render_template('update-manager-account.html',username=session['name'], email=session['email'], details=details,updateRoute='update-admin-account')
+			
+		if request.method == 'POST':
+			payload = request.form
+			status = alchemist.updateAccount(payload,session['manager-email'])
+			
+			if status == False:
+				flash('Unable to update account. Either the email provided is already linked to an account or there was a server error. Please, try again.', ERROR)
+				return redirect(url_for('renderUpdateUserAccount', username=session['name'], email=session['email'], details=details))
+				
+			flash('Account was successfully updated.',SUCCESS)
+			return redirect(url_for('renderUsers'))
+	else:
+		abort(401)
 	
 @app.route('/awards')
 @login_required
 def renderAwards():
-	awards = alchemist.getAwards(session['email'])
-	return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
+	if session['role'] == 'user':
+		awards = alchemist.getAwards(session['email'])
+		return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
+	else:
+		abort(401)
 	
 @app.route('/users')
 @login_required
 def renderUsers():
-	users = alchemist.getUsers()
-	return render_template('users-list.html', users=users, username=session['name'], email=session['email'])
+	if session['role'] == 'admin':
+		users = alchemist.getUsers()
+		return render_template('users-list.html', users=users, username=session['name'], email=session['email'],updateRoute='update-admin-account')
+	else:
+		abort(401)
 	
 @app.route('/remove-award/')
 def removeAward():
@@ -199,9 +322,56 @@ def removeAward():
 	award = alchemist.getAward(awardID)
 	status = alchemist.remove(award)
 	awards = alchemist.getAwards(session['email'])
+	if status == False:
+		flash('Unable to remove award. System Error.', ERROR)
+		return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
+	flash('Award record deleted', SUCCESS)
 	return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
+	
+@app.route('/remove-user/')
+def removeUser():
+	userID = request.args.get('usr')
+	user = alchemist.getUser(userID)
+	users = alchemist.getUsers()
+	
+	if alchemist.archiveAwards(userID) == False:
+		flash('Unable to archive awards',ERROR)
+		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
+	
+	if alchemist.remove(user.account) == False:
+		flash('Unable to remove user. System Error.', ERROR)
+		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
+	flash('User deleted.', SUCCESS)
+	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
+	
+@app.route('/reports',methods=['GET','POST'])
+@login_required
+def renderReports():
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			return render_template('reports.html',username=session['name'], email=session['email'],updateRoute='update-admin-account')
+		
+		if request.method == 'POST':
+			if request.json:
+				payload = request.get_json()
+				
+				if payload['report'] == '1':
+					response = reporter.getAwardsByType()
+				elif payload['report'] == '2':
+					response = reporter.getAwardsByManager()
+				else:
+					abort(400)
+					
+				return jsonify(response)
+					
+			else:
+				abort(400)
+	else:
+		abort(401)
+
+
 @app.route('/sign_s3/')
 def sign_s3():
 	S3_BUCKET = os.environ.get('S3_BUCKET_NAME')
@@ -225,6 +395,13 @@ def sign_s3():
 		'data': presigned_post,
 		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
 	})
+	
+@app.route('/delete_s3/')
+def delete_s3():
+	file_name = request.args.get('file_name')
+	alchemist.deleteUserSig(file_name);
+	return json.dumps({'status': "success"})
+	
 
 	
 @app.route('/password')
@@ -235,15 +412,16 @@ def renderPassword():
 @app.route('/latex', methods=['POST'])
 @login_required
 def renderPDF():
-	#still just a testing LaTex functionality
 	payload = request.form
-
+	print('HERE-----> {0}'.format(payload),file=sys.stderr)
+	sys.stdout.flush()
+	
 	award = alchemist.createAward(payload, session['email'])
 	status = alchemist.save(award)
-	
-	if status is False:
+			
+	if status == False:
 		abort(500)
-	
+				
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
 	sigFile = replace(sigFile,'.','_')
@@ -295,28 +473,25 @@ def renderPDF():
 	
 
 	if pdf is not None:
-		'''
-		#if response code is not 202 then something bad happened... added error checking
-		#the send award function takes two optional arguments: sub -> the email subject line | text -> the email body
-		sender = session['email']
-		recepient = payload['recpEmail']
-		response = emailer.sendAward(sender,recepient,pdf)
-		
-		#debug
-		print('Code: {0}'.format(response.status_code,file=sys.stderr))
-		sys.stdout.flush()
-		print('Body: {0}'.format(response.body,file=sys.stderr))
-		sys.stdout.flush()
-		print('Headers: {0}'.format(response.headers,file=sys.stderr))
-		sys.stdout.flush()
-		#end debug
-		'''
-		return send_file(pdf)
+		if 'preview-btn' in payload:
+			alchemist.remove(award)
+			return send_file(pdf, as_attachment=True)
+		elif 'email-btn' in payload:				
+			sender = session['email']
+			recipient = award.employee.email
+			response = emailer.sendAward(sender,recipient,pdf)
+			
+			if response.status_code != 200 and response.status_code != 202:
+				flash('An error occured and the email was not sent. Please, try again.',ERROR)
+			else:
+				flash('The award has been emailed.',SUCCESS)
+				
+			return redirect(url_for('renderCreate'))
 	else:
 		alchemist.remove(award)
 		abort(500)
 
-
+	
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
 	if request.json:
@@ -354,29 +529,6 @@ def getPassword():
 				abort(500)
 			
 			return jsonify(response)
-			
-		'''details = alchemist.getUserDetails(payload['email'])
-		
-		if details is None:
-			details = alchemist.getAdminDetails(payload['email'])
-			
-			if details is None:
-				response = {'status':404,'message':'The email you provided is not linked to an account.'}
-				return jsonify(response)
-				
-		if payload['reset-method'] == 'question':
-			response = {'one':str(details['question1']), 'two':str(details['question2']),'status':200}
-			return jsonify(response)
-		
-		if payload['reset-method'] == 'email':
-			code = alchemist.genVerificationCode(details['account'])
-			
-			if code is not None:
-				response = emailer.sendPasswordReset(payload['email'],code)
-			else:
-				abort(500)
-			
-			return jsonify(response)'''
 	else:
 		abort(400)
 

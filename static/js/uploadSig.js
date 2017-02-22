@@ -1,4 +1,10 @@
-
+	var currentTempFile;
+	
+	function deleteTempFile(){
+		const xhr = new XMLHttpRequest();
+		xhr.open("GET", "/delete_s3?file_name="+currentTempFile);
+	}
+	
     /*
       Function to carry out the actual POST request to S3 using the signed request from the Python app.
     */
@@ -14,7 +20,6 @@
       xhr.onreadystatechange = () => {
         if(xhr.readyState === 4){
           if(xhr.status === 200 || xhr.status === 204){
-            document.getElementById('preview').src = url;
             document.getElementById('sig-url').value = url;
           }
           else{
@@ -23,6 +28,32 @@
         }
       };
       xhr.send(postData);
+    }
+	
+    /*
+      Function to carry out the actual POST request to S3 using the signed request from the Python app.
+    */
+    function uploadTempFile(file, s3Data, url){
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', s3Data.url);
+      xhr.setRequestHeader('x-amz-acl', 'public-read', 'Access-Control-Allow-Origin');
+      const postData = new FormData();
+      for(key in s3Data.fields){
+        postData.append(key, s3Data.fields[key]);
+      }
+      postData.append('file', file);
+      xhr.onreadystatechange = () => {
+        if(xhr.readyState === 4){
+          if(xhr.status === 200 || xhr.status === 204){
+            document.getElementById('preview').src = url;
+          }
+          else{
+            alert('Could not upload file.');
+          }
+        }
+      };
+      xhr.send(postData);
+	  deleteTempFile();
     }
     /*
       Function to get the temporary signed request from the Python app.
@@ -34,8 +65,12 @@
 		email = document.getElementById('email').value;
 		email = email.replace(/@/g , "_");
 		email = email.replace(/\./g , "_");
+		tempFile = email
 		email = email + "_sig.png"
+		tempFile = tempFile + Date.now() + "_sig.png"
+		currentTempFile = tempFile;
 		const xhr = new XMLHttpRequest();
+		const xhrTemp = new XMLHttpRequest();
 		xhr.open("GET", "/sign_s3?file_name="+email+"&file_type="+file.type);
 		xhr.onreadystatechange = () => {
         if(xhr.readyState === 4){
@@ -48,7 +83,20 @@
           }
         }
       };
+	  xhrTemp.open("GET", "/sign_s3?file_name="+tempFile+"&file_type="+file.type);
+		xhrTemp.onreadystatechange = () => {
+        if(xhrTemp.readyState === 4){
+          if(xhr.status === 200){
+            const response = JSON.parse(xhrTemp.responseText);
+            uploadTempFile(file, response.data, response.url);
+          }
+          else{
+            alert('Could not get signed URL.');
+          }
+        }
+      };
       xhr.send();
+	  xhrTemp.send();
     }
     /*
        Function called when file input updated. If there is a file selected, then
