@@ -106,6 +106,19 @@ class PostgresDatabase(object):
 			print(e,file=sys.stderr)
 			return None
 		return True
+	
+	def deleteUserSig(self, filename):
+		bucket = os.environ.get('S3_BUCKET_NAME')
+		client = boto3.client('s3')
+		try:
+			client.delete_object(bucket, filename)
+		except ClientError as e:
+			print(e.response['Error']['Message'],file=sys.stderr)
+			return None
+		except IOError as e:
+			print(e,file=sys.stderr)
+			return None
+		return True	
 
 		
 	def getUserDetails(self,email):

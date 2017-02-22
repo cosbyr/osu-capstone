@@ -390,6 +390,13 @@ def sign_s3():
 		'data': presigned_post,
 		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
 	})
+	
+@app.route('/delete_s3/')
+def delete_s3():
+	file_name = request.args.get('file_name')
+	alchemist.deleteUserSig(file_name);
+	return json.dumps({'status': "success"})
+	
 
 	
 @app.route('/password')
