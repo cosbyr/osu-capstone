@@ -269,6 +269,9 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -283,6 +286,9 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -317,18 +323,22 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
 	
 	
 	def remove(self,obj):
+		print('HERE------> {0}'.format(obj),file=sys.stderr)
+		sys.stdout.flush()
 		try:
 			db.session.delete(obj)
 			db.session.commit()
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -346,6 +356,7 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -376,6 +387,7 @@ class PostgresDatabase(object):
 		except IntegrityError as e:
 			print(e,file=sys.stderr)
 			sys.stdout.flush()
+			db.session.rollback()
 			return None
 			
 		return code
@@ -406,6 +418,9 @@ class PostgresDatabase(object):
 			db.session.commit()
 		except IntegrityError:
 			response = {'status':500,'message':'Unable to reset password.'}
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return response
 			
 		return response 
@@ -439,6 +454,9 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
 			return False
 			
 		return True
@@ -454,6 +472,34 @@ class PostgresDatabase(object):
 				return {'status':200,'message':'User found.','role':'admin','email':email}
 		
 		return {'status':200,'message':'User found.','role':'user','email':email}	
+	
+
+	def archiveAwards(self,user):
+		awards = self.Award.query.filter_by(creator=user).all()
+		lst = []
+		
+		if awards is not None:
+			for a in awards:
+				fnameCreator = a.manager.fname
+				lnameCreator = a.manager.lname
+				fnameRecepient = a.employee.fname
+				lnameRecepient = a.employee.lname
+				typeId = a.type_id
+				issuedOn = a.issuedOn
+				archive = self.AwardArchive(fnameCreator,lnameCreator,fnameRecepient,lnameRecepient,typeId,issuedOn)	
+				lst.append(archive)
+			
+			try:
+				db.session.add_all(lst)
+				db.session.commit()
+			except IntegrityError as e:
+				print(e,file=sys.stderr)
+				sys.stdout.flush()
+				db.session.rollback()
+				return False
+			
+		return True
+		
 		
 	'''
 	def createRootAdmin(self):

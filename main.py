@@ -2,7 +2,6 @@ from __future__ import print_function #debug
 import sys,os #sys debug
 import logging
 import json, boto3
-#from datetime import datetime
 from handlers.LaTex import award as ah
 from handlers.Database import database
 from handlers.Database import models
@@ -100,7 +99,7 @@ def renderLogout():
 @login_required
 def renderAdmin():
 	if session['role'] == 'admin':
-		return render_template('admin.html', username=session['name'],email=session['email'])
+		return render_template('admin.html', username=session['name'],email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
 
@@ -109,7 +108,7 @@ def renderAdmin():
 def renderAdmins():
 	if session['role'] == 'admin':
 		admins = alchemist.getAdmins(session['email'])
-		return render_template('admins-list.html', admins=admins, username=session['name'], email=session['email'])
+		return render_template('admins-list.html', admins=admins, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
 
@@ -197,7 +196,7 @@ def renderNewAccount():
 def renderNewAdminAccount():
 	if request.method == 'GET':
 		questions = alchemist.getQuestions()
-		return render_template('new-admin-account.html',questions=questions, username=session['name'], email=session['email'])
+		return render_template('new-admin-account.html',questions=questions, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 	
 	if request.method == 'POST':
 		payload = request.form
@@ -206,7 +205,7 @@ def renderNewAdminAccount():
 		
 		if status == False:
 			flash('Unable to create admin account. The email provided is already linked to an account.',ERROR)
-			return redirect(url_for('renderNewAdminAccount', username=session['name'], email=session['email']))
+			return redirect(url_for('renderNewAdminAccount', username=session['name'], email=session['email']))###,updateRoute='update-admin-account' maybe
 		
 		flash('Admin account created.',SUCCESS)
 		return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
@@ -216,22 +215,23 @@ def renderNewAdminAccount():
 def renderUpdateAdminAccount():	
 	if session['role'] == 'admin':
 		if request.method == 'GET':
-			session['admin-email'] = request.args.get('adminemail')
-			details = alchemist.getAdminDetails(session['admin-email'])
+			details = alchemist.getAdminDetails(session['email'])
 			
 			if details is None:
 				abort(500)
 				
-			return render_template('update-admin-account.html',username=session['name'], email=session['email'], details=details)
+			return render_template('update-admin-account.html',username=session['name'], email=session['email'], details=details,updateRoute='update-admin-account')
 			
 		if request.method == 'POST':
 			payload = request.form
-			status = alchemist.updateAdminAccount(payload,session['admin-email'])
+			status = alchemist.updateAdminAccount(payload,session['email'])
 			
 			if status == False:
 				flash('Unable to update admin account. Either the email provided is already linked to an account or there was a server error. Please, try again.', ERROR)
 				return redirect(url_for('renderUpdateAdminAccount', username=session['name'], email=session['email'], details=details))
 				
+			session['email'] = payload['email']
+			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
 			flash('Admin account was successfully updated.',SUCCESS)
 			return redirect(url_for('renderAdmins'))
 	else:
@@ -241,7 +241,7 @@ def renderUpdateAdminAccount():
 def removeAdminUser():
 	adminID = request.args.get('admin')
 	admin = alchemist.getAdmin(adminID)
-	status = alchemist.remove(admin)
+	status = alchemist.remove(admin.account)
 	admins = alchemist.getAdmins(session['email'])
 	if status == False:
 		flash('Unable to remove admin. System Error.', ERROR)
@@ -255,7 +255,7 @@ def renderNewUserAccount():
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			questions = alchemist.getQuestions()
-			return render_template('new-manager-account.html',questions=questions, username=session['name'], email=session['email'])
+			return render_template('new-manager-account.html',questions=questions, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 		
 		if request.method == 'POST':
 			payload = request.form
@@ -283,7 +283,7 @@ def renderUpdateUserAccount():
 			if details is None:
 				abort(500)
 				
-			return render_template('update-manager-account.html',username=session['name'], email=session['email'], details=details)
+			return render_template('update-manager-account.html',username=session['name'], email=session['email'], details=details,updateRoute='update-admin-account')
 			
 		if request.method == 'POST':
 			payload = request.form
@@ -312,7 +312,7 @@ def renderAwards():
 def renderUsers():
 	if session['role'] == 'admin':
 		users = alchemist.getUsers()
-		return render_template('users-list.html', users=users, username=session['name'], email=session['email'])
+		return render_template('users-list.html', users=users, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
 	
@@ -332,11 +332,16 @@ def removeAward():
 def removeUser():
 	userID = request.args.get('usr')
 	user = alchemist.getUser(userID)
-	status = alchemist.remove(user)
 	users = alchemist.getUsers()
-	if status == False:
+	
+	if alchemist.archiveAwards(userID) == False:
+		flash('Unable to archive awards',ERROR)
+		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
+	
+	if alchemist.remove(user.account) == False:
 		flash('Unable to remove user. System Error.', ERROR)
 		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
+		
 	flash('User deleted.', SUCCESS)
 	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
@@ -346,7 +351,7 @@ def removeUser():
 def renderReports():
 	if session['role'] == 'admin':
 		if request.method == 'GET':
-			return render_template('reports.html',username=session['name'], email=session['email'])
+			return render_template('reports.html',username=session['name'], email=session['email'],updateRoute='update-admin-account')
 		
 		if request.method == 'POST':
 			if request.json:
