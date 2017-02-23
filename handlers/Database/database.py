@@ -509,8 +509,13 @@ class PostgresDatabase(object):
 	
 
 	def addAwardType(self,payload):
-		type = self.AwardType(payload['awardType'])
-		return self.save(type)
+		types = self.getAwardTypes()
+		
+		if payload['awardType'] not in types.values():
+			type = self.AwardType(payload['awardType'])
+			return self.save(type)
+		
+		return False
 			
 		
 	'''

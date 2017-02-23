@@ -356,7 +356,7 @@ def renderAwardTypes():
 		
 		if request.method == 'POST':
 			if alchemist.addAwardType(request.form) == False:
-				flash('Unable to add award type.',ERROR)
+				flash('Unable to create award type. Make sure your are not trying to create a duplicate type.',ERROR)
 			else:
 				flash('New award type created.',SUCCESS)
 				
