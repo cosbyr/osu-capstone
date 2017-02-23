@@ -160,6 +160,7 @@ class PostgresDatabase(object):
 	def getUser(self, id):
 		return self.Manager.query.get(id)
 	
+	
 	def getAdmins(self, email):
 		admins = {}
 		results = self.Admin.query.filter(self.Admin.email != email, self.Admin.email != 'root@admin.com').all()
@@ -169,9 +170,11 @@ class PostgresDatabase(object):
 			admin = r.fname + ' ' + r.lname
 			admins[r.id] = {'id':r.id, 'createdOn': createdOnString, 'admin':admin, 'adminEmail': r.email}
 		return admins
-		
+	
+	
 	def getAdmin(self, id):
 		return self.Admin.query.get(id)
+	
 	
 	def getAdminDetails(self,email):
 		admin = self.Admin.query.filter_by(email=email).first()
@@ -191,7 +194,8 @@ class PostgresDatabase(object):
 		'answer2':admin.account.answer2}
 		
 		return details
-		
+	
+	
 	def login(self,payload):
 		email = payload['userName']
 		pword = payload['password']
@@ -239,7 +243,8 @@ class PostgresDatabase(object):
 		manager = self.Manager(account,title,fname,lname,sign,email)
 			
 		return [account,manager]
-		
+	
+	
 	def createAdminAccount(self,payload):
 		fname = payload['firstName']
 		lname = payload['lastName']
@@ -275,7 +280,8 @@ class PostgresDatabase(object):
 			return False
 			
 		return True
-		
+	
+	
 	def updateAdminAccount(self,payload,email):
 		admin = self.Admin.query.filter_by(email=email).first()
 		
@@ -460,7 +466,8 @@ class PostgresDatabase(object):
 			return False
 			
 		return True
-		
+	
+	
 	def findUser(self,email):
 		user = self.Manager.query.filter_by(email=email).first()
 		
@@ -499,7 +506,12 @@ class PostgresDatabase(object):
 				return False
 			
 		return True
-		
+	
+
+	def addAwardType(self,payload):
+		type = self.AwardType(payload['awardType'])
+		return self.save(type)
+			
 		
 	'''
 	def createRootAdmin(self):
