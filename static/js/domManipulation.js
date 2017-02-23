@@ -61,6 +61,17 @@ $(document).ready(function(){
 	});
 
 
+	/*add border around selected border image in create page */
+	$(".border-choice").on("click", function(){
+		$(".border-choice").removeClass("selected-image");
+		$(this).addClass("selected-image");
+	});
+
+	/*add border around selected background image in create page */
+	$(".background-choice").on("click", function(){
+		$(".background-choice").removeClass("selected-image");
+		$(this).addClass("selected-image");
+	});
 
 	/*if choosing to reset password via email a warning box will apear  in /password*/
 	$("#reset-via-email").on("click", function(){
