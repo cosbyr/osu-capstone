@@ -44,6 +44,15 @@
   border: 2px solid #337ab7;
 }
 
+.border-black{
+  padding-top: 2em;
+  border: 2px solid black;
+  min-height: 10em;
+  background: #101010;
+  white-space:normal;
+  margin-top: 1em;
+}
+
 /* Creates loading spinner */
 
 /* Start by setting display:none to make this hidden.
