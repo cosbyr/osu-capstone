@@ -38,13 +38,13 @@
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="pass1">Password</label>
 					<div class="col-sm-6">
-						<input class="form-control" type="password" id="pass1" name="password" required >
+						<input pattern=".{3,}" title="3 characters minimum" class="form-control" type="password" id="pass1" name="password" required >
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="pass2">Reenter Password</label>
 					<div class="col-sm-6">
-						<input class="form-control" type="password" id="pass2" name="password" onkeyup="checkPass(); return false;" required>
+						<input pattern=".{3,}" title="3 characters minimum" class="form-control" type="password" id="pass2" name="password" onkeyup="checkPass(); return false;" required>
 						<span class="help-block">
 							<span class="is-hidden" id="confirmMessage"></span> 
 						</span>

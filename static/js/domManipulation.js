@@ -3,10 +3,11 @@ $(document).ready(function(){
 	$body = $("body");
 	
 	//causes freeze after answering security questions
-	/*$(document).on({
-	    ajaxStart: function() { $body.addClass("loading");    },
-	   // ajaxComplete: function() { $body.removeClass("loading"); }    
-	});*/
+	// $(document).on({
+	//     ajaxStart: function() { 
+	//     	$body.addClass("loading");    
+	// 	}    
+	// });
 	
 	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){
@@ -25,6 +26,12 @@ $(document).ready(function(){
 			contentType: 'application/json',
 		  	dataType: 'json',
 
+		  	beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
 	  		success: function(response) {
 	  			$body.removeClass("loading");
 	  			$('#find-employees').removeClass('is-hidden');
@@ -62,6 +69,18 @@ $(document).ready(function(){
 		console.log("button pressed");
 	});
 
+	/*if choosing to reset password via questions email warning will dissapear */
+	$('#reset-via-questions').on("click",function(){
+		$("#send-email-reset").addClass("is-hidden");
+		console.log("button pressed");
+	});
+
+	/*disable reset via button after it has been clicked*/
+	$('#submit-reset-via').on("click", function(){
+		// $("#submit-reset-via-button").attr("disabled", true);
+		console.log("should disable");
+		// $("#submit-reset-via").css("background-color": "gray");
+	});
 
 	/* choosing to reset via email or password on /password*/
 	var email = $("#reset-password").on('submit', function(){
@@ -80,10 +99,13 @@ $(document).ready(function(){
 			data: data,
 			contentType: 'application/json',
 		  	dataType: 'json',
-			
+		  	beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
 			success: function(response){
-
-				$body.removeClass("loading");
 				if(radioValue == "email"){
 					
 					//console.log("I will now display email stuff");
@@ -94,6 +116,7 @@ $(document).ready(function(){
 					if(response['status'] == 200 || response['status'] == 202){
 						alert(response['message']);
 						window.location.replace("/reset-password");
+						$("#submit-reset-via-button").attr("disabled", true);
 					}
 					else{
 						alert(response['message']);
@@ -104,6 +127,8 @@ $(document).ready(function(){
 				else{
 					// $('#reset-password-main-form').addClass("is-hidden");
 					if(response['status'] == 200){
+						$("#submit-reset-via-button").attr("disabled", true);
+						$("#reset-via-email-button").attr("disabled", true);
 						$("#security-questions").removeClass("is-hidden");
 						$("#send-email-reset").addClass("is-hidden");
 						
@@ -146,6 +171,12 @@ $(document).ready(function(){
 			contentType: 'application/json',
 			dataType: 'json',
 
+			beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
 			success: function(response){
 				$('#security-questions').addClass("is-hidden");
 
@@ -156,7 +187,6 @@ $(document).ready(function(){
 				else{
 					$('#password-reset-failure').removeClass('is-hidden');
 				}			
-			
 			},
 			error: function(jqXHR, exception){
 	      		console.log("error:");
