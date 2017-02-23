@@ -13,31 +13,24 @@
 
 {% block content %}
 	<div class="container">
-		<div>
-			{% if users|length > 0 %}
-			<table class="table">
-				<tr>
-					<th>User</th>
-					<th>Create Date</th>
-					<th>Title</th>
-					<th>Email</th>
-					<th>Edit User?</th>
-					<th>Delete User?</th>
-				</tr>
-				{% for user in users %}
-				<tr>
-					<td>{{users[user].user}}</td>
-					<td>{{users[user].createdOn}}</td>
-					<td>{{users[user].title}}</td>
-					<td>{{users[user].useremail}}</td>
-					<td><a href="/update-manager-account/?usremail={{users[user].useremail}}"<span class="glyphicon glyphicon-pencil"></span></a></td>
-					<td><a href="/remove-user/?usr={{users[user].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
-				</tr>
-				{% endfor %}
-			</table>
-			{% else %}
-			<p>There are no users in the system.</p>
-			{% endif %}
+		<form class="form-vertical" action="/award-types" method="post">
+			<div class="form-group">
+				<div class="row">
+					<label class="col-sm-12" for="awardType">Create New Award Type</label>
+				</div>
+				<div class="row">
+					<div class="col-sm-4"><input class="form-control" type="text" name="awardType" placeholder="Caution: Award types cannot be deleted" required></div>
+					<div class="col-sm-4"><input type="submit" class="btn btn-primary"></div>
+				</div>
+			</div>
+		</form>
+		<br>
+		<div class="row"><div class="col-sm-12"><hr style="border-color:#337aa1; border-width:2px"></div></div>
+		<br>
+		<div class="list-group">
+			{% for id in types %}
+				<a href="#" class="list-group-item"><strong>{{types[id]}}</strong></a>
+			{% endfor %}
 		</div>
 	</div>
 {% endblock content %}

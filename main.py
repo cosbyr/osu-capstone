@@ -345,7 +345,25 @@ def removeUser():
 	flash('User deleted.', SUCCESS)
 	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
-	
+
+@app.route('/award-types',methods=['GET','POST'])
+@login_required
+def renderAwardTypes():
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			types = alchemist.getAwardTypes()
+			return render_template('add-award-type.html',types=types,username=session['name'], email=session['email'],updateRoute='update-admin-account')
+		
+		if request.method == 'POST':
+			if alchemist.addAwardType(request.form) == False:
+				flash('Unable to create award type. Make sure your are not trying to create a duplicate type.',ERROR)
+			else:
+				flash('New award type created.',SUCCESS)
+				
+			return redirect(url_for('renderAwardTypes'))
+	else:
+		abort(401)
+
 @app.route('/reports',methods=['GET','POST'])
 @login_required
 def renderReports():

@@ -130,22 +130,22 @@ class AwardArchive (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	fname_creator = database.db.Column(database.db.String(32),nullable=False)
 	lname_creator = database.db.Column(database.db.String(32),nullable=False)
-	fname_recepient = database.db.Column(database.db.String(32),nullable=False)
-	lname_recepient = database.db.Column(database.db.String(32),nullable=False)
+	fname_recipient = database.db.Column(database.db.String(32),nullable=False)
+	lname_recipient = database.db.Column(database.db.String(32),nullable=False)
 	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	issued_on = database.db.Column(database.db.Date,nullable=False)
 
-	def __init__(self,fnameCreator,lnameCreator,fnameRecepient,lnameRecepient,typeId,issuedOn):
+	def __init__(self,fnameCreator,lnameCreator,fnameRecipient,lnameRecipient,typeId,issuedOn):
 		self.fname_creator = fnameCreator
 		self.lname_creator = lnameCreator
-		self.fname_recepient = fnameRecepient
-		self.lname_recepient = lnameRecepient
+		self.fname_recipient = fnameRecipient
+		self.lname_recipient = lnameRecipient
 		self.type_id = typeId
 		self.issued_on = issuedOn
 
 	def __repr__(self):
 		creator = self.fname_creator + ' ' + self.lname_creator
-		recvdBy = self.fname_recepient + ' ' + self.lname_recepient
+		recvdBy = self.fname_recipient + ' ' + self.lname_recipient
 		return '<AwardArchive Created by: {0} Given to: {1}>'.format(creator,recvdBy)
 		
 class AwardBackground(database.db.Model):
