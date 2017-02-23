@@ -3,12 +3,43 @@
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
+	<!--
 	<li class="active" data-toggle="tab"><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
 	<li ><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
 	<li><a href="/admins"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
 	<li><a href="/new-admin-account"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
 	<li><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
+	-->
+	<li class="active" data-toggle="tab"><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
+	<li class="dropdown">
+		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-user"></span> User Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/users">View Users</li>
+			<li><a href="/new-manager-account">Add Users</a></li>
+		</ul>
+	</li>
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="/admins">View Admins</li>
+			<li><a href="/new-admin-account">Add Admins</a></li>
+		</ul>
+	</li>
+	<li class="dropdown">
+		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
+		</a>
+		<ul class="dropdown-menu">
+			<li><a href="#">Add Employees</li>
+			<li><a href="/award-types">Add Award Types</a></li>
+			<li><a href="/reports">Award Reports</a></li>
+		</ul>
+	</li>
 {% endblock activeNav %}
 
 {% block content %}
