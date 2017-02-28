@@ -524,6 +524,14 @@ def getEmployees():
 		return jsonify(employees)
 	else:
 		abort(400) #put error on create page
+		
+@app.route('/employees-list')
+def getAllEmployees():
+	if session['role'] == 'admin':
+		employees = alchemist.getAllEmployees()
+		return render_template('employees-list.html', employees=employees, username=session['name'], email=session['email'],updateRoute='update-admin-account')
+	else:
+		abort(401)
 
 		
 @app.route('/get-password',methods=['POST'])

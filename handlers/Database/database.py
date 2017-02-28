@@ -380,7 +380,18 @@ class PostgresDatabase(object):
 			return employees
 		else:
 			return {'status':404,'message':'The search returned no results.'} 
+	
+	def getEmployee(self, id):
+		return self.Employee.query.get(id)
+	
+	def getAllEmployees(self):
+		employees = {}
+		results = self.Employee.query.order_by(asc(self.Employee.lname)).all()
 		
+		for r in results:
+			employee = r.fname + ' ' + r.lname
+			employees[r.id] = {'id':r.id,'employee':employee, 'empemail': r.email}		
+		return employees
 
 	def genVerificationCode(self,id):
 		account = self.Account.query.get(id)
