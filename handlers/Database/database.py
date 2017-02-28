@@ -17,14 +17,13 @@ db = SQLAlchemy()
 
 #consider making this a singleton class
 class PostgresDatabase(object):
-	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardArchive,clsAwardBackground,clsAwardTheme,clsEmployee,clsAwardBorder):
+	def __init__(self,clsQuestion,clsAccount,clsAdmin,clsManager,clsAwardType,clsAward,clsAwardBackground,clsAwardTheme,clsEmployee,clsAwardBorder):
 		self.Question = clsQuestion
 		self.Account = clsAccount
 		self.Admin = clsAdmin
 		self.Manager = clsManager
 		self.AwardType = clsAwardType
 		self.Award = clsAward
-		self.AwardArchive = clsAwardArchive
 		self.AwardBackground = clsAwardBackground
 		self.AwardTheme = clsAwardTheme
 		self.Employee = clsEmployee
@@ -336,8 +335,6 @@ class PostgresDatabase(object):
 	
 	
 	def remove(self,obj):
-		print('HERE------> {0}'.format(obj),file=sys.stderr)
-		sys.stdout.flush()
 		try:
 			db.session.delete(obj)
 			db.session.commit()
@@ -492,33 +489,6 @@ class PostgresDatabase(object):
 		return {'status':200,'message':'User found.','role':'user','email':email}	
 	
 
-	def archiveAwards(self,user):
-		awards = self.Award.query.filter_by(creator=user).all()
-		lst = []
-		
-		if awards is not None:
-			for a in awards:
-				fnameCreator = a.manager.fname
-				lnameCreator = a.manager.lname
-				fnameRecepient = a.employee.fname
-				lnameRecepient = a.employee.lname
-				typeId = a.type_id
-				issuedOn = a.issuedOn
-				archive = self.AwardArchive(fnameCreator,lnameCreator,fnameRecepient,lnameRecepient,typeId,issuedOn)	
-				lst.append(archive)
-			
-			try:
-				db.session.add_all(lst)
-				db.session.commit()
-			except IntegrityError as e:
-				print(e,file=sys.stderr)
-				sys.stdout.flush()
-				db.session.rollback()
-				return False
-			
-		return True
-	
-
 	def addAwardType(self,payload):
 		types = self.getAwardTypes()
 		
@@ -529,7 +499,7 @@ class PostgresDatabase(object):
 		return False
 			
 		
-	'''
+	
 	def createRootAdmin(self):
 		pword = argon2.using(rounds=4).hash('root')
 		quest1 = 1
@@ -537,12 +507,14 @@ class PostgresDatabase(object):
 		answ1 = 'root'
 		answ2 = 'root'
 		email = 'root@admin.com'
+		fname = 'Root'
+		lname = 'Admin'
 		created = datetime.now()
 		
 		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
-		admin = self.Admin(account,email)
+		admin = self.Admin(account,email,fname,lname)
 		
 		db.session.add(account)
 		db.session.add(admin)
 		db.session.commit()
-	'''
+	

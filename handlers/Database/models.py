@@ -75,7 +75,7 @@ class Manager (database.db.Model):
 	signature = database.db.Column(database.db.Text, nullable=False)
 	email = database.db.Column(database.db.String(32), nullable=False, unique=True)
 	
-	created = database.db.relationship('Award', backref='manager',lazy='dynamic',cascade='all, delete-orphan')
+	createdBy = database.db.relationship('Award', backref='manager',lazy='dynamic')
 	
 	def __init__(self,account,title,fname,lname,signature,email):
 		self.account = account
@@ -94,7 +94,6 @@ class AwardType (database.db.Model):
 	name = database.db.Column(database.db.String(32),nullable=False)
 
 	type = database.db.relationship('Award', backref='award_type', lazy='dynamic')
-	archive = database.db.relationship('AwardArchive', backref='award_type',lazy='dynamic')
 
 	def __init__(self,name):
 		self.name = name
@@ -104,21 +103,21 @@ class AwardType (database.db.Model):
 
 class Award (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
-	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('manager.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
+	creator = database.db.Column(database.db.Integer, database.db.ForeignKey('manager.id',ondelete='SET NULL',onupdate='RESTRICT'),nullable=True)
 	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	message = database.db.Column(database.db.String(255),nullable=False)
 	issuedOn = database.db.Column(database.db.Date,nullable=False)
-	recepient = database.db.Column(database.db.Integer,database.db.ForeignKey('employee.id',ondelete='CASCADE',onupdate='RESTRICT'),nullable=False)
+	recipient = database.db.Column(database.db.Integer,database.db.ForeignKey('employee.id',ondelete='SET NULL',onupdate='RESTRICT'),nullable=True)
 	background_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_background.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	theme_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_theme.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	border_id = database.db.Column(database.db.Integer,database.db.ForeignKey('award_border.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
 	
-	def __init__(self,creator,typeId,message,issuedOn,recepient,background,theme,border):
+	def __init__(self,creator,typeId,message,issuedOn,recipient,background,theme,border):
 		self.creator = creator
 		self.type_id = typeId
 		self.message = message
 		self.issuedOn = issuedOn
-		self.recepient = recepient
+		self.recipient = recipient
 		self.background_id = background
 		self.theme_id = theme
 		self.border_id = border
@@ -126,27 +125,9 @@ class Award (database.db.Model):
 	def __repr__(self):
 		return '<Award {0} {1} {2}>'.format(self.creator,self.type_id,self.message)
 
-class AwardArchive (database.db.Model):
-	id = database.db.Column(database.db.Integer, primary_key=True)
-	fname_creator = database.db.Column(database.db.String(32),nullable=False)
-	lname_creator = database.db.Column(database.db.String(32),nullable=False)
-	fname_recipient = database.db.Column(database.db.String(32),nullable=False)
-	lname_recipient = database.db.Column(database.db.String(32),nullable=False)
-	type_id = database.db.Column(database.db.Integer, database.db.ForeignKey('award_type.id',ondelete='RESTRICT',onupdate='RESTRICT'),nullable=False)
-	issued_on = database.db.Column(database.db.Date,nullable=False)
-
-	def __init__(self,fnameCreator,lnameCreator,fnameRecipient,lnameRecipient,typeId,issuedOn):
-		self.fname_creator = fnameCreator
-		self.lname_creator = lnameCreator
-		self.fname_recipient = fnameRecipient
-		self.lname_recipient = lnameRecipient
-		self.type_id = typeId
-		self.issued_on = issuedOn
-
-	def __repr__(self):
-		creator = self.fname_creator + ' ' + self.lname_creator
-		recvdBy = self.fname_recipient + ' ' + self.lname_recipient
-		return '<AwardArchive Created by: {0} Given to: {1}>'.format(creator,recvdBy)
+	def check_row(self):
+		if self.creator is None and self.recipient is None:
+			self.remove(self)
 		
 class AwardBackground(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)

@@ -41,7 +41,6 @@ models.Admin,
 models.Manager,
 models.AwardType,
 models.Award,
-models.AwardArchive,
 models.AwardBackground,
 models.AwardTheme,
 models.Employee,
@@ -334,19 +333,26 @@ def removeUser():
 	user = alchemist.getUser(userID)
 	users = alchemist.getUsers()
 	
+	#remove awards that have a null recipient
+	awards = alchemist.getAwards(user.email)
+	for a in awards:
+		a.check_row()
+	
 	sigFilename = user.signature
 	sigFilename = sigFilename.replace('https://camelopardalis-assets.s3.amazonaws.com/',"")
 	
+	'''
 	if alchemist.archiveAwards(userID) == False:
 		flash('Unable to archive awards',ERROR)
 		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
+	'''
 	
 	if alchemist.remove(user.account) == False:
 		flash('Unable to remove user. System Error.', ERROR)
 		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 	else:
 		alchemist.deleteUserSig(sigFilename)
-		
+
 	flash('User deleted.', SUCCESS)
 	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
