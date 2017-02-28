@@ -147,7 +147,6 @@ def renderUpdateAccount():
 			flash('Account was successfully updated.',SUCCESS)
 			return redirect(url_for('renderUser'))
 	else:
-		#admin stuff will replace abort(401)
 		abort(401)
 	
 
@@ -191,6 +190,7 @@ def renderNewAccount():
 		flash('Account created.',SUCCESS)
 		return redirect(url_for('renderLogin'))
 
+		
 @app.route('/new-admin-account',methods=['GET','POST'])
 def renderNewAdminAccount():
 	if request.method == 'GET':
@@ -209,6 +209,7 @@ def renderNewAdminAccount():
 		flash('Admin account created.',SUCCESS)
 		return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
 
+		
 @app.route('/update-admin-account/',methods=['GET','POST'])
 @login_required
 def renderUpdateAdminAccount():	
@@ -236,6 +237,7 @@ def renderUpdateAdminAccount():
 	else:
 		abort(401)
 		
+		
 @app.route('/remove-admin/')
 def removeAdminUser():
 	adminID = request.args.get('admin')
@@ -247,6 +249,7 @@ def removeAdminUser():
 		return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
 	flash('Admin deleted.', SUCCESS)
 	return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
+		
 		
 @app.route('/new-manager-account',methods=['GET','POST'])
 @login_required
@@ -297,6 +300,7 @@ def renderUpdateUserAccount():
 	else:
 		abort(401)
 	
+	
 @app.route('/awards')
 @login_required
 def renderAwards():
@@ -306,6 +310,7 @@ def renderAwards():
 	else:
 		abort(401)
 	
+	
 @app.route('/users')
 @login_required
 def renderUsers():
@@ -314,6 +319,7 @@ def renderUsers():
 		return render_template('users-list.html', users=users, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
+	
 	
 @app.route('/remove-award/')
 def removeAward():
@@ -327,12 +333,14 @@ def removeAward():
 	flash('Award record deleted', SUCCESS)
 	return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
 	
+	
 @app.route('/remove-user/')
 def removeUser():
 	userID = request.args.get('usr')
 	user = alchemist.getUser(userID)
 	users = alchemist.getUsers()
 	
+	#TEST THIS!!
 	#remove awards that have a null recipient
 	awards = alchemist.getAwards(user.email)
 	for a in awards:
@@ -340,12 +348,6 @@ def removeUser():
 	
 	sigFilename = user.signature
 	sigFilename = sigFilename.replace('https://camelopardalis-assets.s3.amazonaws.com/',"")
-	
-	'''
-	if alchemist.archiveAwards(userID) == False:
-		flash('Unable to archive awards',ERROR)
-		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
-	'''
 	
 	if alchemist.remove(user.account) == False:
 		flash('Unable to remove user. System Error.', ERROR)
