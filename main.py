@@ -334,6 +334,9 @@ def removeUser():
 	user = alchemist.getUser(userID)
 	users = alchemist.getUsers()
 	
+	sigFilename = user.signature
+	sigFilename = sigFilename.replace('https://camelopardalis-assets.s3.amazonaws.com/',"")
+	
 	if alchemist.archiveAwards(userID) == False:
 		flash('Unable to archive awards',ERROR)
 		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
@@ -341,6 +344,8 @@ def removeUser():
 	if alchemist.remove(user.account) == False:
 		flash('Unable to remove user. System Error.', ERROR)
 		return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
+	else:
+		alchemist.deleteUserSig(sigFilename)
 		
 	flash('User deleted.', SUCCESS)
 	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
@@ -417,6 +422,7 @@ def sign_s3():
 @app.route('/delete_s3/')
 def delete_s3():
 	file_name = request.args.get('file_name')
+	print (file_name)
 	alchemist.deleteUserSig(file_name);
 	return json.dumps({'status': "success"})
 	

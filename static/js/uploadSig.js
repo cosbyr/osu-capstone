@@ -1,8 +1,7 @@
-	var currentTempFile;
-	
-	function deleteTempFile(){
+	function deleteTempFile(filename){
 		const xhr = new XMLHttpRequest();
-		xhr.open("GET", "/delete_s3?file_name="+currentTempFile);
+		xhr.open('GET', "/delete_s3/?file_name="+filename);
+		xhr.send();
 	}
 	
     /*
@@ -33,7 +32,7 @@
     /*
       Function to carry out the actual POST request to S3 using the signed request from the Python app.
     */
-    function uploadTempFile(file, s3Data, url){
+    function uploadTempFile(file, s3Data, url, filename){
       const xhr = new XMLHttpRequest();
       xhr.open('POST', s3Data.url);
       xhr.setRequestHeader('x-amz-acl', 'public-read', 'Access-Control-Allow-Origin');
@@ -53,7 +52,7 @@
         }
       };
       xhr.send(postData);
-	  deleteTempFile();
+	  deleteTempFile(filename);
     }
     /*
       Function to get the temporary signed request from the Python app.
@@ -68,10 +67,9 @@
 		tempFile = email
 		email = email + "_sig.png"
 		tempFile = tempFile + Date.now() + "_sig.png"
-		currentTempFile = tempFile;
 		const xhr = new XMLHttpRequest();
 		const xhrTemp = new XMLHttpRequest();
-		xhr.open("GET", "/sign_s3?file_name="+email+"&file_type="+file.type);
+		xhr.open("GET", "/sign_s3/?file_name="+email+"&file_type="+file.type);
 		xhr.onreadystatechange = () => {
         if(xhr.readyState === 4){
           if(xhr.status === 200){
@@ -83,12 +81,12 @@
           }
         }
       };
-	  xhrTemp.open("GET", "/sign_s3?file_name="+tempFile+"&file_type="+file.type);
+	  xhrTemp.open("GET", "/sign_s3/?file_name="+tempFile+"&file_type="+file.type);
 		xhrTemp.onreadystatechange = () => {
         if(xhrTemp.readyState === 4){
           if(xhr.status === 200){
             const response = JSON.parse(xhrTemp.responseText);
-            uploadTempFile(file, response.data, response.url);
+            uploadTempFile(file, response.data, response.url, tempFile);
           }
           else{
             alert('Could not get signed URL.');

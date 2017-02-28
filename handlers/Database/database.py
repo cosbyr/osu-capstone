@@ -111,7 +111,7 @@ class PostgresDatabase(object):
 		bucket = os.environ.get('S3_BUCKET_NAME')
 		client = boto3.client('s3')
 		try:
-			client.delete_object(bucket, filename)
+			client.delete_object(Bucket=bucket, Key=filename)
 		except ClientError as e:
 			print(e.response['Error']['Message'],file=sys.stderr)
 			return None
