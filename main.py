@@ -389,7 +389,7 @@ def renderReports():
 				payload = request.get_json()
 				
 				if payload['report'] == '1':
-					response = reporter.getAwardsByType()
+					response = reporter.getAllAwards()
 				elif payload['report'] == '2':
 					response = reporter.getAwardsByManager()
 				else:
