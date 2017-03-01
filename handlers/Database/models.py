@@ -127,7 +127,7 @@ class Award (database.db.Model):
 
 	def check_row(self):
 		if self.creator is None and self.recipient is None:
-			self.remove(self)
+			return True
 		
 class AwardBackground(database.db.Model):
 		id = database.db.Column(database.db.Integer, primary_key=True)

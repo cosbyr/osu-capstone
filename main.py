@@ -340,12 +340,6 @@ def removeUser():
 	user = alchemist.getUser(userID)
 	users = alchemist.getUsers()
 	
-	#TEST THIS!!
-	#remove awards that have a null recipient
-	awards = alchemist.getAwards(user.email)
-	for a in awards:
-		a.check_row()
-	
 	sigFilename = user.signature
 	sigFilename = sigFilename.replace('https://camelopardalis-assets.s3.amazonaws.com/',"")
 	
@@ -355,6 +349,12 @@ def removeUser():
 	else:
 		alchemist.deleteUserSig(sigFilename)
 
+	awards = alchemist.getAllAwards()
+	if awards is not None:
+		for a in awards:
+			if a.check_row() == True:
+				alchemist.remove(a)
+	
 	flash('User deleted.', SUCCESS)
 	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
@@ -534,13 +534,31 @@ def getEmployees():
 		abort(400) #put error on create page
 		
 @app.route('/employees-list')
-def getAllEmployees():
+def renderEmployees():
 	if session['role'] == 'admin':
 		employees = alchemist.getAllEmployees()
 		return render_template('employees-list.html', employees=employees, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
 
+@app.route('/remove-employee/')
+def removeEmployee():
+	userID = request.args.get('employee')
+	employee = alchemist.getEmployee(userID)
+	employees = alchemist.getAllEmployees()
+	
+	if alchemist.remove(employee) == False:
+		flash('Unable to remove employee. System Error.', ERROR)
+		return redirect(url_for('renderEmployees', employees=employees, username=session['name'], email=session['email']))
+	
+	awards = alchemist.getAllAwards()
+	if awards is not None:
+		for a in awards:
+			if a.check_row() == True:
+				alchemist.remove(a)
+	
+	flash('Employee deleted.', SUCCESS)
+	return redirect(url_for('renderEmployees', employees=employees, username=session['name'], email=session['email']))
 		
 @app.route('/get-password',methods=['POST'])
 def getPassword():

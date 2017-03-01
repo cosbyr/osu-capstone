@@ -52,6 +52,9 @@ class PostgresDatabase(object):
 			awards[r.id] = {'id':r.id,'issuedOn':issuedOnString,'recipient':recipient,'type':r.award_type.name}
 			
 		return awards
+
+	def getAllAwards(self):
+		return db.session.query(self.Award).all()
 		
 	def getAward(self, id):
 		return self.Award.query.get(id)
