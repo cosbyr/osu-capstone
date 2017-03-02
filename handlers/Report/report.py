@@ -4,7 +4,7 @@ class Reporter(object):
 	def __init__(self,database):
 		self.db = database
 		
-	def getAwardsByType(self):
+	def getAllAwards(self):
 		awards = {}
 		results = self.db.session.query(models.Award).all()
 		
@@ -34,16 +34,18 @@ class Reporter(object):
 			
 		if resultAwards is not None:
 			for r in resultAwards:
-				if r.manager.id not in awards:
-					awards[r.manager.id] = {'name':'{0} {1}'.format(r.manager.fname,r.manager.lname)}
-					
-					for t in types:
-						awards[r.manager.id][t] = 0
+				if r.manager is not None:
+					if r.manager.id not in awards:
+						name = '{0} {1}'.format(r.manager.fname,r.manager.lname)
+						awards[r.manager.id] = {'name': name,'title':r.manager.title}
 						
-					awards[r.manager.id][r.award_type.name] += 1
-				else:
-					awards[r.manager.id][r.award_type.name] += 1
-						
+						for t in types:
+							awards[r.manager.id][t] = 0
+							
+						awards[r.manager.id][r.award_type.name] += 1
+					else:
+						awards[r.manager.id][r.award_type.name] += 1
+							
 			awards['status'] = 200
 		else:
 			awards['status'] = 404 
