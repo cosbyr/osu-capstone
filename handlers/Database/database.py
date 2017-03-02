@@ -282,6 +282,23 @@ class PostgresDatabase(object):
 			return False
 			
 		return True
+		
+	def updateEmployee(self,payload):
+		employee = self.Employee.query.get(int(payload['emp-id']))
+		
+		employee.fname = payload['first-name']
+		employee.lname = payload['last-name']
+		employee.email = payload['emp-email']
+		
+		try:
+			db.session.commit()
+		except IntegrityError:
+			print(e,file=sys.stderr)
+			sys.stdout.flush()
+			db.session.rollback()
+			return False
+			
+		return True
 	
 	
 	def updateAdminAccount(self,payload,email):
@@ -318,6 +335,16 @@ class PostgresDatabase(object):
 		award = self.Award(creatorId,typeId,message,issuedOn,recipient,background,theme,border)
 			
 		return award
+		
+	def createEmployee(self,payload):
+
+		fname = payload['first-name']
+		lname = payload['last-name']
+		email = payload['emp-email']
+		
+		employee = self.Employee(fname,lname,email)
+			
+		return employee
 
 		
 	def save(self,obj):

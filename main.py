@@ -300,21 +300,49 @@ def renderUpdateUserAccount():
 	else:
 		abort(401)
 
-@app.route('/new-employee',methods=['GET','POST'])
+@app.route('/new-employee', methods=['GET','POST'])
 @login_required
-def newEmplyee():
-	#alchemist.createRootAdmin()
-	return render_template('new-employee.html')	
+def addNewEmployee():
+	if request.method == 'GET':
+		return render_template('new-employee.html', username=session['name'], email=session['email'], updateRoute='update-admin-account')
 	
+	if request.method == 'POST':
+		payload = request.form
+		employee = alchemist.createEmployee(payload)
+		status = alchemist.save(employee)
+		
+		if status == False:
+			flash('Unable to create employee. System Error.',ERROR)
+			return redirect(url_for('addNewEmployee', username=session['name'], email=session['email']))
+		
+	flash('Employee Added: ' + employee.fname +' '+ employee.lname ,SUCCESS)
+	return redirect(url_for('renderEmployees', username=session['name'], email=session['email']))
 
-@app.route('/add-new-employee', methods=['GET','POST'])
+@app.route('/update-employee/',methods=['GET','POST'])
 @login_required
-def addNewEmplyee():
-	#add new employee to DB
-	#payload = request.form
-	#checking for a status of 200 to pop up "sucess" message
-	#status = alchemist.updateAccount(payload, Whatever goes here)
-	return redirect(url_for('new-employee', status=status))
+def renderUpdateEmployee():	
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			employeeID = request.args.get('employee')
+			employee = alchemist.getEmployee(employeeID)
+			
+			if employee is None:
+				abort(500)
+				
+			return render_template('update-employee.html',username=session['name'], email=session['email'], employee=employee,updateRoute='update-admin-account')
+			
+		if request.method == 'POST':
+			payload = request.form
+			status = alchemist.updateEmployee(payload)
+			
+			if status == False:
+				flash('Unable to employee information. System Error', ERROR)
+				return redirect(url_for('renderUpdateEmployee', username=session['name'], email=session['email']))
+				
+			flash('Employee information was successfully updated',SUCCESS)
+			return redirect(url_for('renderEmployees',username=session['name'], email=session['email']))
+	else:
+		abort(401)	
 
 @app.route('/awards')
 @login_required
