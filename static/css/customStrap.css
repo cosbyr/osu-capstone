@@ -75,6 +75,8 @@
   margin-top: 1em;
 }
 
+.inline-form { display: inline-block; }
+
 /* Creates loading spinner */
 
 /* Start by setting display:none to make this hidden.
