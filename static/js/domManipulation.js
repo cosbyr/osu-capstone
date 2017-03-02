@@ -207,6 +207,46 @@ $(document).ready(function(){
 	    });
 	});
 
+
+
+	/*for sucess message /new-employee */
+	$('#add-new-employee').on('submit', function(){
+		event.preventDefault();
+		var that = $(this),
+	      url = that.attr('action'),
+	      type = that.attr('method'),
+		  data = JSON.stringify({'fName': first-name, 'lName': last-name})
+	      console.log(data);
+
+		$.ajax(url, {
+			type: type,
+			data: data,
+			contentType: 'application/json',
+			dataType: 'json',
+
+			beforeSend: function(){
+		        $body.addClass("loading");
+		    },
+		    complete: function(){
+		        $body.removeClass("loading");
+		    },
+			success: function(response){
+				$('#add-new-employee').addClass("is-hidden");
+
+				if(response['status'] == 200){
+					$('#emplyee-added').removeClass('is-hidden');
+				}
+				else{
+					$('#emplyee-not-added').removeClass('is-hidden');
+				}			
+			},
+			error: function(jqXHR, exception){
+	      		console.log("error:");
+	      		console.log(jqXHR);
+	      		//display some error
+	      	}
+	    });
+
 	/*onlick for signature upload button*/
 	$("#file-load-button").click(function () {
 	    $("#file_input").click();

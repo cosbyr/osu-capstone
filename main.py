@@ -299,8 +299,23 @@ def renderUpdateUserAccount():
 			return redirect(url_for('renderUsers'))
 	else:
 		abort(401)
+
+@app.route('/new-employee',methods=['GET','POST'])
+@login_required
+def newEmplyee():
+	#alchemist.createRootAdmin()
+	return render_template('new-employee.html')	
 	
-	
+
+@app.route('/add-new-employee', methods=['GET','POST'])
+@login_required
+def addNewEmplyee():
+	#add new employee to DB
+	#payload = request.form
+	#checking for a status of 200 to pop up "sucess" message
+	#status = alchemist.updateAccount(payload, Whatever goes here)
+	return redirect(url_for('new-employee', status=status))
+
 @app.route('/awards')
 @login_required
 def renderAwards():

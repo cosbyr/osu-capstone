@@ -7,9 +7,9 @@
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
 	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
-	<li class="active" data-toggle="tab"><a href="/admins"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
-	<li><a href="/new-admin-account"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
-	<li><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
+	<li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
+	<li class="active" data-toggle="tab"><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
 	-->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li class="dropdown">
@@ -21,7 +21,7 @@
 			<li><a href="/new-manager-account">Add Users</a></li>
 		</ul>
 	</li>
-	<li class="dropdown active">
+	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
 		</a>
@@ -30,7 +30,7 @@
 			<li><a href="/new-admin-account">Add Admins</a></li>
 		</ul>
 	</li>
-	<li class="dropdown">
+	<li class="dropdown active">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
 			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
 		</a>
@@ -45,29 +45,34 @@
 
 {% block content %}
 	<div class="container">
-		<div>
-			{% if admins|length > 0 %}
-			<table class="table">
-				<tr>
-					<th>Admin</th>
-					<th>Create Date</th>
-					<th>Email</th>
-					<th>Edit Admin?</th>
-					<th>Delete Admin?</th>
-				</tr>
-				{% for admin in admins %}
-				<tr>
-					<td>{{admins[admin].admin}}</td>
-					<td>{{admins[admin].createdOn}}</td>
-					<td>{{admins[admin].adminEmail}}</td>
-					<td><a href="/update-admin-account/?adminemail={{admins[admin].adminEmail}}"<span class="glyphicon glyphicon-pencil"></span></a></td>
-					<td><a href="/remove-admin/?admin={{admins[admin].id}}"<span class="glyphicon glyphicon-remove"></span></a></td>
-				</tr>
-				{% endfor %}
-			</table>
-			{% else %}
-			<p>There are no admins other than yourself in the system.</p>
-			{% endif %}
+		<h1>Add new employee</h1>
+		<br>
+		<form class="form-horizontal" action="/add-employee" method="post" id="add-new-employee">
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="first-name">First name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="first-name" id="first-name" placeholder="First Name" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="last-name">Last name</label>
+				<div class="col-sm-6">
+					<input class="form-control" type="text" name="last-name" id="last-name" placeholder="Last Name" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<div class="col-sm-6 col-sm-offset-4">
+					<input type="submit" class="btn btn-primary">
+				</div>
+
+			</div>
+		</form>
+		<div class="col-sm-6 col-sm-offset-4 is-hidden" id="emplyee-added">
+			<h4>Employee Added</h4>
 		</div>
+		<div class="col-sm-6 col-sm-offset-4 is-hidden" id="emplyee-not-added">
+			<h4>Error: Employee not added</h4>
+		</div>
+		
 	</div>
 {% endblock content %}

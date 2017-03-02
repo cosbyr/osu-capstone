@@ -17,7 +17,7 @@
 			<span class="glyphicon glyphicon-user"></span> User Options <span class="caret"></span>
 		</a>
 		<ul class="dropdown-menu">
-			<li><a href="/users">View Users</li>
+			<li><a href="/users">View Users</a></li>
 			<li><a href="/new-manager-account">Add Users</a></li>
 		</ul>
 	</li>
@@ -26,7 +26,7 @@
 			<span class="glyphicon glyphicon-globe"></span> Admin Options <span class="caret"></span>
 		</a>
 		<ul class="dropdown-menu">
-			<li><a href="/admins">View Admins</li>
+			<li><a href="/admins">View Admins</a></li>
 			<li><a href="/new-admin-account">Add Admins</a></li>
 		</ul>
 	</li>
@@ -35,7 +35,7 @@
 			<span class="glyphicon glyphicon-certificate"></span> Award Options <span class="caret"></span>
 		</a>
 		<ul class="dropdown-menu">
-			<li><a href="#">Add Employees</li>
+			<li><a href="/new-employee">Add Employees</a></li>
 			<li><a href="/employees-list">View Employees</a></li>
 			<li><a href="/award-types">Add Award Types</a></li>
 			<li><a href="/reports">Award Reports</a></li>
@@ -45,8 +45,8 @@
 
 {% block content %}
 	<div class="container">
-	<h1>Admin Home</h1>
-	<hr>
+		<h1>Admin Home</h1>
+		<hr>
 		<div class="row">
 		<!-- users -->
 			<div class="col-sm-6 col-md-3">
@@ -74,6 +74,7 @@
 					</div>
 				</div>
 			</div>
+			<!-- Awards -->
 			<div class="col-sm-6 col-md-3">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
@@ -82,7 +83,7 @@
 					<div class="panel-body">
 						<a href="/award-types" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-star-empty"></span> Add Award Types</a>
 						<a href="/employees-list" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-briefcase"></span> View Employees</a>
-						<a href="#" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus"></span> Add New Employee</a>
+						<a href="/new-employee" class="btn btn-default btn-lg btn-block"><span class="glyphicon glyphicon-plus"></span> Add New Employee</a>
 					</div>
 				</div>
 			</div>
@@ -98,4 +99,5 @@
 			</div>
 		</div>
 	</div>
+	
 {% endblock content %}
