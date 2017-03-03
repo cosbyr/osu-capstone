@@ -236,7 +236,31 @@ def renderUpdateAdminAccount():
 			return redirect(url_for('renderAdmins'))
 	else:
 		abort(401)
+
+@app.route('/update-other-admin-account/',methods=['GET','POST'])
+@login_required
+def renderUpdateOtherAdminAccount():	
+	if session['role'] == 'admin':
+		if request.method == 'GET':
+			session['admin-email'] = request.args.get('adminemail')
+			details = alchemist.getAdminDetails(session['admin-email'])
+			
+			if details is None:
+				abort(500)
+				
+			return render_template('update-other-admin-account.html',username=session['name'], email=session['email'], details=details, updateRoute='update-admin-account')
 		
+	if request.method == 'POST':
+		payload = request.form
+		status = alchemist.updateAdminAccount(payload,session['admin-email'])		
+		if status == False:
+			flash('Unable to update admin account. Either the email provided is already linked to an account or there was a server error. Please, try again.', ERROR)
+			return redirect(url_for('renderOtherUpdateAdminAccount', username=session['name'], email=session['email'], details=details, updateRoute='update-admin-account'))
+			
+		flash('Admin account was successfully updated.',SUCCESS)
+		return redirect(url_for('renderAdmins'))
+	else:
+		abort(401)
 		
 @app.route('/remove-admin/')
 def removeAdminUser():
