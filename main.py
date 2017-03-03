@@ -569,12 +569,14 @@ def renderPDF():
 	
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
+	print(type(request))
+	sys.stdout.flush()
 	if request.json:
 		payload = request.get_json()
 		employees = alchemist.getEmployees(payload)
 		return jsonify(employees)
 	else:
-		abort(400) #put error on create page
+		abort(400)
 		
 @app.route('/employees-list')
 def renderEmployees():

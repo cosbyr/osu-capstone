@@ -15,7 +15,7 @@ $(document).ready(function(){
 	      url = that.attr('action'),
 	      type = that.attr('method'),
 	      data = $("#last-name").val();
-	      data = '{"lname":"' + data + '"}';
+	      data = JSON.stringify({'lname':data});
 	      //console.log(data);
 
 	  	$.ajax('/get-employee', {
@@ -245,11 +245,11 @@ $(document).ready(function(){
 	      		//display some error
 	      	}
 	    });
+
 	});
 
 
 });
-
 
 /*checks that the passwords are the same*/
 function checkPass() {
@@ -283,7 +283,6 @@ function checkPass() {
         $(message).addClass('text-danger');
         $(message).html('Passwords Do Not Match!');
     }
-
 }
 
 
