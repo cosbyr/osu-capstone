@@ -1,29 +1,7 @@
 google.charts.load('current', {packages: ['corechart','table']});
-/*
-google.charts.setOnLoadCallback(drawAllAwards);
-google.charts.setOnLoadCallback(drawAwardsByManager);
-google.charts.setOnLoadCallback(drawAwardsByEmployee);
-google.charts.setOnLoadCallback(drawAwardsByDate);
-
-function drawAllAwards(){
-	
-}
-
-function drawAwardsByManager(){
-	
-}
-
-function drawAwardsByEmployee(){
-	
-}
-
-function drawAwardsByDate(){
-	
-}
-*/
 
 $(document).ready(function(){
-	//all awards report
+	//all awards report (1)
 	$('#all-awards-form').on('submit',function(){
 		event.preventDefault();
 		
@@ -79,7 +57,7 @@ $(document).ready(function(){
 	});
 	
 	
-	//awards by manager report
+	//awards by manager report (2)
 	$('#award-by-manager-form').on('submit',function(){
 		event.preventDefault();
 		
@@ -99,62 +77,8 @@ $(document).ready(function(){
 			dataType:'json',
 			
 			success: function(response){
-				var table;
-				var chart;
-				var chartOptions;
-				var types;
-				var info = [];
-				var managerData = new google.visualization.DataTable();
-				managerData.addColumn('string', 'Name');
-				managerData.addColumn('string', 'Title');
-				
 				if(response['status'] == 200){
 					google.charts.setOnLoadCallback(function(){
-						
-						//form data object out of response for arrayToDataTable() function
-						types = response['types'];
-						types.unshift('Type')
-						types.push({role:'annotation'});
-						info.push(types);
-						
-						for(element in response){
-							if(element != 'status' && element != 'types'){
-								managerData.addRow([response[element]['name'],response[element]['title']]);
-							}
-						}
-						/*for(element in response){
-							var lst = [];
-
-							if(element != 'status' && element != 'types'){
-								lst.push(response[element]['name']);
-								managerData.addRow([response[element]['name'],response[element]['title']]);
-								
-								for(key in response[element]){
-									if(key != 'name' && key != 'title'){
-										lst.push(response[element][key]);
-									}
-								}
-								lst.push('');
-								info.push(lst);
-							}
-						}*/
-						//-------------------------------------------------------------------------------
-						
-						//set default award chart value
-						var defaultData = google.visualization.arrayToDataTable([info[0],['Select Manager(s) From Table',0,0,'']]);
-						
-						//award chart options
-						chartOptions = {
-							title:'Awards By Manager',
-							legend: { position: 'top', maxLines: 3 },
-							bar: { groupWidth: '75%' },
-							isStacked: true,
-							width: 800,
-							height: 400,
-							vAxis: {title:'Number of Awards', minValue:0, maxValue:4, format:'0'},
-							animation:{startup:true,duration:900}
-						};
-						
 						//create html to house manager table and award chart
 						var htmlStr = '<table id="award-manager-table">' +
 										'<tr>' +
@@ -164,66 +88,75 @@ $(document).ready(function(){
 									  '</table>';
 						$('#award-report').append(htmlStr);
 						
+						//init number of award types to display in award chart
+						var lst = [];
+						for(var i = 1; i < response['awards'][0].length - 1;i++){
+							lst.push(0);
+						}
+						
+						//generate manager table rows
+						var managerTable = google.visualization.arrayToDataTable(response['managers']);
+						
 						//draw manager table
-						table = new google.visualization.Table(document.getElementById('manager-table'));
-						table.draw(managerData,{width:300,height:200});
+						var table = new google.visualization.Table(document.getElementById('manager-table'));
+						table.draw(managerTable,{width:300,height:200});
+						
+						//set default award chart value
+						var defaultData = google.visualization.arrayToDataTable([response['awards'][0],['Select Manager(s) From Table'].concat(lst).concat([''])]);
+						
+						//default award chart options
+						chartOptions = {
+							title:'Awards By Manager',
+							legend: {position: 'top', maxLines: 3},
+							bar: {groupWidth: '75%'},
+							isStacked: true,
+							width: 800,
+							height: 400,
+							vAxis: {title:'Number of Awards', minValue:0, maxValue:4, format:'0'},
+							animation:{startup:true,duration:900}
+						};
 						
 						//draw default award chart
-						chart = new google.visualization.ColumnChart(document.getElementById('award-chart'));
+						var chart = new google.visualization.ColumnChart(document.getElementById('award-chart'));
 						chart.draw(defaultData,chartOptions);
-					});
-					
-					console.log('info:');
-					console.log(info);
-					console.log('manager data:');
-					console.log(managerData);
-					
-					//add select event listener on manager table
-					//gets list of managers selected in the table
-					google.visualization.events.addListener(table, 'select', function(){
-						var selection = table.getSelection();
-						if(selection.length > 0){
-							var managers = [];
-							for(var i = 0; i < selection.length; i++){
-								managers.push(managerData.getFormattedValue(selection[i].row,0));
-							}
-							
-							for(element in response){
-								var lst = [];
-
-								if(element != 'status' && element != 'types'){
-									if(managers.indexOf(response[element]['name']) != -1){
-										lst.push(response[element]['name']);
-										
-										for(key in response[element]){
-											if(key != 'name' && key != 'title'){
-												lst.push(response[element][key]);
-											}
-										}
-										lst.push('');
-										info.push(lst);
-									}
+						
+						//add select event listener on manager table
+						google.visualization.events.addListener(table, 'select', function(){
+							//gets list of managers selected in the table
+							var selection = table.getSelection();
+							if(selection.length > 0){
+								var managers = [];
+								for(var i = 0; i < selection.length; i++){
+									managers.push(managerTable.getFormattedValue(selection[i].row,0));
 								}
+								
+								//get data for selected managers
+								var newInfo = [response['awards'][0]];
+								for(var i = 1; i < response['awards'].length; i++){
+									if(managers.indexOf(response['awards'][i][0]) != -1){
+										newInfo.push(response['awards'][i]);
+									} 
+								}
+								
+								//redraw award chart
+								var chartData = google.visualization.arrayToDataTable(newInfo);
+								chart = new google.visualization.ColumnChart(document.getElementById('award-chart'));
+								chartOptions = {
+									title:'Awards By Manager',
+									legend: { position: 'top', maxLines: 3 },
+									bar: { groupWidth: '75%' },
+									isStacked: true,
+									width: 800,
+									height: 400,
+									vAxis: {title:'Number of Awards',minValue:4, viewWindow:{min:0},format:'0'},
+									animation:{startup:true,duration:900}
+								};
+								chart.draw(chartData,chartOptions);
+								
+								//clean up newInfo array
+								newInfo.splice(1,newInfo.length);
 							}
-							
-							//redraw award chart
-							chartOptions = {
-								title:'Awards By Manager',
-								legend: { position: 'top', maxLines: 3 },
-								bar: { groupWidth: '75%' },
-								isStacked: true,
-								width: 800,
-								height: 400,
-								vAxis: {title:'Number of Awards',minValue:4, viewWindow:{min:0},format:'0'},
-								animation:{startup:true,duration:900}
-							};
-							var chartData = google.visualization.arrayToDataTable(info);
-							chart = new google.visualization.ColumnChart(document.getElementById('award-chart'));
-							chart.draw(chartData,chartOptions);
-							
-							//clean up info array
-							info.splice(1,info.length);
-						}
+						});
 					});
 				}
 				else{
