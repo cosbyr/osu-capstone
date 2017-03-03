@@ -2,12 +2,10 @@ $(document).ready(function(){
 
 	$body = $("body");
 	
-	//causes freeze after answering security questions
-	// $(document).on({
-	//     ajaxStart: function() { 
-	//     	$body.addClass("loading");    
-	// 	}    
-	// });
+	/*onlick for signature upload button*/
+	$("#file-load-button").click(function (){
+	    $("#file_input").click();
+	});
 	
 	/* for find employee form on create a new award */
 	$('#get-employee-form').on('submit', function(e){
@@ -208,6 +206,7 @@ $(document).ready(function(){
 	});
 
 
+	
 
 	/*for sucess message /new-employee */
 	$('#add-new-employee').on('submit', function(){
@@ -246,11 +245,9 @@ $(document).ready(function(){
 	      		//display some error
 	      	}
 	    });
-
-	/*onlick for signature upload button*/
-	$("#file-load-button").click(function () {
-	    $("#file_input").click();
 	});
+
+
 });
 
 
