@@ -1,3 +1,20 @@
+
+	function uploadPreReqs(){
+		uploadButton = document.getElementById("file-load-button");
+		if (document.getElementById("firstName").value &&
+			document.getElementById("firstName").value != '' &&
+			document.getElementById("lastName").value &&
+			document.getElementById("lastName").value != '' &&
+			document.getElementById("email").value &&
+			document.getElementById("email").value != '') {
+			uploadButton.disabled = false;
+		}
+		else{
+			uploadButton.disabled = true;
+		}
+	}
+	
+	
 	function deleteTempFile(filename){
 		const xhr = new XMLHttpRequest();
 		xhr.open('GET', "/delete_s3/?file_name="+filename);
