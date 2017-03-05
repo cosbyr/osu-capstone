@@ -52,20 +52,20 @@
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="firstName">First Name</label>
 					<div class="col-sm-6">
-						<input class="form-control" type="text" id="firstName" name="firstName" required >
+						<input class="form-control" type="text" id="firstName" name="firstName" onblur="uploadPreReqs()" required >
 					</div>
 				</div>
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="lastName">Last Name</label>
 					<div class="col-sm-6">
-						<input class="form-control" type="text" id="lastName" name="lastName" required >
+						<input class="form-control" type="text" id="lastName" name="lastName" onblur="uploadPreReqs()" required >
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label class="col-sm-4 control-label" for="email">Email</label>
 					<div class="col-sm-6">
-						<input class="form-control" type="email" id='email' name="email" required >
+						<input class="form-control" type="email" id='email' name="email" onblur="uploadPreReqs()" required >
 					</div>
 				</div>
 				<div class="form-group">
@@ -117,14 +117,14 @@
 					</div>
 				</div>
 				<!-- the file upload. the input is hidden behind my button -->
+				<div class="is-transparent">
+					<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required>
+				</div>
 				<div class="form-group">
 					<label class="col-sm-4 control-label">Upload Signature</label>
 					<div class="col-sm-6">
-						<span class="btn btn-default" id="file-load-button">Upload</span>
+						<button type="button" class="btn btn-default" id="file-load-button" disabled=true>Upload</button>
 					</div>
-				</div>
-				<div class="is-hidden">
-					<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required>
 				</div>
 
 				<div class="form-group">

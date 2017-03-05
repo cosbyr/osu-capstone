@@ -14,7 +14,6 @@
 		}
 	}
 	
-	
 	function deleteTempFile(filename){
 		const xhr = new XMLHttpRequest();
 		xhr.open('GET', "/delete_s3/?file_name="+filename);
@@ -39,7 +38,7 @@
             document.getElementById('sig-url').value = url;
           }
           else{
-            alert('Could not upload file.');
+            //alert('Could not upload file.');
           }
         }
       };
@@ -64,12 +63,12 @@
             document.getElementById('preview').src = url;
           }
           else{
-            alert('Could not upload file.');
+            //alert('Could not upload file.');
           }
         }
       };
       xhr.send(postData);
-	  deleteTempFile(filename);
+	  //deleteTempFile(filename);
     }
     /*
       Function to get the temporary signed request from the Python app.
@@ -94,7 +93,7 @@
             uploadFile(file, response.data, response.url);
           }
           else{
-            alert('Could not get signed URL.');
+            //alert('Could not get signed URL.');
           }
         }
       };
@@ -106,7 +105,7 @@
             uploadTempFile(file, response.data, response.url, tempFile);
           }
           else{
-            alert('Could not get signed URL.');
+            //alert('Could not get signed URL.');
           }
         }
       };
@@ -121,7 +120,7 @@
       const files = document.getElementById('file_input').files;
       const file = files[0];
       if(!file){
-        return alert('No file selected.');
+        //return alert('No file selected.');
       }
       getSignedRequest(file);
     }

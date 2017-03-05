@@ -77,14 +77,14 @@
 					</div>
 				</div>
 				<!-- the file upload. the input is hidden behind my button -->
+				<div class="is-transparent">
+					<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required >
+				</div>
 				<div class="form-group">
 					<label class="col-sm-4 control-label">Upload Signature</label>
 					<div class="col-sm-6">
-						<button class="btn btn-default" id="file-load-button" disabled=true>Upload</button>
+						<button type="button" class="btn btn-default" id="file-load-button" disabled=true>Upload</button>
 					</div>
-				</div>
-				<div class="is-hidden">
-					<input type="file" name="sigfile" value="/static/images/ex-sig.png" id="file_input" accept=".png" required>
 				</div>
 
 				<div class="form-group">

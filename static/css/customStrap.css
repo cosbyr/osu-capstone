@@ -46,6 +46,12 @@
 	display: none;
 }
 
+.is-transparent {
+	opacity:0;
+	filter:alpha(opacity=0);
+	position:absolute;
+}
+
 .uppercase {
 	text-transform: uppercase;
 }

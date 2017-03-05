@@ -95,7 +95,7 @@
 			<div class="form-group">
 				<label class="col-sm-4 control-label">Upload Signature</label>
 				<div class="col-sm-6">
-					<button class="btn btn-default" id="file-load-button">Upload</button>
+					<button type="button" class="btn btn-default" id="file-load-button" disabled=true>Upload</button>
 				</div>
 			</div>
 			<div class="is-hidden">
@@ -109,7 +109,7 @@
 				</div>
 			</div>
 
-				<input type="hidden" id="sig-url" name="signature" value="/static/images/ex-sig.png" >
+				<input type="hidden" id="sig-url" name="signature" value="{{details.signature}}" >
 				
 			<div class="form-group">
 				<div class="col-sm-6 col-sm-offset-4">
