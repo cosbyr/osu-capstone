@@ -144,7 +144,7 @@ def renderUpdateAccount():
 			session['name'] = '{0} {1}'.format(payload['firstName'],payload['lastName'])
 			session['email'] = payload['email']
 			session['title'] = payload['jobTitle']
-			flash('Account was successfully updated.',SUCCESS)
+			##flash('Account was successfully updated.',SUCCESS) <---this is not displaying correctly
 			return redirect(url_for('renderUser'))
 	else:
 		abort(401)
