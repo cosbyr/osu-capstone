@@ -207,8 +207,8 @@ $(document).ready(function(){
 
 
 	
-
-	/*for sucess message /new-employee */
+/*
+	//for sucess message /new-employee
 	$('#add-new-employee').on('submit', function(){
 		event.preventDefault();
 		var that = $(this),
@@ -253,7 +253,7 @@ $(document).ready(function(){
 	});
 
 
-});
+});*/
 
 /*checks that the passwords are the same*/
 function checkPass() {
