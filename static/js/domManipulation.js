@@ -95,12 +95,12 @@ $(document).ready(function(){
 	var email = $("#reset-password").on('submit', function(){
 		event.preventDefault();
 		var that = $(this),
-	      url = that.attr('action'),
-	      type = that.attr('method'),
-	      radioValue = $("input[name='reset-method']:checked").val();
-	      email = $("input[name='email']").val();
-		  data = JSON.stringify({'email':email, 'reset-method':radioValue})
-	      console.log(data);
+		url = that.attr('action'),
+		type = that.attr('method'),
+		radioValue = $("input[name='reset-method']:checked").val();
+		email = $("input[name='email']").val();
+		data = JSON.stringify({'email':email, 'reset-method':radioValue})
+		console.log(data);
 		
 
 		$.ajax(url,{
@@ -214,8 +214,12 @@ $(document).ready(function(){
 		var that = $(this),
 	      url = that.attr('action'),
 	      type = that.attr('method'),
-		  data = JSON.stringify({'fName': first-name, 'lName': last-name})
+	      firstName = $('#firstName').val();
+	      lastName = $('#lastName').val();
+	      email =  $('#empEmail').val();
+		  data = JSON.stringify({'fname': firstName, 'lname': lastName, 'email' : email })
 	      console.log(data);
+	      console.log("button clicked");
 
 		$.ajax(url, {
 			type: type,
