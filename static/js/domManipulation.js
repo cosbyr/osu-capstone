@@ -250,10 +250,10 @@ $(document).ready(function(){
 	      	}
 	    });
 
-	});
+	});*/
 
 
-});*/
+});
 
 /*checks that the passwords are the same*/
 function checkPass() {
