@@ -459,6 +459,8 @@ def renderReports():
 					response = reporter.getAllAwards()
 				elif payload['report'] == '2':
 					response = reporter.getAwardsByManager()
+				elif payload['report'] == '3':
+					response = reporter.getAwardsByEmployee()
 				else:
 					abort(400)
 					

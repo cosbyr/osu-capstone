@@ -60,16 +60,21 @@
 			</div>
 		</form>
 
-		<form class="inline-form" id="award-by-manager-form" method="post" action="/reports">
+		<form class="inline-form" id="award-by-employee-form" method="post" action="/reports">
 			<div class="form-group">
 				<input type="hidden" id="award-by-employee" name="award-type" value="3">
+				<button type="submit" class="btn btn-primary" id="award-by-employee-btn">Awards By Employee</button>
+			</div>
+		</form>
+		<form class="inline-form" id="award-by-manager-form" method="post" action="/reports">
+			<div class="form-group">
+				<input type="hidden" id="award-by-employee" name="award-type" value="4">
 				<button type="submit" class="btn btn-primary" id="award-by-employee-btn">Awards By Type</button>
 			</div>
 		</form>
-
 		<form class="inline-form" id="award-by-manager-form" method="post" action="/reports">
 			<div class="form-group">
-				<input type="hidden" id="award-by-date" name="award-type" value="4">
+				<input type="hidden" id="award-by-date" name="award-type" value="5">
 				<button type="submit" class="btn btn-primary" id="award-by-date-btn">Awards By Date</button>
 			</div>
 		</form>
