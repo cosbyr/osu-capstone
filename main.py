@@ -161,17 +161,6 @@ def renderCreate():
 	else:
 		abort(401)
 
-'''
-#i think this functionality is actually handled by the awards route down below
-@app.route('/history')
-@login_required
-def renderHistory():
-	if session['role'] == 'user':
-		return render_template('history.html',username=session['name'])
-	else:
-		abort(401)
-'''
-
 @app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
 	if request.method == 'GET':
@@ -518,6 +507,10 @@ def renderPDF():
 	sys.stdout.flush()
 	
 	award = alchemist.createAward(payload, session['email'])
+	
+	if award is None:
+		abort(404)
+		
 	status = alchemist.save(award)
 			
 	if status == False:

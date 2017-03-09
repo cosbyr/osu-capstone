@@ -323,6 +323,9 @@ class PostgresDatabase(object):
 		creator = self.Manager.query.filter_by(email=email).first()
 		awardType = self.AwardType.query.get(payload['type'])
 
+		if creator is None or awardType is None:
+			return None
+			
 		creatorId = creator.id
 		typeId = awardType.id
 		message = payload['message']

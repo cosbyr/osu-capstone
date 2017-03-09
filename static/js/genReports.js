@@ -1,4 +1,4 @@
-google.charts.load('current', {packages: ['corechart','table']});
+google.charts.load('current', {packages: ['corechart','table','calendar']});
 
 $(document).ready(function(){
 	//all awards report (1)
@@ -122,6 +122,12 @@ $(document).ready(function(){
 						
 						//add select event listener on manager table
 						google.visualization.events.addListener(table, 'select', function(){
+							//remove calendar chart
+							if($('#calendar-chart').length){
+								$('#calendar-chart').remove();
+								$('.chart-separator').remove();
+							}
+									
 							//gets list of managers selected in the table
 							var selection = table.getSelection();
 							if(selection.length > 0){
@@ -155,6 +161,82 @@ $(document).ready(function(){
 								
 								//clean up newInfo array
 								newInfo.splice(1,newInfo.length);
+								
+								//add select event to bar chart
+								google.visualization.events.addListener(chart, 'select', function(){
+									
+									//reset calendar chart
+									if($('#calendar-chart').length){
+										$('#calendar-chart').remove();
+										$('.chart-separator').remove();
+									}
+									
+									//response['dates'] index constants
+									const FNAME_INDEX = 0;
+									const LNAME_INDEX = 1;
+									const TYPE_INDEX = 2;
+									const DATE_INDEX = 3;
+									const COUNT_INDEX = 4;
+									
+									//get selection data
+									let selection = chart.getSelection();
+									if(selection.length > 0){
+										let managerName = chartData.getFormattedValue(selection[0].row,0);
+										let awardType = chartData.getColumnLabel(selection[0].column);
+										console.log(managerName + ' ' + awardType);
+										
+										//create html to display chart
+										$('#award-report').after("<br class='chart-separator'><br class='chart-separator'><div id='calendar-chart'></div>");
+										
+										//init chart and data table
+										let calendarChartDataTable = new google.visualization.DataTable();
+										let calendarChart = new google.visualization.Calendar(document.getElementById('calendar-chart'));
+										
+										//create chart header
+										calendarChartDataTable.addColumn({type:'date',id:'Date' });
+										calendarChartDataTable.addColumn({type:'number',id:'Awards granted' });
+										
+										//add data to table
+										var years = []
+										for(var i = 0; i < response['dates'].length; i++){
+											//console.log(new Date(response['dates'][i][DATE_INDEX]));
+											let curName = response['dates'][i][FNAME_INDEX] + ' ' + response['dates'][i][LNAME_INDEX];
+											let curType = response['dates'][i][TYPE_INDEX];
+											if((curName === managerName) && (curType === awardType)){
+												//convert date to milliseconds
+												let date = new Date(Date.parse(response['dates'][i][DATE_INDEX]));
+												
+												//get UTC year, month and day
+												//this has to be done because js assumes the date object in the GMT tz and converts to the browser's tz
+												let year = date.getUTCFullYear();
+												let month = date.getUTCMonth();
+												let day = date.getUTCDate();
+												
+												if(years.indexOf(year) < 0){
+													years.push(year);
+												}
+												//create a new date object and pass it to the calendar chart
+												date = new Date(year,month,day);
+												calendarChartDataTable.addRow([date,response['dates'][i][COUNT_INDEX]]);
+											}
+										}
+										
+										//draw chart
+										var options = {
+											title: awardType,
+											height: years.length * 200,
+											noDataPattern: {
+												backgroundColor: '#ffffff',
+												color: '#dbedda'
+											 },
+											 colorAxis: {
+												minValue: 0,  colors: ['#9bffe6', '#0645aa']
+											}
+										};
+
+										calendarChart.draw(calendarChartDataTable, options);
+									}
+								});
 							}
 						});
 					});
@@ -170,7 +252,7 @@ $(document).ready(function(){
 		});
 	});
 	
-	//awards by manager report (3)
+	//awards by employee report (3)
 	$('#award-by-employee-form').on('submit',function(){
 		event.preventDefault();
 		
