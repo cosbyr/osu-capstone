@@ -7,23 +7,40 @@ from handlers.Database import models
 class Reporter(object):
 	def __init__(self,database):
 		self.db = database
-		
+	
+	
 	def getAllAwards(self):
-		awards = {}
-		results = self.db.session.query(models.Award).all()
+		TYPE_INDEX = 0
+		COUNT_INDEX = 1
 		
-		if results is not None:
-			for r in results:
-				if r.award_type.name not in awards:
-					awards[r.award_type.name] = 1
-				else:
-					awards[r.award_type.name] += 1
+		response = {}
+		
+		#awards = self.db.session.query(models.Award).all()
+		#get award count grouped by type
+		awardCount = self.db.session \
+		.query(models.AwardType.name,self.db.func.count(models.Award.type_id)) \
+		.select_from(models.AwardType) \
+		.join(models.Award,models.AwardType.id==models.Award.type_id) \
+		.group_by(models.AwardType.name).all()
+		
+		#get awards grouped by date
+		awardDates = self.db.session \
+		.query(models.AwardType.name,models.Award.issuedOn,self.db.func.count(models.Award.type_id)) \
+		.select_from(models.AwardType) \
+		.join(models.Award,models.AwardType.id==models.Award.type_id) \
+		.group_by(models.AwardType.name,models.Award.issuedOn) \
+		.order_by(models.Award.issuedOn).all()
+		
+		if awardCount is not None and awardDates is not None:
+			for a in awardCount:
+				response[a[TYPE_INDEX]] = a[COUNT_INDEX]
 			
-			awards['status'] = 200
+			response['dates'] = awardDates
+			response['status'] = 200
 		else:
-			awards['status'] = 404 
-			
-		return awards
+			response['status'] = 404
+		
+		return response
 	
 	
 	def getAwardsByEmployee(self):
@@ -34,8 +51,10 @@ class Reporter(object):
 		TYPE = 4
 		COUNT = 5
 		
-		#get award data
+		#get award types
 		types = self.db.session.query(models.AwardType).all()
+		
+		#get award type count by employee
 		awards = self.db.session \
 		.query(models.Award.recipient,models.Employee.fname,models.Employee.lname, models.Employee.email, models.AwardType.name,self.db.func.count(models.Award.type_id)) \
 		.select_from(models.Award) \
@@ -43,9 +62,18 @@ class Reporter(object):
 		.join(models.AwardType,models.AwardType.id==models.Award.type_id) \
 		.group_by(models.Award.recipient,models.Employee.fname,models.Employee.lname, models.Employee.email, models.AwardType.name).all()
 		
+		#get award grouped by date and type
+		awardDates = self.db.session \
+		.query(models.Employee.fname,models.Employee.lname,models.AwardType.name,models.Award.issuedOn,self.db.func.count(models.Award.type_id)) \
+		.select_from(models.Employee) \
+		.join(models.Award,models.Employee.id==models.Award.recipient) \
+		.join(models.AwardType,models.Award.type_id==models.AwardType.id) \
+		.group_by(models.Employee.fname,models.Employee.lname,models.AwardType.name,models.Award.issuedOn) \
+		.order_by(models.Employee.lname,models.Award.issuedOn).all()
+		
 		if types is not None and awards is not None:
 			#init data dict
-			data = {'employees':[['Name', 'Email']],'awards':[['Employee'] + [t.name for t in types] + [{'role':'annotation'}]]}
+			data = {'employees':[['Name', 'Email']],'awards':[['Employee'] + [t.name for t in types] + [{'role':'annotation'}]],'dates':awardDates}
 			
 			history = []
 			for a in awards:			
@@ -66,7 +94,8 @@ class Reporter(object):
 			data['status'] = 404
 			
 		return data
-		
+	
+	
 	def getAwardsByManager(self):
 		ID = 0
 		FNAME = 1
@@ -75,8 +104,10 @@ class Reporter(object):
 		TYPE = 4
 		COUNT = 5
 		
-		#get award data
+		#get award types
 		types = self.db.session.query(models.AwardType).all()
+		
+		#get award type count by manager
 		awards = self.db.session \
 		.query(models.Award.creator,models.Manager.fname,models.Manager.lname,models.Manager.title,models.AwardType.name,self.db.func.count(models.Award.type_id)) \
 		.select_from(models.Award) \
@@ -84,7 +115,7 @@ class Reporter(object):
 		.join(models.AwardType,models.AwardType.id==models.Award.type_id) \
 		.group_by(models.Award.creator,models.Manager.fname,models.Manager.lname,models.Manager.title,models.AwardType.name).all()
 		
-		#get award dates
+		#get award grouped by date and type
 		awardDates = self.db.session \
 		.query(models.Manager.fname,models.Manager.lname,models.AwardType.name,models.Award.issuedOn,self.db.func.count(models.Award.type_id)) \
 		.select_from(models.Manager) \
@@ -92,7 +123,8 @@ class Reporter(object):
 		.join(models.AwardType,models.Award.type_id==models.AwardType.id) \
 		.group_by(models.Manager.fname,models.Manager.lname,models.AwardType.name,models.Award.issuedOn) \
 		.order_by(models.Manager.lname,models.Award.issuedOn).all()
-			
+		
+		
 		if types is not None and awards is not None:
 			#init data dict
 			data = {'managers':[['Name','Title']],'awards':[['Manager'] + [t.name for t in types] + [{'role':'annotation'}]],'dates':awardDates}
