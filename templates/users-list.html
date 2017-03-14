@@ -1,16 +1,10 @@
+<!-- in admin view: lists all users -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<!--
-	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
-	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
-	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
-	<li class="active" data-toggle="tab"><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
-	-->
+	<!-- nave bar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li class="dropdown active">
 		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -46,6 +40,7 @@
 {% block content %}
 	<div class="container">
 		<div class="table-responsive">
+			<!-- created user table -->
 			{% if users|length > 0 %}
 			<table class="table">
 				<tr>
@@ -56,6 +51,7 @@
 					<th>Edit User?</th>
 					<th>Delete User?</th>
 				</tr>
+				<!-- fills table from data base -->
 				{% for user in users %}
 				<tr>
 					<td>{{users[user].user}}</td>
@@ -67,6 +63,7 @@
 				</tr>
 				{% endfor %}
 			</table>
+			<!-- if there are no users in the system -->
 			{% else %}
 			<p>There are no users in the system.</p>
 			{% endif %}

@@ -1,3 +1,4 @@
+<!-- in admin view: shows reports -->
 {% extends "loggedInBase.html" %}
 
 {% block head %}
@@ -8,6 +9,7 @@
 {% endblock head %}
 
 {% block activeNav %}
+	<!-- navbar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li class="dropdown">
 		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -45,21 +47,21 @@
 		<h1>Reports</h1>
 		<br>
 		<h4>Choose Report To View</h4>
+		<!-- all awards -->
 		<form class="inline-form" id="all-awards-form" method="post" action="/reports">
 			<div class="form-group">
 				<input type="hidden" id="all-awards-report" name="all-awards" value="1">
 				<button type="submit" class="btn btn-primary" id="all-awards-btn">All Awards</button>
 			</div>
 		</form>
-
-
+		<!-- awards by user -->
 		<form class="inline-form" id="award-by-manager-form" method="post" action="/reports">
 			<div class="form-group">
 				<input type="hidden" id="award-by-manager" name="award-type" value="2">
 				<button type="submit" class="btn btn-primary" id="award-by-manager-btn">Awards By User</button>
 			</div>
 		</form>
-
+		<!-- awards by recipient -->
 		<form class="inline-form" id="award-by-employee-form" method="post" action="/reports">
 			<div class="form-group">
 				<input type="hidden" id="award-by-employee" name="award-type" value="3">
