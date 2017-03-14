@@ -1,8 +1,10 @@
+<!-- in user view: creates new award -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
+	<!-- navbar -->
 	<li><a href="/user"><span class="glyphicon glyphicon-home"></span> User Home</a></li>
 	<li class="active" data-toggle="tab"><a href="/create"><span class="glyphicon glyphicon-pencil"></span> Create Award</a></li>
 	<li><a href="/awards"><span class="glyphicon glyphicon-tower"></span> List Awards</a></li>
@@ -14,6 +16,7 @@
 		<div class="col-sm-12">
 			<h1>Create New Award</h1>
 		</div>
+		<!-- query for employee -->
 		<form class="form-horizontal" action="/get-employee" method="post" id="get-employee-form">
 			<div class="row">
 				<label class="col-sm-4 control-label" for="last-name">Find Employee</label>
@@ -23,26 +26,22 @@
 						<span class="input-group-btn">
 							<button class="btn btn-primary" type="submit">Search</button>
 						</span>
-					</div><!-- /input-group -->
-				</div><!-- /.col-lg-6 -->
-			</div><!-- /.row -->
-		</form>
-
-
-		<br>
-		<!-- ADD is-hidden BACK IN -->
-		<form class="form-horizontal" action="/latex" method="post"  id="find-employees">
-			
-			<!-- choose employee created via domManipulation.js -->
-			
-				<div class="form-group">
-					<label class="col-sm-4 control-label" for="choose-employee">Choose employee</label>
-					<div class="col-sm-6">
-						<select class="form-control" id="choose-employee" name="employee-to-get-award"></select>
 					</div>
 				</div>
-			
+			</div>
+		</form>
 
+		<br>
+		
+		<!-- create award form -->
+		<form class="form-horizontal" action="/latex" method="post"  id="find-employees">
+			<!-- choose employee created via domManipulation.js -->
+			<div class="form-group">
+				<label class="col-sm-4 control-label" for="choose-employee">Choose employee</label>
+				<div class="col-sm-6">
+					<select class="form-control" id="choose-employee" name="employee-to-get-award"></select>
+				</div>
+			</div>
 
 			<!-- Choose award type -->
 			<div class="form-group">
@@ -59,19 +58,16 @@
 			<!-- Display background options -->
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="award-background">Choose Award Background</label>
-				
-					<div class="col-sm-6" id="award-background">
-
-					{% for key,value in awardBackgrounds.iteritems() %}
-						<div class="col-sm-6">
-							<label>
-								<input class="is-hidden" type="radio" name="background" value="{{ key }}" />
-								<img class="img-responsive thumbnail background-choice" src="../static/images/{{ value }}"" alt="{{ value }}" />
-							</label>							
-						</div>
-					{% endfor %}
+				<div class="col-sm-6" id="award-background">
+				{% for key,value in awardBackgrounds.iteritems() %}
+					<div class="col-sm-6">
+						<label>
+							<input class="is-hidden" type="radio" name="background" value="{{ key }}" />
+							<img class="img-responsive thumbnail background-choice" src="../static/images/{{ value }}"" alt="{{ value }}" />
+						</label>							
 					</div>
-				
+				{% endfor %}
+				</div>	
 			</div>
 
 			<!-- Display border options -->
@@ -91,10 +87,7 @@
 						</label>
 					</div>
 				</div>
-			</div>
-
-			
-			
+			</div>			
 			
 			<!-- Display color options -->
 			<div class="form-group">
@@ -124,17 +117,12 @@
 				</div>
 			</div>
 			
-			<!-- input class="btn btn-primary col-sm-offset-4" type="submit" value="Create Award"> -->
 			<div class="form-group">
 				<div class="col-sm-6 col-sm-offset-4">
 					<button name="preview-btn" class="btn btn-primary" type="submit">Preview Award</button>
 					<button name="email-btn" class="btn btn-primary" type="submit">Email Award</button>
 				</div>
 			</div>
-
 		</form>
-
 	</div>
-
-
 {% endblock content %}
