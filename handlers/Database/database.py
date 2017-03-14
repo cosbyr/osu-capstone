@@ -276,8 +276,6 @@ class PostgresDatabase(object):
 		try:
 			db.session.commit()
 		except IntegrityError:
-			print(e,file=sys.stderr)
-			sys.stdout.flush()
 			db.session.rollback()
 			return False
 			
