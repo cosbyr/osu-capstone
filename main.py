@@ -1,5 +1,5 @@
 from __future__ import print_function #debug
-import sys,os #sys debug
+import os
 import logging
 import json, boto3
 from handlers.LaTex import award as ah
@@ -714,7 +714,8 @@ def renderEmployees():
 	else:
 		abort(401)
 
-		
+
+#remove employee route		
 @app.route('/remove-employee/')
 def removeEmployee():
 	'''
@@ -744,9 +745,17 @@ def removeEmployee():
 	return redirect(url_for('renderEmployees', employees=employees, username=session['name'], email=session['email']))
 
 
-###	
+#get account password route
 @app.route('/get-password',methods=['POST'])
 def getPassword():
+	'''
+	receive json request containing the email linked to the account requesting a password reset
+	and then find that account in the database. if such an account exists, identify its role and
+	get the account details, namely the password. extract the reset method from the json request
+	and return either the security questions linked to the account or send an email to the account
+	holder with a verification code that will enable them to reset their password.
+	'''
+	
 	if request.json:
 		payload = request.get_json()
 		user = alchemist.findUser(payload['email'])
@@ -776,9 +785,16 @@ def getPassword():
 		abort(400)
 
 
-###
+#reset password (via email/verification code) route
 @app.route('/reset-password', methods=['GET', 'POST'])
 def resetPasswordViaEmail():
+	'''
+	GET: render reset password page
+	POST: get form data, validate verfication code and reset account password, then
+	display a status message before rendering the login page (if reset was successful)
+	or the reset password page (if unsuccessful).
+	'''
+	
 	if request.method == 'GET':
 		return render_template('/reset-password.html')
 		
@@ -794,9 +810,14 @@ def resetPasswordViaEmail():
 		return redirect(url_for('renderLogin'))
 		
 
-###
+#reset password by security question route
 @app.route('/reset-pass-via-question', methods=['POST'])
 def resetPasswordViaQuestion():
+	'''
+	POST: get form data, validate the answers given for the security questions then
+	display a status message before rendering the login page.
+	'''
+	
 	payload = request.form
 	status = alchemist.resetPasswordByQuestions(payload)
 	
@@ -807,9 +828,14 @@ def resetPasswordViaQuestion():
 	return redirect(url_for('renderLogin'))
 		
 
-###		
+#validate security questions route
 @app.route('/check-questions',methods=['POST'])
 def checkQuestions():
+	'''
+	get json request containing the answers to an account's security questions,
+	verify those answers against data in the database and return the status.
+	'''
+	
 	if request.json:
 		payload = request.get_json()
 		response = alchemist.verifyAnswers(payload)
@@ -818,7 +844,8 @@ def checkQuestions():
 	else:
 		abort(400)
 
-		
+
+#ensures a user is logged in to the application		
 @loginManager.user_loader
 def accountLoader(id):
 	return alchemist.getAccount(id)
@@ -828,7 +855,8 @@ def accountLoader(id):
 def jquerytest():
     return render_template('jquery.html')
 
-	
+
+#handles server errors	
 @app.errorhandler(500)
 def serverError(e):
     # Log the error and stacktrace.
@@ -836,24 +864,28 @@ def serverError(e):
     return 'An internal error occurred: ' + str(e), 500
 
 
+#handles resource not found errors, i.e. when queried data is not found in the database
 @app.errorhandler(404)
 def resourceNotFoundError(e):
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred: ' + str(e), 400
 
-	
+
+#handles errors that occur when users access routes they are not authorized to view	
 @app.errorhandler(401)
 def unauthorizedError(e):
     return '<h1>You are not authorized to access this page.</h1> \
 	<p>Please login <a href=/login>here</a></p>', 401
 
-	
+
+#handles errors that arise when a request is malformed	
 @app.errorhandler(400)
 def badRequestError(e):
     logging.exception('An error occurred during a request.')
     return 'An internal error occurred: ' + str(e), 400
 
-	
+
+#main	
 if __name__ == "__main__":
     app.run()
 
