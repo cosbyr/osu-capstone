@@ -528,24 +528,4 @@ class PostgresDatabase(object):
 			return self.save(type)
 		
 		return False
-			
-		
-	
-	def createRootAdmin(self):
-		pword = argon2.using(rounds=4).hash('root')
-		quest1 = 1
-		quest2 = 2
-		answ1 = 'root'
-		answ2 = 'root'
-		email = 'root@admin.com'
-		fname = 'Root'
-		lname = 'Admin'
-		created = datetime.now()
-		
-		account = self.Account(pword,quest1,quest2,answ1,answ2,created)
-		admin = self.Admin(account,email,fname,lname)
-		
-		db.session.add(account)
-		db.session.add(admin)
-		db.session.commit()
 	
