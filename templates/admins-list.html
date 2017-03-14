@@ -1,16 +1,10 @@
+ <!-- lists admins -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<!--
-	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
-	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
-	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
-	<li class="active" data-toggle="tab"><a href="/admins"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
-	<li><a href="/new-admin-account"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
-	<li><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
-	-->
+	<!-- navbar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li class="dropdown">
 		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -44,6 +38,7 @@
 {% endblock activeNav %}
 
 {% block content %}
+	<!-- table of all existing admins -->
 	<div class="container">
 		<div class="table-responsive">
 			{% if admins|length > 0 %}
@@ -65,6 +60,7 @@
 				</tr>
 				{% endfor %}
 			</table>
+			<!-- if there are no admins show message -->
 			{% else %}
 			<p>There are no admins other than yourself in the system.</p>
 			{% endif %}

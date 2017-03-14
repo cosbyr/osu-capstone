@@ -1,16 +1,10 @@
+<!-- In Admin view: Lets admins view current and add new award types -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
-	<!--
-	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
-	<li><a href="/users"><span class="glyphicon glyphicon-user"></span> View Users</a></li>
-	<li><a href="/new-manager-account"><span class="glyphicon glyphicon-plus-sign"></span> Add New User</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-globe"></span> View Admins</a></li>
-	<li><a href="#"><span class="glyphicon glyphicon-plus"></span> Add New Admin</a></li>
-	<li class="active" data-toggle="tab"><a href="/reports"><span class="glyphicon glyphicon-dashboard"></span> Reporting Dashboard</a></li>
-	-->
+	<!-- Navbar -->
 	<li><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li class="dropdown">
 		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -47,6 +41,7 @@
 	<div class="container">
 		<h1>View and add award types</h1>
 		<br>
+		<!-- pulls in current awards from database -->
 		<div class="row">
 			<label class="col-sm-4 control-label text-right" for="award-types-list">Current Award Types</label>
 			<div class="col-sm-6">
@@ -61,7 +56,7 @@
 	<br>
 		<div class="row"><div class="col-sm-8 col-sm-offset-2"><hr style="border-color:#337aa1; border-width:2px"></div></div>
 		<br>
-
+		<!-- form to create new award type -->
 		<form class="form-horizontal" action="/award-types" method="post">
 			<div class="form-group">
 				<label class="col-sm-4 control-label" for="awardType">Create New Award Type</label>

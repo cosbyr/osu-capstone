@@ -1,8 +1,10 @@
+<!-- admin home page -->
 {% extends "loggedInBase.html" %}
 
 {% block title %}<title>Capstone Project</title>{% endblock title %}
 
 {% block activeNav %}
+	<!-- navbar -->
 	<li class="active" data-toggle="tab"><a href="/admin"><span class="glyphicon glyphicon-home"></span> Admin Home</a></li>
 	<li class="dropdown">
 		<a href="#"  data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
@@ -40,7 +42,7 @@
 		<h1>Admin Home</h1>
 		<hr>
 		<div class="row">
-		<!-- users -->
+		<!-- users section -->
 			<div class="col-sm-6 col-md-3">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
@@ -53,7 +55,7 @@
 					</div>
 				</div>
 			</div>
-			<!-- admins -->
+			<!-- admins section-->
 			<div class="col-sm-6 col-md-3">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
@@ -66,7 +68,7 @@
 					</div>
 				</div>
 			</div>
-			<!-- Awards -->
+			<!-- Awards section-->
 			<div class="col-sm-6 col-md-3">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
@@ -79,6 +81,7 @@
 					</div>
 				</div>
 			</div>
+			<!-- reporting section -->
 			<div class="col-sm-6 col-md-3">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
