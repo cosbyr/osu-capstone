@@ -12,28 +12,28 @@ from flask import Flask, render_template, send_file, abort, request, redirect, u
 from flask_cors import CORS, cross_origin
 from flask_login import LoginManager, login_required, current_user, login_user, logout_user
 
+#"constants" used to change the color of messages flashed to the 
+#screen after CRUD operations performed by the user
 ERROR = 'red'
 SUCCESS = 'green'
 
+#init Flask framework
 app = Flask('app',template_folder='./templates',static_folder='./static')
 app.secret_key = os.environ['SECRET_KEY']
 
+#init CORS
 CORS(app)
 
+#connect database to application
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 database.db.init_app(app)
 
+#init Flask login functionality
 loginManager = LoginManager()
 loginManager.init_app(app)
 
-'''
-#this was used to create the database 
-from handlers.Database import models
-with app.app_context():
-	database.db.create_all()
-	database.db.session.commit()
-'''
 
+#init object that will handle database operations
 alchemist = database.PostgresDatabase(
 models.Question,
 models.Account,
@@ -46,18 +46,29 @@ models.AwardTheme,
 models.Employee,
 models.AwardBorder)
 
+#init object that will handle email functionality
 emailer = email.Emailer()
 
+#init object that will handle report data retrieval
 reporter = report.Reporter(alchemist.database)
 
+#landing page route
 @app.route('/')
 def renderIndex():
-	#alchemist.createRootAdmin()
+	#render the landing page
 	return render_template('index.html')
 
-	
+
+#login page route
 @app.route('/login',methods=['GET','POST'])
 def renderLogin():
+	'''
+	GET: render login page
+	POST: using data provided by the login form, validate the user's credentials and
+	display a status message regarding the state of the login. Relevant session variables
+	are saved (email, role, name and title(if regular user)).
+	'''
+	
 	if request.method == 'GET':			
 		return render_template('login.html')
 	
@@ -76,6 +87,7 @@ def renderLogin():
 
 		if status == True:
 			login_user(response['account'])
+			
 			if payload['account-type'] == 'admin':
 				session['name'] = '{0} {1}'.format(response['account'].admin.fname,response['account'].admin.lname)
 				return redirect(url_for('renderAdmin'))
@@ -87,43 +99,61 @@ def renderLogin():
 			abort(401)
 			
 
+#logout page route
 @app.route('/logout')
 def renderLogout():
+	'''logout the user and render the logout page'''
+	
 	alchemist.setAuthenticated(current_user,False)
 	logout_user()
 	return render_template('logout.html')
 
-	
+
+#admin portal route	(admin user must be logged in to access this page)
 @app.route('/admin')
 @login_required
 def renderAdmin():
+	'''render the admin portal'''
+	
 	if session['role'] == 'admin':
 		return render_template('admin.html', username=session['name'],email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
 
+		
 @app.route('/admins')
 @login_required
-def renderAdmins():
+def renderAdmins():	
 	if session['role'] == 'admin':
 		admins = alchemist.getAdmins(session['email'])
 		return render_template('admins-list.html', admins=admins, username=session['name'], email=session['email'],updateRoute='update-admin-account')
 	else:
 		abort(401)
 
+		
+#regular user portal route (regular user must be logged in to access this page)
 @app.route('/user')
 @login_required
 def renderUser():
-	#return render_template('user.html',details=details)
+	'''render the user portal'''
+	
 	if session['role'] == 'user':
 		return render_template('user.html',username=session['name'],email=session['email'])
 	else:
 		abort(401)
 
 
+#update account route (regular user must be logged in to access this page)
 @app.route('/update-account',methods=['GET','POST'])
 @login_required
-def renderUpdateAccount():	
+def renderUpdateAccount():
+	'''
+	after ensuring a regular user is accessing the route...
+	GET: retrieve the logged in user's account details from the database and then render the page
+	POST: get form data and update the user's account in the database. save the updated user details
+	in the session dictionary and display a status message
+	'''
+	
 	if session['role'] == 'user':
 		if request.method == 'GET':
 			details = alchemist.getUserDetails(session['email'])
@@ -150,9 +180,15 @@ def renderUpdateAccount():
 		abort(401)
 	
 
+#create award route (regular user must be logged in to access this page)
 @app.route('/create')
 @login_required
 def renderCreate():
+	'''
+	after ensuring a regular user is accessing the route, retrieve award assets from the database 
+	and then render the page.
+	'''
+	
 	if session['role'] == 'user':
 		awardBackgrounds = alchemist.getAwardBackgrounds()
 		awardThemes = alchemist.getAwardThemes()
@@ -161,8 +197,17 @@ def renderCreate():
 	else:
 		abort(401)
 
+
+#create new regular user account route		
 @app.route('/new-account',methods=['GET','POST'])
 def renderNewAccount():
+	'''
+	GET: get the list of available security questions from the database, then render the page
+	POST: get form data, use that data to insert account information into the database and
+	then display a status message before rendering the login (if successful) or new account
+	page (if unsuccessful). 
+	'''
+	
 	if request.method == 'GET':
 		questions = alchemist.getQuestions()
 		return render_template('new-account.html',questions=questions)
@@ -226,6 +271,7 @@ def renderUpdateAdminAccount():
 	else:
 		abort(401)
 
+		
 @app.route('/update-other-admin-account/',methods=['GET','POST'])
 @login_required
 def renderUpdateOtherAdminAccount():	
@@ -250,6 +296,7 @@ def renderUpdateOtherAdminAccount():
 		return redirect(url_for('renderAdmins'))
 	else:
 		abort(401)
+
 		
 @app.route('/remove-admin/')
 def removeAdminUser():
@@ -263,7 +310,7 @@ def removeAdminUser():
 	flash('Admin deleted.', SUCCESS)
 	return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
 		
-		
+	
 @app.route('/new-manager-account',methods=['GET','POST'])
 @login_required
 def renderNewUserAccount():
@@ -313,6 +360,7 @@ def renderUpdateUserAccount():
 	else:
 		abort(401)
 
+		
 @app.route('/new-employee', methods=['GET','POST'])
 @login_required
 def addNewEmployee():
@@ -331,6 +379,7 @@ def addNewEmployee():
 	flash('Employee Added: ' + employee.fname +' '+ employee.lname ,SUCCESS)
 	return redirect(url_for('renderEmployees', username=session['name'], email=session['email']))
 
+	
 @app.route('/update-employee/',methods=['GET','POST'])
 @login_required
 def renderUpdateEmployee():	
@@ -357,9 +406,16 @@ def renderUpdateEmployee():
 	else:
 		abort(401)	
 
+
+#view awards route (regular user must be logged in to access this page)
 @app.route('/awards')
 @login_required
 def renderAwards():
+	'''
+	after ensuring a regular user is accessing the route, get all awards that user has 
+	created from the database and then render the page.
+	'''
+	
 	if session['role'] == 'user':
 		awards = alchemist.getAwards(session['email'])
 		return render_template('user-awards-list.html', awards=awards, username=session['name'], email=session['email'])
@@ -376,9 +432,17 @@ def renderUsers():
 	else:
 		abort(401)
 	
-	
+
+#remove awards route
 @app.route('/remove-award/')
 def removeAward():
+	'''
+	get the id of the award to be removed (retrieved from the page),
+	find that award in the database, remove it and then display a status message.
+	retrieve all remaining awards from the database so that they can be displayed
+	once the page is reloaded.
+	'''
+	
 	awardID = request.args.get('awd')
 	award = alchemist.getAward(awardID)
 	status = alchemist.remove(award)
@@ -390,8 +454,17 @@ def removeAward():
 	return redirect(url_for('renderAwards', awards=awards, username=session['name'], email=session['email']))
 	
 	
+#remove user route
 @app.route('/remove-user/')
 def removeUser():
+	'''
+	get the id of the user to be removed (retrieved from the page),
+	find that user in the database, remove them (as well as their 
+	signature image from the s3 bucket) and then display a status message.
+	retrieve all remaining users from the database so that they can be displayed
+	once the page is reloaded.
+	'''
+	
 	userID = request.args.get('usr')
 	user = alchemist.getUser(userID)
 	users = alchemist.getUsers()
@@ -415,9 +488,17 @@ def removeUser():
 	return redirect(url_for('renderUsers', users=users, username=session['name'], email=session['email']))
 		
 
+#list/add award types route (admin user must be logged in to access this page)
 @app.route('/award-types',methods=['GET','POST'])
 @login_required
 def renderAwardTypes():
+	'''
+	after ensuring an admin user is accessing the route...
+	GET: get all available award types from database and render the page
+	POST: get form data, add that data into the database and then display a status message
+	before reloading the page.
+	'''
+	
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			types = alchemist.getAwardTypes()
@@ -433,9 +514,19 @@ def renderAwardTypes():
 	else:
 		abort(401)
 
+
+#display reports route (admin user must be logged in to access this route)
 @app.route('/reports',methods=['GET','POST'])
 @login_required
 def renderReports():
+	''' 
+	after ensuring an admin user is accessing the route...
+	GET: render the page
+	POST: receive a json request object containing a report code from a button on the page. 
+	retrieve the appropriate data needed to generate the selected report and then return that data
+	as a json object
+	'''
+	
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			return render_template('reports.html',username=session['name'], email=session['email'],updateRoute='update-admin-account')
@@ -493,19 +584,20 @@ def delete_s3():
 	return json.dumps({'status': "success"})
 	
 
-	
+#forgot password route
 @app.route('/password')
 def renderPassword():
+	'''render forgot password page'''
+	
 	return render_template('password.html')
 
-
+	
+#award pdf generation route (a regular user must be logged in to make post requests to the this route)
 @app.route('/latex', methods=['POST'])
 @login_required
 def renderPDF():
+	#get form data and insert that data into the database
 	payload = request.form
-	print('HERE-----> {0}'.format(payload),file=sys.stderr)
-	sys.stdout.flush()
-	
 	award = alchemist.createAward(payload, session['email'])
 	
 	if award is None:
@@ -515,15 +607,18 @@ def renderPDF():
 			
 	if status == False:
 		abort(500)
-				
+	#----------------------------------------------------
+	
+	#form the filename used to retrieve signature from the s3 bucket
 	sigFile = session['email']
 	sigFile = replace(sigFile,'@','_')
 	sigFile = replace(sigFile,'.','_')
 	sigFile += '_sig.png'
 	
-
+	#download the signagure image from the bucket
 	alchemist.downloadUserSig(session['email'])
 	
+	#LaTex code used to generate the two different award borders
 	if payload['border'] == '1':
 		border = r'''{\border \char113} % up left
 				{\border \char109} % up
@@ -543,6 +638,7 @@ def renderPDF():
 				{\border \char003} % bottom
 				{\border \char007} % lower right'''
 	
+	#form award details to be inserted into the LaTex template
 	filename = 'award'
 	
 	awardDate = award.issuedOn
@@ -561,41 +657,54 @@ def renderPDF():
 	'adminTitle':session['title'],
 	'signature':sigFile,
 	'granted':awardDateString}
+	#------------------------------------------------------------
 	
+	#generate the pdf file
 	employeeAward = ah.Award(awdDetails,filename)
 	pdf = employeeAward.genAward()
 	
-
+	#if pdf was successfully generated...
 	if pdf is not None:
+		#if the user elects to preview the award, then remove the award from the database
+		#download the pdf to the user's local machine
 		if 'preview-btn' in payload:
 			alchemist.remove(award)
 			return send_file(pdf, as_attachment=True)
+		#otherwise, email the pdf to the employee specified in the form
 		elif 'email-btn' in payload:				
 			sender = session['email']
 			recipient = award.employee.email
 			response = emailer.sendAward(sender,recipient,pdf)
 			
+			#display a status message
 			if response.status_code != 200 and response.status_code != 202:
 				flash('An error occured and the email was not sent. Please, try again.',ERROR)
 			else:
 				flash('The award has been emailed.',SUCCESS)
 				
 			return redirect(url_for('renderCreate'))
+	#otherwise, remove the award from the database and display an error
 	else:
 		alchemist.remove(award)
 		abort(500)
 
-	
+#get a list of employees route
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
-	print(type(request))
-	sys.stdout.flush()
+	'''
+	receives a json request with a string representing all or part of an 
+	employee's last name. this data is then used to query the database 
+	for all employees with last names matching that string.
+	'''
+	
 	if request.json:
 		payload = request.get_json()
 		employees = alchemist.getEmployees(payload)
 		return jsonify(employees)
 	else:
 		abort(400)
+
+		
 		
 @app.route('/employees-list')
 def renderEmployees():
@@ -605,8 +714,18 @@ def renderEmployees():
 	else:
 		abort(401)
 
+		
 @app.route('/remove-employee/')
 def removeEmployee():
+	'''
+	get the id of the employee to be removed (retrieved from the page),
+	find that employee in the database, remove it and then display a status message.
+	retrieve all remaining employees from the database so that they can be displayed
+	once the page is reloaded. a check is then made to ensure that there are no awards
+	in the database that lack both a creator and a recipient. if such an award is found,
+	it is removed from the database.
+	'''
+	
 	userID = request.args.get('employee')
 	employee = alchemist.getEmployee(userID)
 	employees = alchemist.getAllEmployees()
@@ -623,7 +742,9 @@ def removeEmployee():
 	
 	flash('Employee deleted.', SUCCESS)
 	return redirect(url_for('renderEmployees', employees=employees, username=session['name'], email=session['email']))
-		
+
+
+###	
 @app.route('/get-password',methods=['POST'])
 def getPassword():
 	if request.json:
@@ -655,6 +776,7 @@ def getPassword():
 		abort(400)
 
 
+###
 @app.route('/reset-password', methods=['GET', 'POST'])
 def resetPasswordViaEmail():
 	if request.method == 'GET':
@@ -672,6 +794,7 @@ def resetPasswordViaEmail():
 		return redirect(url_for('renderLogin'))
 		
 
+###
 @app.route('/reset-pass-via-question', methods=['POST'])
 def resetPasswordViaQuestion():
 	payload = request.form
@@ -683,7 +806,8 @@ def resetPasswordViaQuestion():
 	flash('Password was reset.',SUCCESS)
 	return redirect(url_for('renderLogin'))
 		
-		
+
+###		
 @app.route('/check-questions',methods=['POST'])
 def checkQuestions():
 	if request.json:
