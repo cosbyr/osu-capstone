@@ -1,21 +1,22 @@
 from __future__ import print_function #debug
-import sys #debug
 from datetime import datetime
 
 from handlers.Database import models
 
+#this class provides a blueprint for objects that produce data for the google charts api
 class Reporter(object):
+	#attach access to the database to the object
 	def __init__(self,database):
 		self.db = database
 	
-	
+	#this functions forms the data needed for the All Awards report
 	def getAllAwards(self):
+		#"constants"
 		TYPE_INDEX = 0
 		COUNT_INDEX = 1
 		
 		response = {}
 		
-		#awards = self.db.session.query(models.Award).all()
 		#get award count grouped by type
 		awardCount = self.db.session \
 		.query(models.AwardType.name,self.db.func.count(models.Award.type_id)) \
@@ -31,6 +32,7 @@ class Reporter(object):
 		.group_by(models.AwardType.name,models.Award.issuedOn) \
 		.order_by(models.Award.issuedOn).all()
 		
+		#put the results of the preceding queries into the response dictionary
 		if awardCount is not None and awardDates is not None:
 			for a in awardCount:
 				response[a[TYPE_INDEX]] = a[COUNT_INDEX]
@@ -43,7 +45,9 @@ class Reporter(object):
 		return response
 	
 	
+	#this function forms the data needed for the Awards by Employee report
 	def getAwardsByEmployee(self):
+		#"constants"
 		ID = 0
 		FNAME = 1
 		LNAME = 2
@@ -54,7 +58,7 @@ class Reporter(object):
 		#get award types
 		types = self.db.session.query(models.AwardType).all()
 		
-		#get award type count by employee
+		#get award type count grouped by employee
 		awards = self.db.session \
 		.query(models.Award.recipient,models.Employee.fname,models.Employee.lname, models.Employee.email, models.AwardType.name,self.db.func.count(models.Award.type_id)) \
 		.select_from(models.Award) \
@@ -75,6 +79,7 @@ class Reporter(object):
 			#init data dict
 			data = {'employees':[['Name', 'Email']],'awards':[['Employee'] + [t.name for t in types] + [{'role':'annotation'}]],'dates':awardDates}
 			
+			#put the query results into the data dict
 			history = []
 			for a in awards:			
 				if a[ID] not in history:
@@ -96,7 +101,9 @@ class Reporter(object):
 		return data
 	
 	
+	#this function forms the data needed for the Awards by User report
 	def getAwardsByManager(self):
+		#"constants"
 		ID = 0
 		FNAME = 1
 		LNAME = 2
@@ -129,6 +136,7 @@ class Reporter(object):
 			#init data dict
 			data = {'managers':[['Name','Title']],'awards':[['Manager'] + [t.name for t in types] + [{'role':'annotation'}]],'dates':awardDates}
 
+			#put the query results into the data dict
 			history = []
 			for a in awards:			
 				if a[ID] not in history:

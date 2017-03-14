@@ -1,5 +1,14 @@
+'''
+Each class in this file serves as an object relational map for the tables 
+in the underlying database. This is done through the use of Flask-SQLAlchemy.
+In general, each class function serves only to initialize the object (analogous
+to an entry into or already existing in the database) and to represent the object
+as a string. The exceptions to this rule can be found in the Account class which
+contains a number of getter and setter methods.
+'''
+
 from handlers.Database import database
-			
+	
 class Account (database.db.Model):
 	id = database.db.Column(database.db.Integer, primary_key=True)
 	pword = database.db.Column(database.db.String(255), nullable=False)

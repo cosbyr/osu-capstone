@@ -1,7 +1,7 @@
 //loads google charts api
 google.charts.load('current', {packages: ['corechart','table','calendar']});
 
-// handle requests
+//handle requests
 function makeRequest(form,formID){
 	var url = form.attr('action');
 	var type = form.attr('method');
@@ -16,6 +16,7 @@ function makeRequest(form,formID){
 		
 		success: function(response){			
 			if(response['status'] == 200){
+				//select the appropriate report to draw.
 				google.charts.setOnLoadCallback(function(){
 					switch(reportType){
 						case '1':
@@ -107,18 +108,22 @@ function createTableReportDiv(divID){
 //draws a pie chart that displays all awards that have been given so far
 //displays a calendar chart when a piece of the pie is selected by the user
 function drawAllAwardsReport(response){
+	//create chart header
 	let dataTable = new google.visualization.DataTable();
 	dataTable.addColumn('string', 'Award');
 	dataTable.addColumn('number', 'Issued On');
 	
+	//fill chart with data
 	for(key in response){
 		if(key != 'status' && key != 'dates'){
 			dataTable.addRow([key,response[key]])
 		}
 	}
 	
+	//define chart type
 	let chart = new google.visualization.PieChart(document.getElementById('award-report'));
 
+	//draw chart
 	let options = {
 		title: 'All Awards',
 		chartArea:{
