@@ -1,3 +1,12 @@
+'''
+Title: Employee Recognition System
+Authors: Sarah Cawley, Ryan Cosby, and Conrad Lewin
+Oregon State University Capstone Course
+Description: This is the main routing file used to handle all of the server side routing calls for our 
+employee recognition system. The application is used to deliver award recognition emails to employee
+recipients. Admin users are able to monitor users and the number of awards being delivered to employees.
+'''
+
 from __future__ import print_function #debug
 import os
 import logging
@@ -120,10 +129,11 @@ def renderAdmin():
 	else:
 		abort(401)
 
-		
+# admin listing rout		
 @app.route('/admins')
 @login_required
 def renderAdmins():	
+	'''renders a table of all of the admins in the system'''
 	if session['role'] == 'admin':
 		admins = alchemist.getAdmins(session['email'])
 		return render_template('admins-list.html', admins=admins, username=session['name'], email=session['email'],updateRoute='update-admin-account')
@@ -224,9 +234,15 @@ def renderNewAccount():
 		flash('Account created.',SUCCESS)
 		return redirect(url_for('renderLogin'))
 
-		
+#create a new admin account route		
 @app.route('/new-admin-account',methods=['GET','POST'])
 def renderNewAdminAccount():
+	'''
+	GET: renders the new admin account submittal form
+	POST: get form data, use that data to insert account information into the database and
+	then display a status message before rendering the login (if successful) or new account
+	page (if unsuccessful)
+	'''
 	if request.method == 'GET':
 		questions = alchemist.getQuestions()
 		return render_template('new-admin-account.html',questions=questions, username=session['name'], email=session['email'],updateRoute='update-admin-account')
@@ -243,10 +259,16 @@ def renderNewAdminAccount():
 		flash('Admin account created.',SUCCESS)
 		return redirect(url_for('renderAdmin', username=session['name'], email=session['email']))
 
-		
+#update current logged in admin account route here		
 @app.route('/update-admin-account/',methods=['GET','POST'])
 @login_required
 def renderUpdateAdminAccount():	
+	'''
+	GET: renders the update admin account submittal form
+	POST: get form data, use that data to update account information into the database and
+	then display a status message before rendering the login (if successful) or new account
+	page (if unsuccessful)
+	'''
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			details = alchemist.getAdminDetails(session['email'])
@@ -271,10 +293,16 @@ def renderUpdateAdminAccount():
 	else:
 		abort(401)
 
-		
+#update other admin account route		
 @app.route('/update-other-admin-account/',methods=['GET','POST'])
 @login_required
-def renderUpdateOtherAdminAccount():	
+def renderUpdateOtherAdminAccount():
+	'''
+	GET: renders the update admin account submittal form
+	POST: get form data, use that data to update account information into the database and
+	then display a status message before rendering the login (if successful) or new account
+	page (if unsuccessful)
+	'''
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			session['admin-email'] = request.args.get('adminemail')
@@ -297,9 +325,13 @@ def renderUpdateOtherAdminAccount():
 	else:
 		abort(401)
 
-		
+#delete admin account route		
 @app.route('/remove-admin/')
 def removeAdminUser():
+	'''
+	Finds the selected admin account from the admin listing table and deletes the account. 
+	The admin list is rendered again to show the account has been removed
+	'''
 	adminID = request.args.get('admin')
 	admin = alchemist.getAdmin(adminID)
 	status = alchemist.remove(admin.account)
@@ -310,10 +342,16 @@ def removeAdminUser():
 	flash('Admin deleted.', SUCCESS)
 	return redirect(url_for('renderAdmins', admins=admins, username=session['name'], email=session['email']))
 		
-	
+#create a new standard user account from admin login	
 @app.route('/new-manager-account',methods=['GET','POST'])
 @login_required
 def renderNewUserAccount():
+	'''
+	GET: renders the new user account submittal form
+	POST: get form data, use that data to insert account information into the database and
+	then display a status message before rendering the login (if successful) or new account
+	page (if unsuccessful)
+	'''
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			questions = alchemist.getQuestions()
@@ -333,10 +371,16 @@ def renderNewUserAccount():
 	else:
 		abort(401)
 		
-
+# update standard user account from admin login
 @app.route('/update-manager-account/',methods=['GET','POST'])
 @login_required
-def renderUpdateUserAccount():	
+def renderUpdateUserAccount():
+	'''
+	GET: renders the update account submittal form
+	POST: get form data, use that data to update account information into the database and
+	then display a status message before rendering the login (if successful) or update account
+	page (if unsuccessful)
+	'''	
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			session['manager-email'] = request.args.get('usremail')
@@ -360,10 +404,16 @@ def renderUpdateUserAccount():
 	else:
 		abort(401)
 
-		
+#add new employee route		
 @app.route('/new-employee', methods=['GET','POST'])
 @login_required
 def addNewEmployee():
+	'''
+	GET: renders the new employee submittal form
+	POST: get form data, use that data to insert employee information into the database and
+	then display a status message before rendering the login (if successful) or new employee
+	page (if unsuccessful)
+	'''
 	if request.method == 'GET':
 		return render_template('new-employee.html', username=session['name'], email=session['email'], updateRoute='update-admin-account')
 	
@@ -379,10 +429,16 @@ def addNewEmployee():
 	flash('Employee Added: ' + employee.fname +' '+ employee.lname ,SUCCESS)
 	return redirect(url_for('renderEmployees', username=session['name'], email=session['email']))
 
-	
+#update employee info route	
 @app.route('/update-employee/',methods=['GET','POST'])
 @login_required
-def renderUpdateEmployee():	
+def renderUpdateEmployee():
+	'''
+	GET: renders the update employee submittal form
+	POST: get form data, use that data to update employee information into the database and
+	then display a status message before rendering the login (if successful) or update employee
+	page (if unsuccessful)
+	'''
 	if session['role'] == 'admin':
 		if request.method == 'GET':
 			employeeID = request.args.get('employee')
@@ -422,10 +478,14 @@ def renderAwards():
 	else:
 		abort(401)
 	
-	
+#route to view listing of non-admin users	
 @app.route('/users')
 @login_required
 def renderUsers():
+	'''
+	after ensuring an admin user is accessing the route, get all users in the database
+	and render the table in the page.
+	'''
 	if session['role'] == 'admin':
 		users = alchemist.getUsers()
 		return render_template('users-list.html', users=users, username=session['name'], email=session['email'],updateRoute='update-admin-account')
@@ -551,7 +611,8 @@ def renderReports():
 	else:
 		abort(401)
 
-
+#internal route used to submit signature file to Amazon S3 service
+#Source: https://devcenter.heroku.com/articles/s3-upload-python
 @app.route('/sign_s3/')
 def sign_s3():
 	S3_BUCKET = os.environ.get('S3_BUCKET_NAME')
@@ -575,7 +636,8 @@ def sign_s3():
 		'data': presigned_post,
 		'url': 'https://%s.s3.amazonaws.com/%s' % (S3_BUCKET, file_name)
 	})
-	
+
+#internal route used to delete signature files from the system when user accoutns are deleted	
 @app.route('/delete_s3/')
 def delete_s3():
 	file_name = request.args.get('file_name')
@@ -688,7 +750,7 @@ def renderPDF():
 		alchemist.remove(award)
 		abort(500)
 
-#get a list of employees route
+#get a list of employees route used for create award page
 @app.route('/get-employee',methods=['POST'])
 def getEmployees():
 	'''
@@ -705,7 +767,7 @@ def getEmployees():
 		abort(400)
 
 		
-		
+#get a list of employees route used for employee list page for logged in admin		
 @app.route('/employees-list')
 def renderEmployees():
 	if session['role'] == 'admin':

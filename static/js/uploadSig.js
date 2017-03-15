@@ -1,4 +1,6 @@
-
+	/*
+	  Function determines whether all of the proper form items contain content before signature file is uploaded
+	*/
 	function uploadPreReqs(){
 		uploadButton = document.getElementById("file-load-button");
 		if (document.getElementById("firstName").value &&
@@ -22,6 +24,7 @@
 	
     /*
       Function to carry out the actual POST request to S3 using the signed request from the Python app.
+	  Source: https://devcenter.heroku.com/articles/s3-upload-python
     */
     function uploadFile(file, s3Data, url){
       const xhr = new XMLHttpRequest();
@@ -47,6 +50,9 @@
 	
     /*
       Function to carry out the actual POST request to S3 using the signed request from the Python app.
+	  This function uploads a temporary signature file to the database to keep the browser cache from
+	  loading an older version of the signature file
+	  Source: https://devcenter.heroku.com/articles/s3-upload-python
     */
     function uploadTempFile(file, s3Data, url, filename){
       const xhr = new XMLHttpRequest();
